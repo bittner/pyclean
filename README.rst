@@ -59,14 +59,14 @@ software!)
 Debian
 ------
 
-The Python scripts Debian ships with its `python-minimal`_ and
-`python3-minimal`_ packages can be found at:
+Just for reference, the Python scripts Debian ships with its
+`python-minimal`_ and `python3-minimal`_ packages can be found at:
 
-- `salsa.debian.org/cpython-team/python-defaults
+- pyclean: `salsa.debian.org/cpython-team/python-defaults
   <https://salsa.debian.org/cpython-team/python-defaults/blob/master/pyclean>`__
-- `salsa.debian.org/cpython-team/python3-defaults
+- py3clean: `salsa.debian.org/cpython-team/python3-defaults
   <https://salsa.debian.org/cpython-team/python3-defaults/blob/master/py3clean>`__
-- `salsa.debian.org/debian/pypy
+- pypyclean: `salsa.debian.org/debian/pypy
   <https://salsa.debian.org/debian/pypy/blob/debian/debian/scripts/pypyclean>`__
 
 .. _python-minimal: https://packages.debian.org/stable/python-minimal
@@ -78,6 +78,9 @@ Installation
 .. code:: console
 
     $ pip install pyclean
+
+This installs 3 CLI commands, ``pyclean``, ``py3clean``, ``pypyclean``,
+which are meant to be run for Python 2, Python 3 and PyPy 2.7.
 
 Use pyclean with Tox
 --------------------
@@ -95,6 +98,19 @@ You'll then be able to run it with `Tox`_ like this:
 
 .. code:: console
 
-    tox -e clean
+    $ tox -e clean
 
 .. _Tox: https://tox.readthedocs.io/
+
+Roadmap (for v2.0.0)
+====================
+
+#. Consolidate original Debian scripts into a single code base that
+   serves all target platforms (py27, py3x, pypy2.7, pypy3.5).
+#. Ensure the package is actually tested also on Windows NT and Darwin
+   target machines :-) (AppVeyor and Travis CI).
+#. Reduce the package dependencies to an absolute minimum for maximum
+   portability.
+#. Add additional CLI options to delete debris from builds, testing and
+   packaging (build/, .cache/, dist/, .pytest_cache/, .tox/ and
+   free-form targets).
