@@ -8,16 +8,15 @@ https://salsa.debian.org/debian/pypy/blob/debian/debian/scripts/pypyclean
 Copyright © 2013-2019 Stefano Rivera <stefanor@debian.org>
 """
 import collections
+import errno
 import itertools
 import os
 import shutil
 import subprocess
-import sys
 
 
 def abort(message):
-    print >> sys.stderr, message
-    sys.exit(1)
+    raise SystemExit(message)
 
 
 def package_modules(package):
@@ -65,10 +64,10 @@ def cleanup_namespaces(package, verbose):
                             namespace.replace('.', '/'),
                             '__init__.py')
         if not os.path.exists(init):
-            print 'Missing namespace init: %s' % init
+            print('Missing namespace init: %s' % init)
             continue
         if os.path.getsize(init) != 0:
-            print 'Non-empty init, ignoring: %s' % init
+            print('Non-empty init, ignoring: %s' % init)
             continue
         inits_to_remove.append(init)
 
@@ -130,14 +129,14 @@ def clean_modules(modules, verbose):
         for fn in os.listdir(pycache):
             if fn.endswith('.pyc') and fn.rsplit('.', 2)[0] in basenames:
                 if verbose:
-                    print 'Removing %s' % os.path.join(pycache, fn)
+                    print('Removing %s' % os.path.join(pycache, fn))
                 os.unlink(os.path.join(pycache, fn))
             else:
                 empty = False
 
         if empty:
             if verbose:
-                print 'Pruning %s' % pycache
+                print('Pruning %s' % pycache)
             os.rmdir(pycache)
 
 
@@ -148,7 +147,7 @@ def clean_directories(directories, verbose):
             for dir_ in dirnames:
                 if dir_ == '__pycache__':
                     if verbose:
-                        print 'Removing %s' % os.path.join(dirpath, dir_)
+                        print('Removing %s' % os.path.join(dirpath, dir_))
                     shutil.rmtree(os.path.join(dirpath, dir_))
 
 
