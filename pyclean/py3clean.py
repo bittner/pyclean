@@ -1,52 +1,37 @@
-#! /usr/bin/python3
-# vim: et ts=4 sw=4
+# coding=utf-8
+"""
+Python 3 pyclean implementation.
 
-# Copyright © 2010-2012 Piotr Ożarowski <piotr@debian.org>
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-
-import logging
-import optparse
-import sys
-# glob1() is not in the public documentation, UTSL.
-from glob import glob1
-from os import environ, remove, rmdir
-from os.path import dirname, basename, exists, join, splitext
-sys.path.insert(1, '/usr/share/python3/')
-from debpython import files as dpf
-from debpython.interpreter import Interpreter
-from debpython.version import SUPPORTED, getver, vrepr
-
-
-# initialize script
-logging.basicConfig(format='%(levelname).1s: %(module)s:%(lineno)d: '
-                           '%(message)s')
-log = logging.getLogger(__name__)
-
-"""TODO: move it to manpage
+TODO: move it to manpage
 Examples:
     py3clean -p python3-mako # all .py[co] files and __pycache__ directories from the package
     py3clean /usr/lib/python3.1/dist-packages # python3.1
     py3clean -V 3.3 /usr/lib/python3/ # python 3.3 only
     py3clean -V 3.3 /usr/lib/foo/bar.py # bar/__pycache__/bar.cpython-33.py[co]
     py3clean /usr/lib/python3/ # all Python 3.X
+
+Original source at:
+https://salsa.debian.org/cpython-team/python3-defaults/blob/master/py3clean
+
+Copyright © 2010-2012 Piotr Ożarowski <piotr@debian.org>
 """
+import logging
+import sys
+# glob1() is not in the public documentation, UTSL.
+from glob import glob1
+from os import environ, remove, rmdir
+from os.path import dirname, basename, exists, join, splitext
+
+sys.path.insert(1, '/usr/share/python3/')
+
+from debpython import files as dpf
+from debpython.interpreter import Interpreter
+from debpython.version import SUPPORTED, getver, vrepr
+
+# initialize script
+logging.basicConfig(format='%(levelname).1s: %(module)s:%(lineno)d: '
+                           '%(message)s')
+log = logging.getLogger(__name__)
 
 
 def get_magic_tag_to_remove(version):
@@ -155,56 +140,36 @@ def destroyer(magic_tag=None):  # ;-)
         log.info("removed files: %s", counter)
 
 
-def main():
-    usage = '%prog [-V VERSION] [-p PACKAGE] [DIR_OR_FILE]'
-    parser = optparse.OptionParser(usage, version='%prog DEVELV')
-    parser.add_option('-v', '--verbose', action='store_true', dest='verbose',
-                      help='turn verbose mode on')
-    parser.add_option('-q', '--quiet', action='store_false', dest='verbose',
-                      default=False, help='be quiet')
-    parser.add_option('-p', '--package',
-                      help='specify Debian package name to clean')
-    parser.add_option('-V', dest='version',
-                      help='specify Python version to clean')
-
-    (options, args) = parser.parse_args()
-
-    if options.verbose or environ.get('PYCLEAN_DEBUG') == '1':
+def main(args):
+    """Entry point for Python 3"""
+    if args.verbose or environ.get('PYCLEAN_DEBUG') == '1':
         log.setLevel(logging.DEBUG)
         log.debug('argv: %s', sys.argv)
-        log.debug('options: %s', options)
         log.debug('args: %s', args)
     else:
         log.setLevel(logging.WARNING)
 
-    if options.version:
-        if options.version.endswith('3.1'):  # 3.1, -3.1
+    if args.version:
+        if args.version.endswith('3.1'):  # 3.1, -3.1
             magic_tag = False
         else:
-            magic_tag = get_magic_tag_to_remove(getver(options.version))
+            magic_tag = get_magic_tag_to_remove(getver(args.version))
         d = destroyer(magic_tag)
     else:
         d = destroyer()  # remove everything
     next(d)  # initialize coroutine
 
-    if not options.package and not args:
-        parser.print_usage()
-        exit(1)
+    if args.package:
+        log.info('cleaning package %s', args.package)
+        pfiles = set(dpf.from_package(args.package))
 
-    if options.package:
-        log.info('cleaning package %s', options.package)
-        pfiles = set(dpf.from_package(options.package))
-
-    if args:
-        log.info('cleaning directories: %s', args)
-        files = set(dpf.from_directory(args))
-        if options.package:
+    if args.directory:
+        log.info('cleaning directories: %s', args.directory)
+        files = set(dpf.from_directory(args.directory))
+        if args.package:
             files = files & pfiles
     else:
         files = pfiles
 
     for filename in files:
         d.send(filename)
-
-if __name__ == '__main__':
-    main()

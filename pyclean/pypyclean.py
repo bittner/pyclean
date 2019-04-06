@@ -1,6 +1,12 @@
-#!/usr/bin/pypy
+# coding=utf-8
+"""
+PyPy pyclean implementation.
 
-import argparse
+Original source at:
+https://salsa.debian.org/debian/pypy/blob/debian/debian/scripts/pypyclean
+
+Copyright © 2013-2019 Stefano Rivera <stefanor@debian.org>
+"""
 import collections
 import itertools
 import os
@@ -15,7 +21,7 @@ def abort(message):
 
 
 def package_modules(package):
-    '''Iterate through all python modules in an installed Debian package'''
+    """Iterate through all python modules in an installed Debian package"""
     p = subprocess.Popen(('dpkg', '-L', package), stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
     files, stderr = p.communicate()
@@ -30,7 +36,7 @@ def package_modules(package):
 
 
 def installed_namespaces():
-    '''Return a dictionary of package: frozenset(namespaces)'''
+    """Return a dictionary of package: frozenset(namespaces)"""
     ns_dir = '/usr/lib/pypy/ns'
     ns_by_pkg = {}
     for pkg in os.listdir(ns_dir):
@@ -43,10 +49,10 @@ def installed_namespaces():
 
 
 def cleanup_namespaces(package, verbose):
-    '''Check if a namespace is still being used and, if not:
+    """Check if a namespace is still being used and, if not:
     Remove the __init__.py.
     Remove any pycs related to it.
-    '''
+    """
     ns_by_pkg = installed_namespaces()
     pkg_namespaces = ns_by_pkg.pop(package, None)
     if not pkg_namespaces:
@@ -72,13 +78,13 @@ def cleanup_namespaces(package, verbose):
 
 
 def cleanup_package_modules(package, verbose):
-    '''Iterate through all python modules in an installed Debian package that
+    """Iterate through all python modules in an installed Debian package that
     were in /usr/share/doc/, and previously byte-compiled by
     pypy << 6.0.0+dfsg-2. See #904521
 
     Can be removed once every pypy library has been re-uploaded, since this was
     added.
-    '''
+    """
     p = subprocess.Popen(('dpkg', '-L', package), stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
     files, stderr = p.communicate()
@@ -97,7 +103,7 @@ def cleanup_package_modules(package, verbose):
 
 
 def find_modules(root):
-    '''Iterate through all python modules in directory tree root'''
+    """Iterate through all python modules in directory tree root"""
     if os.path.isfile(root):
         yield root
         return
@@ -109,7 +115,7 @@ def find_modules(root):
 
 
 def clean_modules(modules, verbose):
-    '''Remove all .pyc files for every module specified'''
+    """Remove all .pyc files for every module specified"""
     clean = collections.defaultdict(list)
     for module in modules:
         dir_, basename = os.path.split(module)
@@ -136,7 +142,7 @@ def clean_modules(modules, verbose):
 
 
 def clean_directories(directories, verbose):
-    '''Indiscriminately remove __pycache__ directories'''
+    """Indiscriminately remove __pycache__ directories"""
     for root in directories:
         for dirpath, dirnames, filenames in os.walk(root):
             for dir_ in dirnames:
@@ -146,26 +152,8 @@ def clean_directories(directories, verbose):
                     shutil.rmtree(os.path.join(dirpath, dir_))
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description='Remove byte-compiled files for a package')
-    parser.add_argument('-p', '--package', metavar='PACKAGE',
-                        action='append', default=[],
-                        help='Debian package to byte-compile '
-                             '(may be specified multiple times)')
-    parser.add_argument('directory', nargs='*',
-                        help='Directory tree (or file) to byte-compile')
-    parser.add_argument('-v', '--verbose', action='store_true',
-                        help='Be more verbose')
-    parser.add_argument('-q', '--quiet', action='store_true',
-                        help='Be quiet')
-    args = parser.parse_args()
-
-    if not (args.package or args.directory):
-        parser.error('Either a package or a directory must be specified')
-    if args.quiet and args.verbose:
-        parser.error('--quiet and --verbose cannot both be specified')
-
+def main(args):
+    """Entry point for PyPy"""
     modules_p = set(itertools.chain(*(
         package_modules(package) for package in args.package)))
     modules_d = set(itertools.chain(*(
@@ -192,9 +180,3 @@ def main():
     for package in args.package:
         cleanup_namespaces(package, args.verbose)
         cleanup_package_modules(package, args.verbose)
-
-
-if __name__ == '__main__':
-    main()
-
-# vim: ft=python
