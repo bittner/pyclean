@@ -3,6 +3,8 @@ Command line interface implementation for pyclean.
 """
 import argparse
 
+from . import __version__
+
 
 def parse_arguments():
     """
@@ -10,6 +12,10 @@ def parse_arguments():
     """
     parser = argparse.ArgumentParser(
         description='Remove byte-compiled files for a package')
+
+    parser.add_argument('--version', action='version', version=__version__)
+    parser.add_argument('-V', metavar='VERSION',
+                        help='specify Python version to clean')
     parser.add_argument('-p', '--package', metavar='PACKAGE',
                         action='append', default=[],
                         help='Debian package to byte-compile '
