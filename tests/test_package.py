@@ -12,7 +12,7 @@ def test_package_py2():
     """
     Does collecting/traversing packages for cleaning work for Python 2?
     """
-    exit_status = os.system('pyclean -p foo')
+    exit_status = os.system('pyclean -p python-apt')
     assert exit_status == 0
 
 
@@ -21,7 +21,7 @@ def test_package_py3():
     """
     Does collecting/traversing packages for cleaning work for Python 3?
     """
-    exit_status = os.system('py3clean -p foo')
+    exit_status = os.system('py3clean -p python-apt')
     assert exit_status == 0
 
 
@@ -32,5 +32,5 @@ def test_package_pypy():
     """
     Does collecting/traversing packages for cleaning work for PyPy?
     """
-    exit_status = os.system('pypyclean -p foo')
+    exit_status = os.system('pypyclean -p python-apt')
     assert exit_status == 0

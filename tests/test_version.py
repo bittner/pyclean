@@ -12,7 +12,7 @@ def test_filterversion_py2():
     """
     Does filtering by Python version work when run with Python 2?
     """
-    exit_status = os.system('pyclean -V 3.5 /tmp/foo')
+    exit_status = os.system('pyclean -V 2.7 -p python-apt')
     assert exit_status == 0
 
 
@@ -21,16 +21,15 @@ def test_filterversion_py3():
     """
     Does filtering by Python version work when run with Python 3?
     """
-    exit_status = os.system('py3clean -V 3.5 /tmp/foo')
+    exit_status = os.system('py3clean -V 3.5 -p python-apt')
     assert exit_status == 0
 
 
-@pytest.mark.skipif(platform.python_implementation() != 'PyPy'
-                    or sys.version_info >= (3,),
+@pytest.mark.skipif(platform.python_implementation() != 'PyPy',
                     reason="requires PyPy2")
 def test_filterversion_pypy():
     """
     Does filtering by Python version work when run with PyPy?
     """
-    exit_status = os.system('pypyclean -V 3.5 /tmp/foo')
+    exit_status = os.system('pypyclean -V 2.7 -p python-apt')
     assert exit_status == 0
