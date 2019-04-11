@@ -34,3 +34,14 @@ def test_directory_pypy():
     """
     exit_status = os.system('pypyclean foo')
     assert exit_status == 0
+
+
+@pytest.mark.skipif(platform.python_implementation() != 'PyPy'
+                    or sys.version_info < (3,),
+                    reason="requires PyPy3")
+def test_directory_pypy3():
+    """
+    Does traversing directories for cleaning work for PyPy3?
+    """
+    exit_status = os.system('pypyclean foo')
+    assert exit_status == 0

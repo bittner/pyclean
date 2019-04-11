@@ -34,3 +34,14 @@ def test_entrypoint_pypy():
     """
     exit_status = os.system('pypyclean --help')
     assert exit_status == 0
+
+
+@pytest.mark.skipif(platform.python_implementation() != 'PyPy'
+                    or sys.version_info < (3,),
+                    reason="requires PyPy3")
+def test_entrypoint_pypy3():
+    """
+    Is entrypoint script installed for PyPy3? (setup.py)
+    """
+    exit_status = os.system('pypyclean --help')
+    assert exit_status == 0
