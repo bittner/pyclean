@@ -34,3 +34,14 @@ def test_package_pypy():
     """
     exit_status = os.system('pypyclean -p python-apt')
     assert exit_status == 0
+
+
+@pytest.mark.skipif(platform.python_implementation() != 'PyPy'
+                    or sys.version_info < (3,),
+                    reason="requires PyPy2")
+def test_package_pypy3():
+    """
+    Does collecting/traversing packages for cleaning work for PyPy3?
+    """
+    exit_status = os.system('pypyclean -p python-apt')
+    assert exit_status == 0
