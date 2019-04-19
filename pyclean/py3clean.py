@@ -160,8 +160,9 @@ def main(args):
     next(d)  # initialize coroutine
 
     if args.package:
-        log.info('cleaning package %s', args.package)
-        pfiles = set(dpf.from_package(args.package))
+        for pkg in args.package:
+            log.info('cleaning package %s', pkg)
+            pfiles = set(dpf.from_package(pkg))
 
     if args.directory:
         log.info('cleaning directories: %s', args.directory)
