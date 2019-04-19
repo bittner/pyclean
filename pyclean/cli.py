@@ -14,7 +14,7 @@ def parse_arguments():
         description='Remove byte-compiled files for a package')
 
     parser.add_argument('--version', action='version', version=__version__)
-    parser.add_argument('-V', metavar='VERSION',
+    parser.add_argument('-V', metavar='VERSION', dest='version',
                         help='specify Python version to clean')
     parser.add_argument('-p', '--package', metavar='PACKAGE',
                         action='append', default=[],

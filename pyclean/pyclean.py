@@ -65,10 +65,11 @@ def main(args):
     d.next()  # initialize coroutine
 
     if args.package:
-        log.info('cleaning package %s', args.package)
-        pfiles = dpf.from_package(args.package, extensions=('.py', '.so'))
-        pfiles = add_namespace_files(pfiles, args.package, action=False)
-        pfiles = set(dpf.filter_out_ext(pfiles, ('.so',)))
+        for pkg in args.package:
+            log.info('cleaning package %s', pkg)
+            pfiles = dpf.from_package(pkg, extensions=('.py', '.so'))
+            pfiles = add_namespace_files(pfiles, pkg, action=False)
+            pfiles = set(dpf.filter_out_ext(pfiles, ('.so',)))
 
     if args.directory:
         log.info('cleaning directories: %s', args.directory)
