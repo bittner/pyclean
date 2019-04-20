@@ -34,7 +34,7 @@ def package_modules(package):
     if p.returncode != 0:
         abort('Unable to list files in %s. Is it installed?' % package)
 
-    for fn in files.splitlines():
+    for fn in str(files).splitlines():
         if fn.endswith('.py'):
             if fn.startswith('/usr/share/doc/'):
                 continue
@@ -127,7 +127,7 @@ def clean_modules(modules, verbose):
         dir_, basename = os.path.split(module)
         clean[dir_].append(os.path.splitext(basename)[0])
 
-    for dir_, basenames in clean.iteritems():
+    for dir_, basenames in clean.items():
         pycache = os.path.join(dir_, '__pycache__')
         if not os.path.exists(pycache):
             continue
