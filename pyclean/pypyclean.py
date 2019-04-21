@@ -16,6 +16,8 @@ import shutil
 import subprocess
 import sys
 
+from functools import reduce
+
 # initialize script
 logging.basicConfig(format='%(levelname).1s: %(module)s:%(lineno)d: '
                            '%(message)s')
