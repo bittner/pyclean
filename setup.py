@@ -26,7 +26,7 @@ setup(
     url=package.__url__,
     packages=find_packages(exclude=['test*']),
     include_package_data=True,
-    keywords=['python', 'bytecode', 'tools'],
+    keywords=['python', 'bytecode', 'cli', 'tools'],
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
