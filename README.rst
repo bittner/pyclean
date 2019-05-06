@@ -7,6 +7,10 @@ Worried about ``.pyc`` files and ``__pycache__`` directories? Fear not!
 Pyclean is here to help. Finally the single-command clean up for Python
 bytecode files in your favorite directories. On any platform.
 
+|video|
+
+`Presented at PyConX`_, Firenze 2019.
+
 .. |latest-version| image:: https://img.shields.io/pypi/v/pyclean.svg
    :alt: Latest version on PyPI
    :target: https://pypi.org/project/pyclean
@@ -22,6 +26,10 @@ bytecode files in your favorite directories. On any platform.
 .. |license| image:: https://img.shields.io/pypi/l/pyclean.svg
    :alt: Software license
    :target: https://github.com/bittner/pyclean/blob/master/LICENSE
+.. |video| image:: https://asciinema.org/a/g8Q2ljghA7W4RD9cb3Xz100Tl.svg
+   :alt: PyClean and its future
+   :target: https://asciinema.org/a/g8Q2ljghA7W4RD9cb3Xz100Tl
+.. _Presented at PyConX: https://slides.com/bittner/pyconx-pyclean/
 
 Wait! What is bytecode?
 -----------------------
