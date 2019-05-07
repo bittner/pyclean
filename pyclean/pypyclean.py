@@ -95,7 +95,8 @@ def cleanup_package_modules(package, verbose):
     """
     p = subprocess.Popen(('dpkg', '-L', package), stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
-    files, stderr = p.communicate()
+    stdout, stderr = p.communicate()
+    files = str(stdout)
     if p.returncode != 0:
         abort('Unable to list files in %s. Is it installed?' % package)
 
