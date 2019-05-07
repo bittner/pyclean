@@ -20,7 +20,7 @@ def test_filterversion_py2():
     """
     Does filtering by Python version work when run with Python 2?
     """
-    with ArgvContext('-V', '2.7', '-p', 'python-apt'):
+    with ArgvContext('pyclean', '-V', '2.7', '-p', 'python-apt'):
         pyclean.cli.pyclean()
 
 
@@ -29,7 +29,7 @@ def test_filterversion_py3():
     """
     Does filtering by Python version work when run with Python 3?
     """
-    with ArgvContext('-V', '3.5', '-p', 'python-apt'):
+    with ArgvContext('py3clean', '-V', '3.5', '-p', 'python-apt'):
         pyclean.cli.py3clean()
 
 
@@ -41,7 +41,7 @@ def test_filterversion_pypy(mock_namespaces):
     """
     Does filtering by Python version work when run with PyPy?
     """
-    with ArgvContext('-V', '2.7', '-p', 'python-apt'):
+    with ArgvContext('pypyclean', '-V', '2.7', '-p', 'python-apt'):
         pyclean.cli.pypyclean()
 
     assert mock_namespaces.called
@@ -55,7 +55,7 @@ def test_filterversion_pypy3(mock_namespaces):
     """
     Does filtering by Python version work when run with PyPy3?
     """
-    with ArgvContext('-V', '3.5', '-p', 'python-apt'):
+    with ArgvContext('pypyclean', '-V', '3.5', '-p', 'python-apt'):
         pyclean.cli.pypyclean()
 
     assert mock_namespaces.called
