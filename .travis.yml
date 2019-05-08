@@ -31,6 +31,8 @@ matrix:
   - env: TOXENV=flake8
   - env: TOXENV=pylint
   - env: TOXENV=bandit
+  - os: osx
+  - os: windows
 
 jobs:
   include:
