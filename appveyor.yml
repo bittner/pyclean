@@ -1,0 +1,18 @@
+---
+image: Visual Studio 2017
+
+environment:
+  matrix:
+  - TOXENV: py27
+  - TOXENV: py34
+  - TOXENV: py35
+  - TOXENV: py36
+  - TOXENV: py37
+
+build: off
+
+install:
+- pip install tox
+
+test_script:
+- tox

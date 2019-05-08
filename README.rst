@@ -1,7 +1,7 @@
 pyclean |latest-version|
 ========================
 
-|build-status| |health| |python-support| |license|
+|travis-build| |appveyor-build| |health| |python-support| |license|
 
 Worried about ``.pyc`` files and ``__pycache__`` directories? Fear not!
 Pyclean is here to help. Finally the single-command clean up for Python
@@ -14,12 +14,15 @@ bytecode files in your favorite directories. On any platform.
 .. |latest-version| image:: https://img.shields.io/pypi/v/pyclean.svg
    :alt: Latest version on PyPI
    :target: https://pypi.org/project/pyclean
-.. |build-status| image:: https://img.shields.io/travis/bittner/pyclean/master.svg
+.. |travis-build| image:: https://img.shields.io/travis/bittner/pyclean/master.svg
    :alt: Build status
    :target: https://travis-ci.org/bittner/pyclean
+.. |appveyor-build| image:: https://img.shields.io/appveyor/ci/bittner/pyclean/master.svg
+   :alt: Build status
+   :target: https://ci.appveyor.com/project/bittner/pyclean
 .. |health| image:: https://img.shields.io/codacy/grade/69de1364a09f41b399f95afe901826eb/master.svg
-   :target: https://www.codacy.com/app/bittner/pyclean
    :alt: Code health
+   :target: https://www.codacy.com/app/bittner/pyclean
 .. |python-support| image:: https://img.shields.io/pypi/pyversions/pyclean.svg
    :alt: Python versions
    :target: https://pypi.org/project/pyclean
