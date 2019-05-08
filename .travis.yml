@@ -11,6 +11,11 @@ python:
 - pypy2.7-6.0
 - pypy3.5
 
+os:
+- linux
+- osx
+- windows
+
 install:
 - pip install tox-travis
 script:
