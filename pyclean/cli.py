@@ -3,7 +3,7 @@ Command line interface implementation for pyclean.
 """
 import argparse
 
-from . import __version__
+from . import __version__, compat
 
 
 def parse_arguments():
@@ -37,19 +37,14 @@ def parse_arguments():
     return args
 
 
-def pyclean():
-    from . import pyclean
+def main():
+    """
+    Entry point for all scripts
+    """
     args = parse_arguments()
-    pyclean.main(args)
+    impl = compat.get_implementation()
+    impl.main(args)
 
 
-def py3clean():
-    from . import py3clean
-    args = parse_arguments()
-    py3clean.main(args)
-
-
-def pypyclean():
-    from . import pypyclean
-    args = parse_arguments()
-    pypyclean.main(args)
+# aliases (backward-compatibility)
+pyclean = py3clean = pypyclean = main
