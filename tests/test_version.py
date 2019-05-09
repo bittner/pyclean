@@ -15,47 +15,24 @@ import pyclean.cli
 from helpers import ArgvContext
 
 
-@pytest.mark.skipif(sys.version_info >= (3,), reason="requires Python 2")
-def test_filterversion_py2():
-    """
-    Does filtering by Python version work when run with Python 2?
-    """
-    with ArgvContext('pyclean', '-V', '2.7', '-p', 'python-apt'):
-        pyclean.cli.pyclean()
-
-
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
-def test_filterversion_py3():
+@pytest.mark.skipif(platform.python_implementation() != 'CPython',
+                    reason="requires CPython")
+def test_filterversion_py():
     """
     Does filtering by Python version work when run with Python 3?
     """
-    with ArgvContext('py3clean', '-V', '3.5', '-p', 'python-apt'):
-        pyclean.cli.py3clean()
+    with ArgvContext('pyclean', '-V', '3.5', '-p', 'python-apt'):
+        pyclean.cli.main()
 
 
-@pytest.mark.skipif(platform.python_implementation() != 'PyPy'
-                    or sys.version_info >= (3,),
-                    reason="requires PyPy2")
+@pytest.mark.skipif(platform.python_implementation() != 'PyPy',
+                    reason="requires PyPy")
 @patch('pyclean.pypyclean.installed_namespaces', return_value={})
 def test_filterversion_pypy(mock_namespaces):
     """
     Does filtering by Python version work when run with PyPy?
     """
     with ArgvContext('pypyclean', '-V', '2.7', '-p', 'python-apt'):
-        pyclean.cli.pypyclean()
-
-    assert mock_namespaces.called
-
-
-@pytest.mark.skipif(platform.python_implementation() != 'PyPy'
-                    or sys.version_info < (3,),
-                    reason="requires PyPy3")
-@patch('pyclean.pypyclean.installed_namespaces', return_value={})
-def test_filterversion_pypy3(mock_namespaces):
-    """
-    Does filtering by Python version work when run with PyPy3?
-    """
-    with ArgvContext('pypyclean', '-V', '3.5', '-p', 'python-apt'):
-        pyclean.cli.pypyclean()
+        pyclean.cli.main()
 
     assert mock_namespaces.called
