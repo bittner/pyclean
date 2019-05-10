@@ -16,7 +16,7 @@ from pyclean import compat
 @pytest.mark.skipif(platform.python_implementation() != 'CPython'
                     or sys.version_info >= (3,),
                     reason="requires CPython 2")
-def test_get_implementation_py2():
+def test_detect_py2():
     """
     Is pyclean implementation returned for Python 2?
     """
@@ -27,7 +27,7 @@ def test_get_implementation_py2():
 @pytest.mark.skipif(platform.python_implementation() != 'CPython'
                     or sys.version_info < (3,),
                     reason="requires CPython 3")
-def test_get_implementation_py3():
+def test_detect_py3():
     """
     Is py3clean implementation for Python 3?
     """
@@ -37,7 +37,7 @@ def test_get_implementation_py3():
 
 @pytest.mark.skipif(platform.python_implementation() != 'PyPy',
                     reason="requires PyPy")
-def test_get_implementation_pypy():
+def test_detect_pypy():
     """
     Is pypyclean implementation for PyPy?
     """

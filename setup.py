@@ -44,9 +44,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'pyclean = pyclean.cli:pyclean',
-            'py3clean = pyclean.cli:py3clean',
-            'pypyclean = pyclean.cli:pypyclean',
+            'pyclean = pyclean.cli:main',
         ],
     },
 )
