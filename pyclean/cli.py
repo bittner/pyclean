@@ -44,7 +44,3 @@ def main():
     args = parse_arguments()
     impl = compat.get_implementation()
     impl.main(args)
-
-
-# aliases (backward-compatibility)
-pyclean = py3clean = pypyclean = main

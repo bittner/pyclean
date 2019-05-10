@@ -1,9 +1,10 @@
 """
 Cross-Python version compatibility.
 """
-import importlib
 import platform
 import sys
+
+from importlib import import_module
 
 
 def get_implementation():
@@ -23,5 +24,5 @@ def get_implementation():
         sys.version[0],
     )
 
-    module = implementation[python_version]
-    return importlib.import_module(module)
+    module_name = implementation[python_version]
+    return import_module(module_name)
