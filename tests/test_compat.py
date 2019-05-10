@@ -5,11 +5,6 @@ import platform
 import pytest
 import sys
 
-try:
-    from unittest.mock import patch
-except ImportError:  # Python 2.7, PyPy2
-    from mock import patch
-
 from pyclean import compat
 
 
