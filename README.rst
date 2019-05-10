@@ -90,8 +90,32 @@ Installation
 
     $ pip install pyclean
 
-This installs 3 CLI commands, ``pyclean``, ``py3clean``, ``pypyclean``,
-which are meant to be run for Python 2, Python 3 and PyPy 2.7.
+Usage
+=====
+
+.. code:: console
+
+    $ pyclean --help
+
+If you want to explicitly operate the version-specific implementation:
+
+.. code:: console
+
+    $ py2clean --help
+    $ py3clean --help
+    $ pypyclean --help
+
+Clean up all bytecode in the current directory tree, and explain verbosely:
+
+.. code:: console
+
+    $ pyclean -v .
+
+Clean up all bytecode for a Debian package: (may require root permissions)
+
+.. code:: console
+
+    $ pyclean -p python3-keyring
 
 Use pyclean with Tox
 --------------------

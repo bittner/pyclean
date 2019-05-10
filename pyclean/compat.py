@@ -7,10 +7,10 @@ import sys
 from importlib import import_module
 
 
-def get_implementation():
+def get_implementation(override=None):
     """
-    Return a reference to the function that implements
-    pyclean for the active Python version.
+    Detect the active Python version and return a reference to the
+    module serving the version-specific pyclean implementation.
     """
     implementation = dict(
         CPython2='pyclean.pyclean',
@@ -19,10 +19,10 @@ def get_implementation():
         PyPy3='pyclean.pypyclean',
     )
 
-    python_version = '%s%s' % (
+    detected_version = '%s%s' % (
         platform.python_implementation(),
         sys.version[0],
     )
 
-    module_name = implementation[python_version]
+    module_name = implementation[override if override else detected_version]
     return import_module(module_name)
