@@ -3,7 +3,6 @@ Tests for filtering by Python version
 """
 import platform
 import pytest
-import sys
 
 try:
     from unittest.mock import patch
