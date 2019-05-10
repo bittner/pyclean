@@ -15,10 +15,70 @@ from helpers import ArgvContext
 
 def test_entrypoint():
     """
-    Is entrypoint script installed for Python 2? (setup.py)
+    Is entrypoint script installed? (setup.py)
     """
     exit_status = os.system('pyclean --help')
     assert exit_status == 0
+
+
+def test_entrypoint_py2_installed():
+    """
+    Is entrypoint script installed for Python 2? (setup.py)
+    """
+    exit_status = os.system('py2clean --help')
+    assert exit_status == 0
+
+
+@patch('pyclean.compat.import_module')
+def test_entrypoint_py2_working(mock_import_module):
+    """
+    Is entrypoint overriding with Python 2 implementation?
+    """
+    with ArgvContext('py2clean', 'foo'):
+        pyclean.cli.py2clean()
+
+    args, _ = mock_import_module.call_args
+    assert args == ('pyclean.pyclean',)
+
+
+def test_entrypoint_py3_installed():
+    """
+    Is entrypoint script installed for Python 3? (setup.py)
+    """
+    exit_status = os.system('py3clean --help')
+    assert exit_status == 0
+
+
+@patch('pyclean.compat.import_module')
+def test_entrypoint_py3_working(mock_import_module):
+    """
+    Is entrypoint overriding with Python 3 implementation?
+    """
+    with ArgvContext('py3clean', 'foo'):
+        pyclean.cli.py3clean()
+
+    args, _ = mock_import_module.call_args
+    assert args == ('pyclean.py3clean',)
+
+
+def test_entrypoint_pypy_installed():
+    """
+    Is entrypoint script installed for PyPy 2/3? (setup.py)
+    """
+    exit_status = os.system('pypyclean --help')
+    assert exit_status == 0
+
+
+@patch('pyclean.compat.import_module')
+def test_entrypoint_pypy_working(mock_import_module):
+    """
+    Is entrypoint overriding with PyPy implementation?
+    """
+    with ArgvContext('pypyclean', 'foo'):
+        pyclean.cli.pypyclean()
+
+    args, _ = mock_import_module.call_args
+    assert args == ('pyclean.pypyclean',)
 
 
 @patch('pyclean.compat.get_implementation')

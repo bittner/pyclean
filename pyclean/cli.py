@@ -37,10 +37,31 @@ def parse_arguments():
     return args
 
 
-def main():
+def main(override=None):
     """
     Entry point for all scripts
     """
     args = parse_arguments()
-    impl = compat.get_implementation()
+    impl = compat.get_implementation(override=override)
     impl.main(args)
+
+
+def py2clean():
+    """
+    Forces the use of the implementation for Python 2
+    """
+    main('CPython2')
+
+
+def py3clean():
+    """
+    Forces the use of the implementation for Python 3
+    """
+    main('CPython3')
+
+
+def pypyclean():
+    """
+    Forces the use of the implementation for PyPy (2+3)
+    """
+    main('PyPy2')
