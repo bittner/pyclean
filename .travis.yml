@@ -27,15 +27,13 @@ stages:
 - test
 - deploy
 
-matrix:
+jobs:
   allow_failures:
   - env: TOXENV=flake8
   - env: TOXENV=pylint
   - env: TOXENV=bandit
   - os: osx
   - os: windows
-
-jobs:
   include:
   - { stage: lint, python: 3.7, env: TOXENV=flake8 }
   - { stage: lint, python: 3.7, env: TOXENV=pylint }
