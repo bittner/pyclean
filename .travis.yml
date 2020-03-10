@@ -40,8 +40,7 @@ jobs:
   - { stage: lint, python: 3.7, env: TOXENV=readme }
 
   - stage: deploy
-    install: skip
-    script: skip
+    if: tag is present
     deploy:
       provider: pypi
       distributions: sdist bdist_wheel
@@ -50,3 +49,6 @@ jobs:
         secure: iCxu5p6kmlp+ZoFwr29L7HMu6BmaI47OMWONBxMKGKk0R2x6dMSGEA/TRIWg1ioCqgJdsRewreijuZRG1Gg5GopfYt//HU6Hdhn7yApWRwKjIJ5+zmX+5BAdgBQ641jiHt7nZX3jzP2QMuqsEQTytieDNVi96aZpt1AsIvUYMtQ6USY0drGO0sxxYLtsmB2mTyOzHZ4iqu+dn0DqSVWpxttzIMVGyGfyFkAMMCJJPoE5cw3TLsQAiBE0+PCoLvsa8X+HFZH0TNk3AhGfKMlpKnvhji+TNHDpKVBU7cCPLbg7m+HTOEoLy3mAAUBECeciKtfAE4MDyW8OlUMYUhoJm6keHGEfWltukIKUNCy9JqsubiDyTEIA5NeOaO/5fQQAiENAM7tgxtb+MTxFSn14vtvaExt7GxyZtJc0TZk6AYdWr8kyfwSri431qWlSHk6OrC3mgvuq0KkoHOQvqD/DyCxUThlr2HzJ8kHIZqh391e9pnCoHDd7s3dfWyywqHRqzQG1dh52gClIXxwqq9/BcKOg7SAfXYOV0+68MhQ+rOq69vxPbmunMNNlaa2gbg5rkwKMCmIvptlCjwYqniV+BLJ+Sp7Y4HKIwc/SCnWwNqeUKPLzSMuFwo3p1G1NfWUCempeX8e3OJpsSxSVoEvBLM2lotjgF7I9xYUk7TLKsuY=
       on:
         tags: true
+    install: skip
+    script: skip
+    python: 3.7
