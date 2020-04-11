@@ -1,3 +1,10 @@
+# coding=utf-8
+"""
+Python 3 pyclean implementation.
+
+Copyright 2020 James Hansen
+"""
+
 import os
 import argparse
 from os.path import join as os_join
