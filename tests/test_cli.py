@@ -8,9 +8,9 @@ try:
 except ImportError:  # Python 2.7, PyPy2
     from mock import patch
 
-import pyclean.cli
+from cli_test_helpers import ArgvContext
 
-from helpers import ArgvContext
+import pyclean.cli
 
 
 def test_entrypoint():

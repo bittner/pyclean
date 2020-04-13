@@ -2,8 +2,8 @@
 Tests for the cross-Python version compatibility module
 """
 import platform
-import pytest
 import sys
+import pytest
 
 from pyclean import compat
 
