@@ -15,8 +15,8 @@ def test_detect_py2():
     """
     Is pyclean implementation returned for Python 2?
     """
-    from pyclean import pyclean
-    assert compat.get_implementation() is pyclean
+    from pyclean import py2clean
+    assert compat.get_implementation() is py2clean
 
 
 @pytest.mark.skipif(platform.python_implementation() != 'CPython'

@@ -13,7 +13,7 @@ def get_implementation(override=None):
     module serving the version-specific pyclean implementation.
     """
     implementation = dict(
-        CPython2='pyclean.pyclean',
+        CPython2='pyclean.py2clean',
         CPython3='pyclean.py3clean',
         PyPy2='pyclean.pypyclean',
         PyPy3='pyclean.pypyclean',

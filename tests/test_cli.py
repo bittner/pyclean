@@ -38,7 +38,7 @@ def test_entrypoint_py2_working(mock_import_module):
         pyclean.cli.py2clean()
 
     args, _ = mock_import_module.call_args
-    assert args == ('pyclean.pyclean',)
+    assert args == ('pyclean.py2clean',)
 
 
 def test_entrypoint_py3_installed():
