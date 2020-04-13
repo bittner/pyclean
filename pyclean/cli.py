@@ -3,7 +3,7 @@ Command line interface implementation for pyclean.
 """
 import argparse
 
-from . import __version__, compat
+from . import __version__, compat, modern
 
 
 def parse_arguments():
@@ -20,6 +20,8 @@ def parse_arguments():
                         action='append', default=[],
                         help='Debian package to byte-compile '
                              '(may be specified multiple times)')
+    parser.add_argument('--legacy', action='store_true',
+                        help='Use legacy Debian implementation (autodetect)')
     parser.add_argument('directory', nargs='*',
                         help='Directory tree (or file) to byte-compile')
 
@@ -42,8 +44,11 @@ def main(override=None):
     Entry point for all scripts
     """
     args = parse_arguments()
-    impl = compat.get_implementation(override=override)
-    impl.main(args)
+    if override or args.legacy:
+        impl = compat.get_implementation(override=override)
+        impl.main(args)
+    else:
+        modern.pyclean(args)
 
 
 def py2clean():

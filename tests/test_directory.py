@@ -10,5 +10,5 @@ def test_clean_directory():
     """
     Does traversing directories for cleaning work for Python 2?
     """
-    with ArgvContext('pyclean', 'foo'):
+    with ArgvContext('pyclean', '--legacy', 'foo'):
         pyclean.cli.main()

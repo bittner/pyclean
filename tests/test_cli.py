@@ -82,11 +82,22 @@ def test_entrypoint_pypy_working(mock_import_module):
 
 
 @patch('pyclean.compat.get_implementation')
-def test_calls_compat(mock_get_implementation):
+def test_legacy_calls_compat(mock_get_implementation):
     """
-    Does a call to `pyclean` invoke the compat layer?
+    Does calling `pyclean --legacy` invoke the compat layer?
+    """
+    with ArgvContext('pyclean', '--legacy', 'foo'):
+        pyclean.cli.main()
+
+    assert mock_get_implementation.called
+
+
+@patch('pyclean.modern.pyclean')
+def test_default_modern(mock_modern_pyclean):
+    """
+    Does simply calling `pyclean` invoke the modern implementation?
     """
     with ArgvContext('pyclean', 'foo'):
         pyclean.cli.main()
 
-    assert mock_get_implementation.called
+    assert mock_modern_pyclean.called
