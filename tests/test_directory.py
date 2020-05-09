@@ -1,14 +1,14 @@
 """
 Tests for the cleaning logic on folders
 """
-import pyclean.cli
+from cli_test_helpers import ArgvContext
 
-from helpers import ArgvContext
+import pyclean.cli
 
 
 def test_clean_directory():
     """
     Does traversing directories for cleaning work for Python 2?
     """
-    with ArgvContext('pyclean', 'foo'):
+    with ArgvContext('pyclean', '--legacy', 'foo'):
         pyclean.cli.main()
