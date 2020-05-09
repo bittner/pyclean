@@ -68,6 +68,8 @@ def remove_files_and_dirs(files, dirs):
 
 def pyclean(args):
     """Cross-platform cleaning of Python bytecode"""
+    if not args:
+        return
     dirs_to_check, files_to_remove, dirs_to_remove = list(), list(), list()
     for directory in args.directory:
         check_dirs, files, dirs = find_files(directory)
