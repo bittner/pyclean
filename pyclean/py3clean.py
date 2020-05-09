@@ -2,100 +2,175 @@
 """
 Python 3 pyclean implementation.
 
-Copyright 2020 James Hansen
+TODO: move it to manpage
+Examples:
+    py3clean -p python3-mako # all .py[co] files and __pycache__ directories from the package
+    py3clean /usr/lib/python3.1/dist-packages # python3.1
+    py3clean -V 3.3 /usr/lib/python3/ # python 3.3 only
+    py3clean -V 3.3 /usr/lib/foo/bar.py # bar/__pycache__/bar.cpython-33.py[co]
+    py3clean /usr/lib/python3/ # all Python 3.X
+
+Original source at:
+https://salsa.debian.org/cpython-team/python3-defaults/blob/master/py3clean
+
+Copyright © 2010-2012 Piotr Ożarowski <piotr@debian.org>
 """
+import logging
+import sys
+# glob1() is not in the public documentation, UTSL.
+from glob import glob1
+from os import environ, remove, rmdir
+from os.path import dirname, basename, exists, join, splitext
 
-import os
-import argparse
-from os.path import join as os_join
+sys.path.insert(1, '/usr/share/python3/')
 
-def find_files(start_dir: str) -> tuple:
-    """Find all .pyc[o] files as well as all __pycache__ directories.
+from debpython import files as dpf
+from debpython.interpreter import Interpreter
+from debpython.version import SUPPORTED, getver, vrepr
 
-    : param start_dir:
-        * The starting directory to walk through to find files
-          and directories.
-    :type start_dir: str
+# initialize script
+logging.basicConfig(format='%(levelname).1s: %(module)s:%(lineno)d: '
+                           '%(message)s')
+log = logging.getLogger(__name__)
 
-    Returns a tuple of:
-        - a list of directories found that are called __pycache__
-        - a list of .pyc[o] files to remove
-        - a list of directories that can be removed after the files
-          are removed
-    
-    Note that the first and third lists may not be equal.
-    """
-    dirs_to_check = list()
 
-    # Walk the tree and find any directory named __pycache__
-    for root, dirs, files in os.walk(start_dir):
-        if '__pycache__' in dirs:
-            dirs_to_check.append(os_join(root, '__pycache__'))
-
-    files_to_remove = list()
-    dirs_to_remove = list()
-
-    # In the found directories, look for .pyc or .pyco files.
-    for d in dirs_to_check:
-        with os.scandir(d) as dir_it:
-            pyc_count = 0
-            dir_count = 0
-            for item in dir_it:
-                dir_count += 1
-                if item.name.endswith('.pyc') or item.name.endswith('.pyco'):
-                    pyc_count += 1
-                    files_to_remove.append(os_join(d, item.name))
-            # If this is true, we can also unlink the directory
-            # since it will be empty
-            if dir_count == pyc_count:
-                dirs_to_remove.append(d)
-
-    return dirs_to_check, files_to_remove, dirs_to_remove
-
-def remove_files_and_dirs(files: list, dirs: list) -> None:
-    """Removes the named files and directories.
-
-    :param files:
-        * List of files to remove.
-    :param dirs:
-        * List of directories to remove.
-    :type files: list
-    :type dirs: list
-
-    Note, this will swallow OSErrors raised if permissions are
-    wrong or something else fails in the remove operations.
-    It will print an error.
-    """
-    for f_name in files:
+def get_magic_tag_to_remove(version):
+    """Returns magic tag or True if all of them should be removed."""
+    i = Interpreter('python')
+    map_ = {}
+    for v in SUPPORTED:
         try:
-            os.remove(f_name)
-        except OSError as os_err:
-            print(f"Failed to remove {f_name}")
-            print(f"    {str(os_err)}")
-    
-    for dir_name in dirs:
+            map_[v] = i.magic_tag(v)
+        except Exception:
+            log.debug('magic tag for %s not recognized', vrepr(v), exc_info=True)
+    if version not in map_:
         try:
-            os.rmdir(dir_name)
-        except OSError as os_err:
-            print(f"Failed to remove {dir_name}")
-            print(f"    {str(os_err)}")
+            map_[version] = i.magic_tag(version)
+        except Exception as e:
+            log.error('cannot find magic tag for Python %s: %s', vrepr(version), e)
+            exit(4)
 
-def _make_arg_parser() -> argparse.ArgumentParser:
-    """Makes the parser for the command line arguments.
+    tag = map_[version]
+    # skip shared tags
+    for v, t in map_.items():
+        if v == version:
+            continue
+        if t == tag:
+            log.info('magic tag(s) used by python%s. Nothing to remove.',
+                     vrepr(v))
+            exit(0)
+
+    log.debug('magic tags to remove: %s', tag)
+    return tag
+
+
+def destroyer(magic_tag=None):  # ;-)
+    """Remove every .py[co] file associated to received .py file.
+
+    :param magic_tag:
+        * If None, removes all associated .py[co] files from __pycache__
+          directory.  If the resulting directory is empty, and is not a system
+          site package, then the directory is also removed.
+        * If False, removes python3.1's .pyc files only
+        * Otherwise removes given magic tag from __pycache__ directory.  If
+          the resulting directory is empty, and is not a system site package,
+          then the directory is also removed.
+    :type magic_tag: None or False or str
     """
-    parser = argparse.ArgumentParser(description="Removes .pyc files and __pycache__ directories from a tree")
-    parser.add_argument("root_dir",
-                        metavar="ROOT_PATH",
-                        help="Path to start searching for file in.")
-    return parser    
+    if magic_tag is None:
 
-def main(args: argparse.Namespace) -> None:
+        # remove compiled files in __pycache__ directory
+        def find_files_to_remove(pyfile):
+            directory = join(dirname(pyfile), '__pycache__')
+            fname = splitext(basename(pyfile))[0]
+            for fn in glob1(directory, "%s.*" % fname):
+                yield join(directory, fn)
+            # remove "classic" .pyc files as well
+            for filename in ("%sc" % pyfile, "%so" % pyfile):
+                if exists(filename):
+                    yield filename
+            # workaround for http://bugs.python.org/issue22966
+            if '.' in fname:
+                sane_fname = join(dirname(pyfile), fname.split('.', 1)[0])
+                for fn in find_files_to_remove(sane_fname):
+                    yield join(directory, fn)
+    elif magic_tag is False:
+
+        # remove 3.1's .pyc files only
+        def find_files_to_remove(pyfile):  # NOQA
+            for filename in ("%sc" % pyfile, "%so" % pyfile):
+                if exists(filename):
+                    yield filename
+    else:
+
+        # remove .pyc files for no longer needed magic tags
+        def find_files_to_remove(pyfile):  # NOQA
+            directory = join(dirname(pyfile), '__pycache__')
+            fname = splitext(basename(pyfile))[0]
+            for fn in glob1(directory, "%s.%s.py[co]" % (fname, magic_tag)):
+                yield join(directory, fn)
+            # workaround for http://bugs.python.org/issue22966
+            if '.' in fname:
+                sane_fname = join(dirname(pyfile), fname.split('.', 1)[0])
+                for fn in find_files_to_remove(sane_fname):
+                    yield join(directory, fn)
+
+    def myremove(fname):
+        remove(fname)
+        directory = dirname(fname)
+        # remove __pycache__ directory if it's empty
+        if directory.endswith('__pycache__'):
+            try:
+                rmdir(directory)
+            except Exception:
+                pass
+
+    counter = 0
+    try:
+        while True:
+            pyfile = (yield)
+            for filename in find_files_to_remove(pyfile):
+                try:
+                    myremove(filename)
+                    counter += 1
+                except (IOError, OSError) as e:
+                    log.error('cannot remove %s', filename)
+                    log.debug(e)
+    except GeneratorExit:
+        log.info("removed files: %s", counter)
+
+
+def main(args):
     """Entry point for Python 3"""
-    dirs_to_check, files_to_remove, dirs_to_remove = find_files(args.root_dir)
-    print(f"Found {len(files_to_remove)} files to remove in {len(dirs_to_check)} directories. Can remove {len(dirs_to_remove)} directories.")
-    remove_files_and_dirs(files_to_remove, dirs_to_remove)
+    if args.verbose or environ.get('PYCLEAN_DEBUG') == '1':
+        log.setLevel(logging.DEBUG)
+        log.debug('argv: %s', sys.argv)
+        log.debug('args: %s', args)
+    else:
+        log.setLevel(logging.WARNING)
 
-if __name__ == "__main__":
-    parser = _make_arg_parser()
-    args = parser.parse_args()
-    main(args)
+    if args.version:
+        if args.version.endswith('3.1'):  # 3.1, -3.1
+            magic_tag = False
+        else:
+            magic_tag = get_magic_tag_to_remove(getver(args.version))
+        d = destroyer(magic_tag)
+    else:
+        d = destroyer()  # remove everything
+    next(d)  # initialize coroutine
+
+    if args.package:
+        for pkg in args.package:
+            log.info('cleaning package %s', pkg)
+            pfiles = set(dpf.from_package(pkg))
+
+    if args.directory:
+        log.info('cleaning directories: %s', args.directory)
+        files = set(dpf.from_directory(args.directory))
+        if args.package:
+            files = files & pfiles
+    else:
+        files = pfiles
+
+    for filename in files:
+        d.send(filename)
