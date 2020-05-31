@@ -20,7 +20,7 @@ def test_clean_package():
     """
     Does collecting/traversing packages for cleaning work for Python 2+3?
     """
-    with ArgvContext('pyclean', '--legacy', '-p', 'python-apt'):
+    with ArgvContext('pyclean', '--legacy', '-p', 'python'):
         pyclean.cli.main()
 
 
@@ -31,7 +31,7 @@ def test_clean_package_pypy(mock_namespaces):
     """
     Does collecting/traversing packages for cleaning work for PyPy?
     """
-    with ArgvContext('pyclean', '--legacy', '-p', 'python-apt'):
+    with ArgvContext('pyclean', '--legacy', '-p', 'python'):
         pyclean.cli.main()
 
     assert mock_namespaces.called
