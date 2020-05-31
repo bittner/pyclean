@@ -28,7 +28,6 @@ stages:
 
 jobs:
   allow_failures:
-  - env: TOXENV=flake8
   - env: TOXENV=pylint
   - env: TOXENV=bandit
   - os: osx
