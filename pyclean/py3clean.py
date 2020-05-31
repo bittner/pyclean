@@ -2,13 +2,17 @@
 """
 Python 3 pyclean implementation.
 
-TODO: move it to manpage
 Examples:
-    py3clean -p python3-mako # all .py[co] files and __pycache__ directories from the package
-    py3clean /usr/lib/python3.1/dist-packages # python3.1
-    py3clean -V 3.3 /usr/lib/python3/ # python 3.3 only
-    py3clean -V 3.3 /usr/lib/foo/bar.py # bar/__pycache__/bar.cpython-33.py[co]
-    py3clean /usr/lib/python3/ # all Python 3.X
+    # all .py[co] files and __pycache__ directories from the package
+    py3clean -p python3-mako
+    # python3.1
+    py3clean /usr/lib/python3.1/dist-packages
+    # python 3.3 only
+    py3clean -V 3.3 /usr/lib/python3/
+    # bar/__pycache__/bar.cpython-33.py[co]
+    py3clean -V 3.3 /usr/lib/foo/bar.py
+    # all Python 3.X
+    py3clean /usr/lib/python3/
 
 Original source at:
 https://salsa.debian.org/cpython-team/python3-defaults/blob/master/py3clean
@@ -42,12 +46,14 @@ def get_magic_tag_to_remove(version):
         try:
             map_[v] = i.magic_tag(v)
         except Exception:
-            log.debug('magic tag for %s not recognized', vrepr(v), exc_info=True)
+            log.debug('magic tag for %s not recognized', vrepr(v),
+                      exc_info=True)
     if version not in map_:
         try:
             map_[version] = i.magic_tag(version)
         except Exception as e:
-            log.error('cannot find magic tag for Python %s: %s', vrepr(version), e)
+            log.error('cannot find magic tag for Python %s: %s',
+                      vrepr(version), e)
             exit(4)
 
     tag = map_[version]
