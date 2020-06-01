@@ -2,10 +2,11 @@
 """
 Python 2 pyclean implementation.
 
-TODO: move it to manpage
 Examples:
-    pyclean -p python-mako # all .py[co] files from the package
-    pyclean /usr/lib/python2.6/dist-packages # python2.6
+    # all .py[co] files from the package
+    pyclean -p python-mako
+    # python2.6
+    pyclean /usr/lib/python2.6/dist-packages
 
 Original source at:
 https://salsa.debian.org/cpython-team/python-defaults/blob/master/pyclean
