@@ -1,7 +1,7 @@
 pyclean |latest-version|
 ========================
 
-|travis-build| |appveyor-build| |health| |python-support| |license|
+|checks-status| |tests-status| |qa| |health| |python-support| |license|
 
 Worried about ``.pyc`` files and ``__pycache__`` directories? Fear not!
 Pyclean is here to help. Finally the single-command clean up for Python
@@ -14,12 +14,15 @@ bytecode files in your favorite directories. On any platform.
 .. |latest-version| image:: https://img.shields.io/pypi/v/pyclean.svg
    :alt: Latest version on PyPI
    :target: https://pypi.org/project/pyclean
-.. |travis-build| image:: https://img.shields.io/travis/bittner/pyclean/master.svg
-   :alt: Build status
-   :target: https://travis-ci.org/bittner/pyclean
-.. |appveyor-build| image:: https://img.shields.io/appveyor/ci/bittner/pyclean/master.svg
-   :alt: Build status
-   :target: https://ci.appveyor.com/project/bittner/pyclean
+.. |checks-status| image:: https://img.shields.io/github/workflow/status/bittner/pyclean/Checks/master?label=checks
+   :alt: GitHub Workflow Status
+   :target: https://github.com/bittner/pyclean/actions?query=workflow%3AChecks
+.. |tests-status| image:: https://img.shields.io/github/workflow/status/bittner/pyclean/Tests/master?label=tests
+   :alt: GitHub Workflow Status
+   :target: https://github.com/bittner/pyclean/actions?query=workflow%3ATests
+.. |qa| image:: https://img.shields.io/scrutinizer/build/g/bittner/pyclean/master?label=qa
+   :alt: Scrutinizer
+   :target: https://scrutinizer-ci.com/g/bittner/pyclean/
 .. |health| image:: https://img.shields.io/codacy/grade/69de1364a09f41b399f95afe901826eb/master.svg
    :alt: Code health
    :target: https://www.codacy.com/app/bittner/pyclean
