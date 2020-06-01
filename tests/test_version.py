@@ -12,7 +12,7 @@ except ImportError:  # Python 2.7, PyPy2
 
 from cli_test_helpers import ArgvContext
 
-import pyclean.cli
+import pyclean
 
 
 @pytest.mark.skipif(platform.python_implementation() != 'CPython' or
