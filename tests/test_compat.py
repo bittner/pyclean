@@ -9,8 +9,9 @@ import pyclean
 
 
 @pytest.mark.skipif(platform.python_implementation() != 'CPython'
-                    or sys.version_info >= (3,),
-                    reason="requires CPython 2")
+                    or sys.version_info >= (3,)
+                    or platform.system() != 'Linux',
+                    reason="requires CPython 2 on Debian Linux")
 def test_detect_py2():
     """
     Is pyclean implementation returned for Python 2?
@@ -19,8 +20,9 @@ def test_detect_py2():
 
 
 @pytest.mark.skipif(platform.python_implementation() != 'CPython'
-                    or sys.version_info < (3,),
-                    reason="requires CPython 3")
+                    or sys.version_info < (3,)
+                    or platform.system() != 'Linux',
+                    reason="requires CPython 3 on Debian Linux")
 def test_detect_py3():
     """
     Is py3clean implementation for Python 3?

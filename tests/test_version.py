@@ -15,8 +15,10 @@ from cli_test_helpers import ArgvContext
 import pyclean
 
 
-@pytest.mark.skipif(platform.python_implementation() != 'CPython' or
-                    sys.version_info < (3,), reason="requires CPython 3")
+@pytest.mark.skipif(platform.python_implementation() != 'CPython'
+                    or sys.version_info < (3,)
+                    or platform.system() != 'Linux',
+                    reason="requires CPython 3 on Debian Linux")
 @patch('pyclean.py3clean.Interpreter.magic_tag', return_value='{impl}-{ver}'
        .format(
            impl=platform.python_implementation().lower(),  # e.g. "cpython"
@@ -31,8 +33,10 @@ def test_filterversion_py3(mock_magictag):
         pyclean.cli.main()
 
 
-@pytest.mark.skipif(platform.python_implementation() != 'CPython' or
-                    sys.version_info >= (3,), reason="requires CPython 2")
+@pytest.mark.skipif(platform.python_implementation() != 'CPython'
+                    or sys.version_info >= (3,)
+                    or platform.system() != 'Linux',
+                    reason="requires CPython 2 on Debian Linux")
 def test_filterversion_py2():
     """
     Does filtering by Python version work when run with Python 2?
