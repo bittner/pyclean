@@ -25,8 +25,9 @@ def test_clean_package():
         pyclean.cli.main()
 
 
-@pytest.mark.skipif(platform.python_implementation() != 'PyPy',
-                    reason="requires PyPy")
+@pytest.mark.skipif(platform.python_implementation() != 'PyPy'
+                    or platform.system() != 'Linux',
+                    reason="requires PyPy on Debian Linux")
 @patch('pyclean.pypyclean.installed_namespaces', return_value={})
 def test_clean_package_pypy(mock_namespaces):
     """
