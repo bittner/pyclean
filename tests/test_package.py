@@ -14,8 +14,9 @@ from cli_test_helpers import ArgvContext
 import pyclean.cli
 
 
-@pytest.mark.skipif(platform.python_implementation() != 'CPython',
-                    reason="requires CPython")
+@pytest.mark.skipif(platform.python_implementation() != 'CPython'
+                    or platform.system() != 'Linux',
+                    reason="requires CPython on Debian Linux")
 def test_clean_package():
     """
     Does collecting/traversing packages for cleaning work for Python 2+3?
