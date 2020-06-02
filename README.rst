@@ -100,7 +100,7 @@ Usage
 
     $ pyclean --help
 
-If you want to explicitly operate the version-specific implementation:
+If you want to explicitly operate the Debian-specific implementation:
 
 .. code:: console
 
@@ -145,8 +145,6 @@ Roadmap (for v2.0.0)
 
 #. Consolidate original Debian scripts into a single code base that
    serves all target platforms (py27, py3x, pypy2.7, pypy3.5).
-#. Ensure the package is actually tested also on Windows NT and Darwin
-   target machines :-) (AppVeyor and Travis CI).
 #. Reduce the package dependencies to an absolute minimum for maximum
    portability.
 #. Add additional CLI options to delete debris from builds, testing and
