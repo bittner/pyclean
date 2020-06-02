@@ -14,16 +14,16 @@ bytecode files in your favorite directories. On any platform.
 .. |latest-version| image:: https://img.shields.io/pypi/v/pyclean.svg
    :alt: Latest version on PyPI
    :target: https://pypi.org/project/pyclean
-.. |checks-status| image:: https://img.shields.io/github/workflow/status/bittner/pyclean/Checks/master?label=checks
+.. |checks-status| image:: https://img.shields.io/github/workflow/status/bittner/pyclean/Checks/master?label=Checks&logo=github
    :alt: GitHub Workflow Status
    :target: https://github.com/bittner/pyclean/actions?query=workflow%3AChecks
-.. |tests-status| image:: https://img.shields.io/github/workflow/status/bittner/pyclean/Tests/master?label=tests
+.. |tests-status| image:: https://img.shields.io/github/workflow/status/bittner/pyclean/Tests/master?label=Tests&logo=github
    :alt: GitHub Workflow Status
    :target: https://github.com/bittner/pyclean/actions?query=workflow%3ATests
-.. |qa| image:: https://img.shields.io/scrutinizer/build/g/bittner/pyclean/master?label=qa
+.. |qa| image:: https://img.shields.io/scrutinizer/build/g/bittner/pyclean/master?label=QA&logo=scrutinizer
    :alt: Scrutinizer
    :target: https://scrutinizer-ci.com/g/bittner/pyclean/
-.. |health| image:: https://img.shields.io/codacy/grade/69de1364a09f41b399f95afe901826eb/master.svg
+.. |health| image:: https://img.shields.io/codacy/grade/69de1364a09f41b399f95afe901826eb/master.svg?logo=codacy
    :alt: Code health
    :target: https://www.codacy.com/app/bittner/pyclean
 .. |python-support| image:: https://img.shields.io/pypi/pyversions/pyclean.svg
