@@ -118,7 +118,7 @@ Clean up all bytecode for a Debian package: (may require root permissions)
 
 .. code:: console
 
-    $ pyclean -p python3-keyring
+    $ pyclean -p python3-keyring --legacy
 
 Use pyclean with Tox
 --------------------
@@ -140,11 +140,11 @@ You'll then be able to run it with `Tox`_ like this:
 
 .. _Tox: https://tox.readthedocs.io/
 
-Roadmap (for v2.0.0)
+Roadmap (for v3.0.0)
 ====================
 
-#. Consolidate original Debian scripts into a single code base that
-   serves all target platforms (py27, py3x, pypy2.7, pypy3.5).
+#. Replace original Debian scripts (current ``--legacy``) by a single,
+   pure Python, Python 3-only code base that serves all target platforms.
 #. Reduce the package dependencies to an absolute minimum for maximum
    portability.
 #. Add additional CLI options to delete debris from builds, testing and
