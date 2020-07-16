@@ -20,16 +20,18 @@ def parse_arguments():
                         action='append', default=[],
                         help='Debian package to byte-compile '
                              '(may be specified multiple times)')
-    parser.add_argument('--legacy', action='store_true',
-                        help='Use legacy Debian implementation (autodetect)')
     parser.add_argument('directory', nargs='*',
                         help='Directory tree (or file) to byte-compile')
+    parser.add_argument('--legacy', action='store_true',
+                        help='Use legacy Debian implementation (autodetect)')
+    parser.add_argument('-n', '--dry-run', action='store_true',
+                        help='Show what would be done')
 
     verbosity = parser.add_mutually_exclusive_group()
-    verbosity.add_argument('-v', '--verbose', action='store_true',
-                           help='Be more verbose')
     verbosity.add_argument('-q', '--quiet', action='store_true',
                            help='Be quiet')
+    verbosity.add_argument('-v', '--verbose', action='store_true',
+                           help='Be more verbose')
 
     args = parser.parse_args()
 
