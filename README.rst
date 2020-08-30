@@ -140,8 +140,15 @@ You'll then be able to run it with `Tox`_ like this:
 
 .. _Tox: https://tox.readthedocs.io/
 
+Development
+===========
+
+If you want to help out please see our `contribution guide`_.
+
+.. _contribution guide: https://github.com/bittner/pyclean/blob/master/CONTRIBUTING.md
+
 Roadmap (for v3.0.0)
-====================
+--------------------
 
 #. Replace original Debian scripts (current ``--legacy``) by a single,
    pure Python, Python 3-only code base that serves all target platforms.
