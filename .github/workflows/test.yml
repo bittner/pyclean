@@ -9,7 +9,7 @@ on:
     - master
 
 jobs:
-  build:
+  test:
     runs-on: ${{ matrix.platform }}
     strategy:
       fail-fast: false
