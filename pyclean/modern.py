@@ -67,7 +67,7 @@ def pyclean(args):
 
     for directory in args.directory:
         log.info("Cleaning directory %s", directory)
-        descend_and_clean_bytecode(Path(directory))
+        descend_and_clean_bytecode(Path(directory), args.clean_test_cache)
 
     log.info("Total %d files, %d directories %s.",
              Runner.unlink_count, Runner.rmdir_count,
@@ -78,7 +78,7 @@ def pyclean(args):
                   Runner.unlink_failed, Runner.rmdir_failed)
 
 
-def descend_and_clean_bytecode(directory):
+def descend_and_clean_bytecode(directory, clean_test_cache):
     """
     Walk and descend a directory tree, cleaning up bytecode files along
     the way. Only delete bytecode folders if they are empty in the end.
@@ -88,9 +88,25 @@ def descend_and_clean_bytecode(directory):
             if child.suffix in ['.pyc', '.pyo']:
                 Runner.unlink(child)
         elif child.is_dir():
-            descend_and_clean_bytecode(child)
+            if child.name == '.pytest_cache' and clean_test_cache:
+                descend_and_remove_directory(child)
+            else:
+                descend_and_clean_bytecode(child, clean_test_cache)
 
             if child.name == '__pycache__':
                 Runner.rmdir(child)
         else:
             log.debug("Ignoring %s", child)
+
+
+def descend_and_remove_directory(directory):
+    """
+    Delete all files in a directory, then delete the directory.
+    """
+    for child in directory.iterdir():
+        if child.is_file():
+            Runner.unlink(child)
+        elif child.is_dir():
+            descend_and_remove_directory(child)
+
+    Runner.rmdir(directory)

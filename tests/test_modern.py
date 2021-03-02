@@ -27,7 +27,21 @@ def test_walks_tree(mock_descend):
         pyclean.cli.main()
 
     assert mock_descend.mock_calls == [
-        call(Path('.')),
+        call(Path('.'), False),
+    ]
+
+
+@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
+@patch('pyclean.modern.descend_and_clean_bytecode')
+def test_walks_tree_and_test_cache(mock_descend):
+    """
+    Does pyclean walk the directory tree, including test cache?
+    """
+    with ArgvContext('pyclean', '.', '--clean-test-cache'):
+        pyclean.cli.main()
+
+    assert mock_descend.mock_calls == [
+        call(Path('.'), True),
     ]
 
 
@@ -41,9 +55,9 @@ def test_walks_all_trees(mock_descend):
         pyclean.cli.main()
 
     assert mock_descend.mock_calls == [
-        call(Path('foo')),
-        call(Path('bar')),
-        call(Path('baz')),
+        call(Path('foo'), False),
+        call(Path('bar'), False),
+        call(Path('baz'), False),
     ]
 
 

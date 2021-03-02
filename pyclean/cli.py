@@ -26,6 +26,8 @@ def parse_arguments():
                         help='Use legacy Debian implementation (autodetect)')
     parser.add_argument('-n', '--dry-run', action='store_true',
                         help='Show what would be done')
+    parser.add_argument('-t', '--clean-test-cache', action='store_true',
+                        help='Clean test cache directory')
 
     verbosity = parser.add_mutually_exclusive_group()
     verbosity.add_argument('-q', '--quiet', action='store_true',
