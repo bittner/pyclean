@@ -13,7 +13,8 @@ except ImportError:  # Python 2.7, PyPy2
 
 from cli_test_helpers import ArgvContext
 
-import pyclean
+import pyclean.cli
+import pyclean.modern
 
 
 @pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
