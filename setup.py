@@ -10,6 +10,7 @@ import pyclean as package
 
 def read_file(filename):
     """Get the contents of a file"""
+    # pylint: disable=unspecified-encoding
     with open(join(abspath(dirname(__file__)), filename)) as file:
         return file.read()
 
