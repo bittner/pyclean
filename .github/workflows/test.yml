@@ -25,8 +25,8 @@ jobs:
         - '3.7'
         - '3.8'
         - '3.9'
-        - pypy2
-        - pypy3
+        - pypy-2.7
+        - pypy-3.7
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
