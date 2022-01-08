@@ -2,8 +2,9 @@
 Tests for the modern module
 """
 import logging
-import pytest
 import sys
+
+import pytest
 
 try:
     from pathlib import Path

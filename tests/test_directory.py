@@ -2,8 +2,8 @@
 Tests for the cleaning logic on folders
 """
 import platform
-import pytest
 
+import pytest
 from cli_test_helpers import ArgvContext
 
 import pyclean.cli

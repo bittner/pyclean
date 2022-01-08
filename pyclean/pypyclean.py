@@ -15,7 +15,6 @@ import os
 import shutil
 import subprocess
 import sys
-
 from functools import reduce
 
 # initialize script

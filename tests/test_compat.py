@@ -3,6 +3,7 @@ Tests for the cross-Python version compatibility module
 """
 import platform
 import sys
+
 import pytest
 
 import pyclean

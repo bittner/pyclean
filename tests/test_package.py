@@ -2,6 +2,7 @@
 Tests for the cleaning logic on Python packages
 """
 import platform
+
 import pytest
 
 try:

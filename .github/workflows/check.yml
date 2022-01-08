@@ -16,6 +16,7 @@ jobs:
       matrix:
         env:
         - flake8
+        - isort
         - pylint
         - readme
     steps:
