@@ -12,6 +12,10 @@ exclude = [
 [tool.coverage.xml]
 output = "tests/reports/coverage.xml"
 
+[tool.isort]
+color_output = true
+profile = "black"
+
 [tool.pylint.master]
 ignore = ["py2clean.py","py3clean.py","pypyclean.py"]
 output-format = "colorized"

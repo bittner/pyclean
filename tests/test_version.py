@@ -3,6 +3,7 @@ Tests for filtering by Python version
 """
 import platform
 import sys
+
 import pytest
 
 try:

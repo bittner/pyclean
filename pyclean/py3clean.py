@@ -21,10 +21,11 @@ Copyright © 2010-2012 Piotr Ożarowski <piotr@debian.org>
 """
 import logging
 import sys
+
 # glob1() is not in the public documentation, UTSL.
 from glob import glob1
 from os import environ, remove, rmdir
-from os.path import dirname, basename, exists, join, splitext
+from os.path import basename, dirname, exists, join, splitext
 
 sys.path.insert(1, '/usr/share/python3/')
 
