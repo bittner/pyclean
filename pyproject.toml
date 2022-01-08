@@ -1,0 +1,20 @@
+[tool.bandit]
+exclude = [
+    ".tox",
+    "build",
+    "dist",
+    "tests",
+    "pyclean/py2clean.py",
+    "pyclean/py3clean.py",
+    "pyclean/pypyclean.py",
+]
+
+[tool.coverage.xml]
+output = "tests/reports/coverage.xml"
+
+[tool.pylint.master]
+ignore = ["py2clean.py","py3clean.py","pypyclean.py"]
+output-format = "colorized"
+
+[tool.pytest.ini_options]
+addopts = "--junitxml=tests/reports/unittests.xml --color=yes --verbose"
