@@ -9,6 +9,9 @@ exclude = [
     "pyclean/pypyclean.py",
 ]
 
+[tool.black]
+color = true
+
 [tool.coverage.xml]
 output = "tests/reports/coverage.xml"
 
