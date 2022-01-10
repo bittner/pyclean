@@ -1,13 +1,21 @@
 [tool.bandit]
-exclude = [
-    ".tox",
-    "build",
-    "dist",
-    "tests",
-    "pyclean/py2clean.py",
-    "pyclean/py3clean.py",
-    "pyclean/pypyclean.py",
-]
+# Exclude/ignore of files is currently broken in Bandit:
+# https://github.com/PyCQA/bandit/issues/693
+# https://github.com/PyCQA/bandit/issues/490
+# https://github.com/PyCQA/bandit/issues/438#issuecomment-494211922
+#
+# Reading settings from configuration files is broken:
+# https://github.com/PyCQA/bandit/issues/753
+# https://github.com/PyCQA/bandit/issues/595
+#
+# Reading from pyproject.toml not yet functional:
+# Must install "toml" package and use "-c pyproject.toml".
+# https://github.com/PyCQA/bandit/issues/758
+#
+# INI file configuration and CLI usage is unclear:
+# https://github.com/PyCQA/bandit/issues/603
+# https://github.com/PyCQA/bandit/issues/467
+# https://github.com/PyCQA/bandit/issues/396
 
 [tool.black]
 color = true

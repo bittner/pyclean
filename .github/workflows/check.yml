@@ -18,6 +18,7 @@ jobs:
         - flake8
         - isort
         - pylint
+        - bandit
         - readme
     steps:
     - uses: actions/checkout@v2
