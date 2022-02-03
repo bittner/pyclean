@@ -1,6 +1,7 @@
 """
 Main entry point for running pyclean as a module.
 """
-from . import cli
+from .cli import main
 
-cli.main()
+if __name__ == '__main__':
+    main()
