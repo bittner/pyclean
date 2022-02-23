@@ -12,32 +12,32 @@ bytecode files in your favorite directories. On any platform.
 `Presented at PyConX`_, Firenze 2019.
 
 .. |latest-version| image:: https://img.shields.io/pypi/v/pyclean.svg
+   :target: https://pypi.org/project/pyclean
    :alt: Latest version on PyPI
-   :target: https://pypi.org/project/pyclean
 .. |checks-status| image:: https://img.shields.io/github/workflow/status/bittner/pyclean/Checks/main?label=Checks&logo=github
+   :target: https://github.com/bittner/pyclean/actions/workflows/check.yml
    :alt: GitHub Workflow Status
-   :target: https://github.com/bittner/pyclean/actions?query=workflow%3AChecks
 .. |tests-status| image:: https://img.shields.io/github/workflow/status/bittner/pyclean/Tests/main?label=Tests&logo=github
+   :target: https://github.com/bittner/pyclean/actions/workflows/test.yml
    :alt: GitHub Workflow Status
-   :target: https://github.com/bittner/pyclean/actions?query=workflow%3ATests
 .. |scrutinizer| image:: https://img.shields.io/scrutinizer/build/g/bittner/pyclean/main?logo=scrutinizer&label=%22
-   :alt: Scrutinizer
    :target: https://scrutinizer-ci.com/g/bittner/pyclean/
+   :alt: Scrutinizer
 .. |codacy| image:: https://img.shields.io/codacy/grade/69de1364a09f41b399f95afe901826eb/main.svg?logo=codacy&label=%22
+   :target: https://app.codacy.com/gh/bittner/pyclean/dashboard
    :alt: Code health
-   :target: https://www.codacy.com/app/bittner/pyclean
 .. |metabob| image:: https://img.shields.io/badge/⦿-✓-59bfbf.svg?logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAADIAAAA8CAMAAAAT6xnzAAAAz1BMVEUAAAAAAAD%2F%2F%2F%2BPj4%2BqqqpERET6%2BvqJiYn09PTr6%2BuCgoLS0tJqampQUFAkJCQKCgrg4ODFxcVycnJiYmLLy8tnZ2dMTEw7Ozs2NjalpaWfn593d3daWlpWVlZUVFQsLCwcHBwODg7w8PDc3NzDw8O8vLw%2FPz8fHx8ZGRn39%2Ffm5ubY2NjV1dXPz8%2FIyMi0tLSZmZmFhYUyMjIwMDDj4%2BOUlJRtbW1ISEgiIiISEhLt7e3AwMCvr6%2BdnZ2Hh4ddXV0qKioUFBStra1%2Bfn56enphvz08AAAAAXRSTlMAQObYZgAAArJJREFUSMfVlteWqjAARXPoVaqIvTs69u7c6eX%2Fv%2BkiIkME29Nddz%2BQFcgmyeIkgfz39O4VSktUyTk4VrRtUSxxv3dmWh6ATrJQ%2FF4DRz77u4eA%2FicOfGcIDi5ipwQRV2ieGmVcZUYbeVyHpZXC3cocN7CjlApuwEsaXdzAkiTRcJ3mK6WwuA5P7u6lRCs8riPSSg6XyBW7OlCjlV3ybWO51TLdoo0DxmuLYYZP2NJK%2FfeNLnNEUjlNz0%2FlsLI5XWF6rHSYFMIguLygTivfiLD3TaSkoLKOozxL6mnE3hBhMR2n4G%2FZ9rEH0YDRMFCZGLFDB8ZYlQFfbwLFg8KC77bbJtfgm8BH1nKplVGzLHfIAV97Ywi9vQF8120iICHUeh9RjqAPNYBXXeAxUGaY%2FISJlBVKoeKihs9ykoiSOZ54udECezoTSqHiIiHEnSCkYB4ejsf0svQT2ZAO2RmqeOLf7QpMDgHOICzymeteLoZNBA6sIAhucJ3y9bc%2Fkk4rtVjoYSZwNW%2FekgqHHGj4EoKiVcYHpXix8lLFi8AIzKMGZ7BX%2FrzjvTRd%2B3gtUnOxY4VbFVBdF5Ul%2BMcomxwPoGIJXfq79OPgM7KSA5Cby7%2BplM195RnwsrYkPkikPFJHoUDjAmWSAEfUuMlANttqx7I6I7O1r1uAllTi2ZSZcNIW6%2FD1hoGQvp%2BfSkw3UtIBGAUjE5Eip66jgaX70SVzAWQ4DWpboqaz0XGKEZU%2FKSXNU90TufGjhQMLcn7361eNnqZwanvA7Jki4sJR%2BfC8kgTmyGp7RplRo%2FfWVpQYk1sk9lgaPzWTqj13dvTJR6PcdFjS3LT533tipH9gmncrpIfLOCSNh0v0SRbbC0aDI5nUcA6dnIOtIIPPDbnIW%2BHBSA6ooJTIDRSVyqJeX1aVOflX%2FAUMXjWVQWa95AAAAABJRU5ErkJggg%3D%3D
+   :target: https://metabob.com/github/bittner/pyclean
    :alt: Visualizer
-   :target: https://metabob.com/bittner/pyclean
 .. |python-support| image:: https://img.shields.io/pypi/pyversions/pyclean.svg
-   :alt: Python versions
    :target: https://pypi.org/project/pyclean
+   :alt: Python versions
 .. |license| image:: https://img.shields.io/pypi/l/pyclean.svg
-   :alt: Software license
    :target: https://github.com/bittner/pyclean/blob/main/LICENSE
+   :alt: Software license
 .. |video| image:: https://asciinema.org/a/g8Q2ljghA7W4RD9cb3Xz100Tl.svg
-   :alt: PyClean and its future
    :target: https://asciinema.org/a/g8Q2ljghA7W4RD9cb3Xz100Tl
+   :alt: PyClean and its future
 .. _Presented at PyConX: https://slides.com/bittner/pyconx-pyclean/
 
 Wait! What is bytecode?
