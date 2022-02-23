@@ -36,7 +36,8 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
-tests/reports/
+tests/*-report.json
+tests/*-report.xml
 
 # pyenv
 .python-version

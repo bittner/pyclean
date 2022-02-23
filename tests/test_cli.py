@@ -2,13 +2,14 @@
 Tests for the pyclean CLI
 """
 import os
+import platform
 
 try:
     from unittest.mock import patch
 except ImportError:  # Python 2.7, PyPy2
     from mock import patch
 
-from cli_test_helpers import ArgvContext
+from cli_test_helpers import ArgvContext, shell
 
 import pyclean.cli
 
@@ -17,16 +18,16 @@ def test_entrypoint():
     """
     Is entrypoint script installed? (setup.py)
     """
-    exit_status = os.system('pyclean --help')
-    assert exit_status == 0
+    result = shell('pyclean --help')
+    assert result.exit_code == 0
 
 
 def test_entrypoint_py2_installed():
     """
     Is entrypoint script installed for Python 2? (setup.py)
     """
-    exit_status = os.system('py2clean --help')
-    assert exit_status == 0
+    result = shell('py2clean --help')
+    assert result.exit_code == 0
 
 
 @patch('pyclean.compat.import_module')
@@ -45,8 +46,8 @@ def test_entrypoint_py3_installed():
     """
     Is entrypoint script installed for Python 3? (setup.py)
     """
-    exit_status = os.system('py3clean --help')
-    assert exit_status == 0
+    result = shell('py3clean --help')
+    assert result.exit_code == 0
 
 
 @patch('pyclean.compat.import_module')
@@ -65,8 +66,8 @@ def test_entrypoint_pypy_installed():
     """
     Is entrypoint script installed for PyPy 2/3? (setup.py)
     """
-    exit_status = os.system('pypyclean --help')
-    assert exit_status == 0
+    result = shell('pypyclean --help')
+    assert result.exit_code == 0
 
 
 @patch('pyclean.compat.import_module')
@@ -79,6 +80,22 @@ def test_entrypoint_pypy_working(mock_import_module):
 
     args, _ = mock_import_module.call_args
     assert args == ('pyclean.pypyclean',)
+
+
+def test_version_option():
+    """
+    Does --version yield the expected information?
+    """
+    expected_output = '' if platform.python_version_tuple() < ('3',) \
+        else '%s%s' % (
+            pyclean.__version__,
+            os.linesep
+        )
+
+    result = shell('pyclean --version')
+
+    assert result.stdout == expected_output
+    assert result.exit_code == 0
 
 
 @patch('pyclean.compat.get_implementation')
