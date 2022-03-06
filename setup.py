@@ -18,7 +18,6 @@ def read_file(filename):
 setup(
     name=package.__name__,
     version=package.__version__,
-    license=package.__license__,
     author=package.__author__,
     author_email=package.__email__,
     description=package.__doc__.strip(),
