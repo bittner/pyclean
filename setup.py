@@ -3,6 +3,7 @@
 Packaging setup for pyclean
 """
 from os.path import abspath, dirname, join
+
 from setuptools import find_packages, setup
 
 import pyclean as package
@@ -18,12 +19,12 @@ def read_file(filename):
 setup(
     name=package.__name__,
     version=package.__version__,
-    author=package.__author__,
-    author_email=package.__email__,
+    author='Peter Bittner',
+    author_email='django@bittner.it',
     description=package.__doc__.strip(),
     long_description=read_file('README.rst'),
     long_description_content_type='text/x-rst',
-    url=package.__url__,
+    url='https://github.com/bittner/pyclean',
     packages=find_packages(exclude=['test*']),
     include_package_data=True,
     keywords=['python', 'bytecode', 'cli', 'tools'],
