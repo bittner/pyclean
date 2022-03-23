@@ -29,7 +29,7 @@ def test_filterversion_py3(mock_magictag):
     """
     Does filtering by Python version work when run with Python 3?
     """
-    with ArgvContext('pyclean', '--legacy', '-V', '3.5', '-p', 'python'), \
+    with ArgvContext('pyclean', '--legacy', '-V', '3.5', '-p', 'python3'), \
             pytest.raises(SystemExit):
         pyclean.cli.main()
 
@@ -42,7 +42,7 @@ def test_filterversion_py2():
     """
     Does filtering by Python version work when run with Python 2?
     """
-    with ArgvContext('pyclean', '--legacy', '-V', '2.7', '-p', 'python'):
+    with ArgvContext('pyclean', '--legacy', '-V', '2.7', '-p', 'python3'):
         pyclean.cli.main()
 
 
@@ -54,7 +54,7 @@ def test_filterversion_pypy(mock_namespaces):
     """
     Does filtering by Python version work when run with PyPy?
     """
-    with ArgvContext('pyclean', '--legacy', '-V', '2.7', '-p', 'python'):
+    with ArgvContext('pyclean', '--legacy', '-V', '2.7', '-p', 'python3'):
         pyclean.cli.main()
 
     assert mock_namespaces.called
