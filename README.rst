@@ -132,8 +132,9 @@ If you want to avoid installing ``pyclean`` you can add it to your
 .. code:: ini
 
     [testenv:clean]
+    skip_install = true
     deps = pyclean
-    commands = pyclean {toxinidir}
+    commands = pyclean {posargs:.}
 
 You'll then be able to run it with `Tox`_ like this:
 

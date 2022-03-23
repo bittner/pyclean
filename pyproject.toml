@@ -5,6 +5,9 @@ exclude = [".git",".github",".tox","py2clean.py","py3clean.py","pypyclean.py","t
 [tool.black]
 color = true
 
+[tool.coverage.run]
+source = ["pyclean"]
+
 [tool.coverage.xml]
 output = "tests/coverage-report.xml"
 
