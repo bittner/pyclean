@@ -3,12 +3,14 @@ Tests for the pyclean CLI
 """
 import os
 import platform
+import sys
 
 try:
     from unittest.mock import patch
 except ImportError:  # Python 2.7, PyPy2
     from mock import patch
 
+import pytest
 from cli_test_helpers import ArgvContext, shell
 
 import pyclean.cli
@@ -80,6 +82,29 @@ def test_entrypoint_pypy_working(mock_import_module):
 
     args, _ = mock_import_module.call_args
     assert args == ('pyclean.pypyclean',)
+
+
+@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
+def test_dryrun_option():
+    """
+    Does a --dry-run option exist?
+    """
+    result = shell('pyclean --dry-run tests')
+
+    assert result.exit_code == 0
+
+
+def test_ignore_option():
+    """
+    Does an --ignore option exist and append values to a list of defaults?
+    """
+    default = ['.git', '.tox', '.venv']
+    expected_ignore_list = default + ['foo']
+
+    with ArgvContext('pyclean', '.', '--ignore', 'foo'):
+        args = pyclean.cli.parse_arguments()
+
+    assert args.ignore == expected_ignore_list
 
 
 def test_version_option():
