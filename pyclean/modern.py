@@ -58,12 +58,7 @@ def pyclean(args):
     """Cross-platform cleaning of Python bytecode."""
     Runner.unlink = print_filename if args.dry_run else remove_file
     Runner.rmdir = print_dirname if args.dry_run else remove_directory
-
-    log_level = logging.FATAL if args.quiet \
-        else logging.DEBUG if args.verbose \
-        else logging.INFO
-    log_format = "%(message)s"
-    logging.basicConfig(level=log_level, format=log_format)
+    Runner.ignore = args.ignore
 
     for directory in args.directory:
         log.info("Cleaning directory %s", directory)
@@ -88,7 +83,10 @@ def descend_and_clean_bytecode(directory):
             if child.suffix in ['.pyc', '.pyo']:
                 Runner.unlink(child)
         elif child.is_dir():
-            descend_and_clean_bytecode(child)
+            if child.name in Runner.ignore:
+                log.debug("Skipping %s", child)
+            else:
+                descend_and_clean_bytecode(child)
 
             if child.name == '__pycache__':
                 Runner.rmdir(child)
