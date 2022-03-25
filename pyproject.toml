@@ -20,4 +20,4 @@ ignore = ["py2clean.py","py3clean.py","pypyclean.py"]
 output-format = "colorized"
 
 [tool.pytest.ini_options]
-addopts = "--doctest-modules --ignore=pyclean/py2clean.py --ignore=pyclean/py3clean.py --ignore=pyclean/pypyclean.py --junitxml=tests/unittests-report.xml --color=yes --verbose"
+addopts = "--color=yes --doctest-modules --ignore=pyclean/py2clean.py --ignore=pyclean/py3clean.py --ignore=pyclean/pypyclean.py --junitxml=tests/unittests-report.xml --verbose"
