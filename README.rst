@@ -4,7 +4,7 @@ pyclean |latest-version|
 |checks-status| |tests-status| |scrutinizer| |codacy| |metabob| |python-support| |license|
 
 Worried about ``.pyc`` files and ``__pycache__`` directories? Fear not!
-Pyclean is here to help. Finally the single-command clean up for Python
+PyClean is here to help. Finally the single-command clean up for Python
 bytecode files in your favorite directories. On any platform.
 
 |video|
