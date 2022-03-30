@@ -13,6 +13,8 @@ def parse_arguments():
     """
     Parse and handle CLI arguments
     """
+    debris_default_topics = ['build', 'cache', 'coverage', 'pytest']
+
     parser = argparse.ArgumentParser(
         description='Remove byte-compiled files for a package',
     )
@@ -26,11 +28,17 @@ def parse_arguments():
                              '(may be specified multiple times)')
     parser.add_argument('directory', nargs='*',
                         help='Directory tree (or file) to byte-compile')
-    parser.add_argument('-i', '--ignore', metavar='DIRECTORY',
-                        action='append', default=['.git', '.tox', '.venv'],
+    parser.add_argument('-i', '--ignore', metavar='DIRECTORY', action='extend',
+                        nargs='+', default=['.git', '.tox', '.venv'],
                         help='Directory that should be ignored '
                              '(may be specified multiple times; '
                              'default: %(default)s)')
+    parser.add_argument('-d', '--debris', metavar='TOPIC', action='extend',
+                        nargs='*', default=argparse.SUPPRESS,
+                        choices=debris_default_topics,
+                        help='Removes typical leftovers from well-known '
+                             'programs (may be specified multiple times; '
+                             'default: %s)' % debris_default_topics)
     parser.add_argument('--legacy', action='store_true',
                         help='Use legacy Debian implementation (autodetect)')
     parser.add_argument('-n', '--dry-run', action='store_true',
@@ -49,39 +57,14 @@ def parse_arguments():
         parser.error('A directory (or files) or a list of packages '
                      'must be specified.')
 
-    args.ignore = parse_ignore_list(args.ignore)
-    log.debug("Ignored directories: %s", ','.join(args.ignore))
+    if 'debris' in args:
+        if args.debris == []:
+            args.debris = debris_default_topics
+        log.debug("Debris requested to clean up for: %s", ' '.join(args.debris))
+
+    log.debug("Ignored directories: %s", ' '.join(args.ignore))
 
     return args
-
-
-def parse_ignore_list(directory_list):
-    """
-    Split up and reintegrate folder names in values having a comma-separated
-    list of directory names.
-
-    >>> parse_ignore_list(['a,b,c'])
-    ['a', 'b', 'c']
-    >>> parse_ignore_list(['a', 'b,c'])
-    ['a', 'b', 'c']
-    >>> parse_ignore_list(['a , b, c'])
-    ['a', 'b', 'c']
-    >>> parse_ignore_list([',,a,,,b,,'])
-    ['a', 'b']
-    >>> parse_ignore_list([',a', 'b,'])
-    ['a', 'b']
-    """
-    ignore_list = []
-
-    for dirname in directory_list:
-        if ',' not in dirname:
-            ignore_list += [dirname]
-        else:
-            ignore_list += [
-                token.strip() for token in dirname.split(',') if token.strip()
-            ]
-
-    return sorted(list(set(ignore_list)))
 
 
 def init_logging(args):

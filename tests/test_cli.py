@@ -99,12 +99,32 @@ def test_ignore_option():
     Does an --ignore option exist and append values to a list of defaults?
     """
     default = ['.git', '.tox', '.venv']
-    expected_ignore_list = default + ['foo']
+    expected_ignore_list = default + ['foo', 'bar']
 
-    with ArgvContext('pyclean', '.', '--ignore', 'foo'):
+    with ArgvContext('pyclean', '.', '--ignore', 'foo', 'bar'):
         args = pyclean.cli.parse_arguments()
 
     assert args.ignore == expected_ignore_list
+
+
+def test_debris_default_args():
+    """
+    Does calling `pyclean --debris` use defaults for the debris option?
+    """
+    with ArgvContext('pyclean', 'foo', '--debris'):
+        args = pyclean.cli.parse_arguments()
+
+    assert args.debris == ['build', 'cache', 'coverage', 'pytest']
+
+
+def test_debris_explicit_args():
+    """
+    Does calling `pyclean --debris` with explicit arguments provide those?
+    """
+    with ArgvContext('pyclean', 'foo', '--debris', 'build', 'pytest'):
+        args = pyclean.cli.parse_arguments()
+
+    assert args.debris == ['build', 'pytest']
 
 
 def test_version_option():
@@ -112,10 +132,7 @@ def test_version_option():
     Does --version yield the expected information?
     """
     expected_output = '' if platform.python_version_tuple() < ('3',) \
-        else '%s%s' % (
-            pyclean.__version__,
-            os.linesep
-        )
+        else '%s%s' % (pyclean.__version__, os.linesep)
 
     result = shell('pyclean --version')
 
@@ -128,7 +145,7 @@ def test_legacy_calls_compat(mock_get_implementation):
     """
     Does calling `pyclean --legacy` invoke the compat layer?
     """
-    with ArgvContext('pyclean', '--legacy', 'foo'):
+    with ArgvContext('pyclean', 'foo', '--legacy'):
         pyclean.cli.main()
 
     assert mock_get_implementation.called
