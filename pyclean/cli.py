@@ -16,7 +16,7 @@ def parse_arguments():
     debris_default_topics = ['build', 'cache', 'coverage', 'pytest']
 
     parser = argparse.ArgumentParser(
-        description='Remove byte-compiled files for a package',
+        description='Remove byte-compiled files for a package or project.',
     )
 
     parser.add_argument('--version', action='version', version=__version__)
@@ -27,28 +27,28 @@ def parse_arguments():
                         help='Debian package to byte-compile '
                              '(may be specified multiple times)')
     parser.add_argument('directory', nargs='*',
-                        help='Directory tree (or file) to byte-compile')
+                        help='directory tree to traverse for byte-code')
     parser.add_argument('-i', '--ignore', metavar='DIRECTORY', action='extend',
                         nargs='+', default=['.git', '.tox', '.venv'],
-                        help='Directory that should be ignored '
+                        help='directory that should be ignored '
                              '(may be specified multiple times; '
                              'default: %(default)s)')
     parser.add_argument('-d', '--debris', metavar='TOPIC', action='extend',
                         nargs='*', default=argparse.SUPPRESS,
                         choices=debris_default_topics,
-                        help='Removes typical leftovers from well-known '
+                        help='remove typical leftovers from well-known '
                              'programs (may be specified multiple times; '
                              'default: %s)' % debris_default_topics)
     parser.add_argument('--legacy', action='store_true',
-                        help='Use legacy Debian implementation (autodetect)')
+                        help='use legacy Debian implementation (autodetect)')
     parser.add_argument('-n', '--dry-run', action='store_true',
-                        help='Show what would be done')
+                        help='show what would be done')
 
     verbosity = parser.add_mutually_exclusive_group()
     verbosity.add_argument('-q', '--quiet', action='store_true',
-                           help='Be quiet')
+                           help='be quiet')
     verbosity.add_argument('-v', '--verbose', action='store_true',
-                           help='Be more verbose')
+                           help='be more verbose')
 
     args = parser.parse_args()
     init_logging(args)
