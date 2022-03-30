@@ -32,12 +32,12 @@ htmlcov/
 .coverage.*
 .cache
 nosetests.xml
+coverage.json
 coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
-tests/*-report.json
-tests/*-report.xml
+tests/junit-report.xml
 
 # pyenv
 .python-version
