@@ -14,6 +14,7 @@ def parse_arguments():
     Parse and handle CLI arguments
     """
     debris_default_topics = ['build', 'cache', 'coverage', 'pytest']
+    debris_optional_topics = ['tox']
 
     parser = argparse.ArgumentParser(
         description='Remove byte-compiled files for a package or project.',
@@ -35,7 +36,7 @@ def parse_arguments():
                              'default: %(default)s)')
     parser.add_argument('-d', '--debris', metavar='TOPIC', action='extend',
                         nargs='*', default=argparse.SUPPRESS,
-                        choices=debris_default_topics,
+                        choices=debris_default_topics + debris_optional_topics,
                         help='remove typical leftovers from well-known '
                              'programs (may be specified multiple times; '
                              'default: %s)' % debris_default_topics)
@@ -61,6 +62,8 @@ def parse_arguments():
         if args.debris == []:
             args.debris = debris_default_topics
         log.debug("Debris requested to clean up for: %s", ' '.join(args.debris))
+    else:
+        args.debris = []
 
     log.debug("Ignored directories: %s", ' '.join(args.ignore))
 
