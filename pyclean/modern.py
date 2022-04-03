@@ -64,6 +64,9 @@ def pyclean(args):
         log.info("Cleaning directory %s", directory)
         descend_and_clean_bytecode(Path(directory))
 
+    for topic in args.debris:
+        remove_debris_for(topic)
+
     log.info("Total %d files, %d directories %s.",
              Runner.unlink_count, Runner.rmdir_count,
              "would be removed" if args.dry_run else "removed")
@@ -92,3 +95,36 @@ def descend_and_clean_bytecode(directory):
                 Runner.rmdir(child)
         else:
             log.debug("Ignoring %s", child)
+
+
+def remove_debris_for(topic):
+    """
+    Clean up debris for a specific topic.
+    """
+    topics = {
+        'build': [
+            'dist',
+            'sdist',
+            '*.egg-info',
+        ],
+        'cache': [
+            '.cache',
+        ],
+        'coverage': [
+            '.coverage',
+            'coverage.json',
+            'coverage.xml',
+            'htmlcov',
+        ],
+        'pytest': [
+            '.pytest_cache',
+        ],
+        'tox': [
+            '.tox',
+        ],
+    }
+
+    log.debug("Cleaning up debris for %s ...", topic)
+
+    for pathname in topics[topic]:
+        log.debug(pathname)
