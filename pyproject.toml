@@ -1,6 +1,5 @@
 [tool.bandit]
-# NOTE: Exclude/ignore of files is currently broken in Bandit
-exclude = [".git",".github",".tox","py2clean.py","py3clean.py","pypyclean.py","tests"]
+exclude_dirs = [".git",".github",".tox","tests","pyclean/py2clean.py","pyclean/py3clean.py","pyclean/pypyclean.py"]
 
 [tool.black]
 color = true
