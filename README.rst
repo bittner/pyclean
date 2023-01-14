@@ -14,10 +14,10 @@ bytecode files in your favorite directories. On any platform.
 .. |latest-version| image:: https://img.shields.io/pypi/v/pyclean.svg
    :target: https://pypi.org/project/pyclean
    :alt: Latest version on PyPI
-.. |checks-status| image:: https://img.shields.io/github/workflow/status/bittner/pyclean/Checks/main?label=Checks&logo=github
+.. |checks-status| image:: https://img.shields.io/github/actions/workflow/status/bittner/pyclean/check.yml?branch=main&label=Checks&logo=github
    :target: https://github.com/bittner/pyclean/actions/workflows/check.yml
    :alt: GitHub Workflow Status
-.. |tests-status| image:: https://img.shields.io/github/workflow/status/bittner/pyclean/Tests/main?label=Tests&logo=github
+.. |tests-status| image:: https://img.shields.io/github/actions/workflow/status/bittner/pyclean/test.yml?branch=main&label=Tests&logo=github
    :target: https://github.com/bittner/pyclean/actions/workflows/test.yml
    :alt: GitHub Workflow Status
 .. |scrutinizer| image:: https://img.shields.io/scrutinizer/build/g/bittner/pyclean/main?logo=scrutinizer&label=%22
