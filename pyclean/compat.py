@@ -19,7 +19,6 @@ def get_implementation(override=None):
         PyPy3='pyclean.pypyclean',
     )
 
-    # pylint: disable=consider-using-f-string
     detected_version = '%s%s' % (
         platform.python_implementation(),
         sys.version[0],
