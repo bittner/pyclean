@@ -123,6 +123,13 @@ Clean up all bytecode for a Debian package: (may require root permissions)
 
     $ pyclean -p python3-keyring --legacy
 
+Dry-run cleanup of bytecode and leftovers from common Python development
+tools (to see what would be deleted):
+
+.. code:: console
+
+    $ pyclean . --debris --dry-run --verbose
+
 Use pyclean with Tox
 --------------------
 
