@@ -13,24 +13,32 @@ BYTECODE_FILES = ['.pyc', '.pyo']
 BYTECODE_DIRS = ['__pycache__']
 DEBRIS_TOPICS = {
     'build': [
-        'dist/**',
-        'sdist/**',
-        '*.egg-info/**',
+        'dist/**/*',
+        'dist/',
+        'sdist/**/*',
+        'sdist/',
+        '*.egg-info/**/*',
+        '*.egg-info/',
     ],
     'cache': [
-        '.cache/**',
+        '.cache/**/*',
+        '.cache/',
     ],
     'coverage': [
         '.coverage',
         'coverage.json',
         'coverage.xml',
-        'htmlcov/**',
+        'htmlcov/**/*',
+        'htmlcov/',
     ],
     'pytest': [
-        '.pytest_cache/**',
+        '.pytest_cache/**/*',
+        '.pytest_cache/',
+        'pytestdebug.log',
     ],
     'tox': [
-        '.tox/**',
+        '.tox/**/*',
+        '.tox/',
     ],
 }
 
@@ -134,7 +142,7 @@ def remove_debris_for(topic, directory):
         path_list = sorted(directory.glob(path_glob))
 
         for dir_object in path_list:
-            if dir_object.is_file():
-                Runner.unlink(dir_object)
-            elif dir_object.is_dir():
+            if dir_object.is_dir():
                 Runner.rmdir(dir_object)
+            else:
+                Runner.unlink(dir_object)
