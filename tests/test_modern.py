@@ -3,12 +3,13 @@ Tests for the modern module
 """
 import logging
 import sys
+from argparse import Namespace
 
 import pytest
 
 try:
     from pathlib import Path
-    from unittest.mock import call, patch
+    from unittest.mock import Mock, call, patch
 except ImportError:  # Python 2.7, PyPy2
     from mock import patch
 
@@ -16,6 +17,39 @@ from cli_test_helpers import ArgvContext
 
 import pyclean.cli
 import pyclean.modern
+
+
+class FilesystemObjectMock(str):
+
+    def __init__(self, name):
+        pass
+
+    def is_file(self):
+        return False
+
+    def is_dir(self):
+        return False
+
+    def is_symlink(self):
+        return False
+
+
+class DirectoryMock(FilesystemObjectMock):
+
+    def is_dir(self):
+        return True
+
+
+class FileMock(FilesystemObjectMock):
+
+    def is_file(self):
+        return True
+
+
+class SymlinkMock(FilesystemObjectMock):
+
+    def is_symlink(self):
+        return True
 
 
 @pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
@@ -94,6 +128,47 @@ def test_quiet_logging(mock_descend, mock_logconfig):
 
 
 @pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
+@patch('pathlib.Path.iterdir', return_value=[SymlinkMock('a-link')])
+def test_ignore_otherobjects(mock_iterdir):
+    """
+    Is "ignoring" displayed for any uncommon file system object?
+    """
+    pyclean.modern.Runner.unlink = Mock()
+    pyclean.modern.Runner.rmdir = Mock()
+    pyclean.modern.log = Mock()
+
+    pyclean.modern.descend_and_clean(
+        Path('.'), pyclean.modern.BYTECODE_FILES, pyclean.modern.BYTECODE_DIRS
+    )
+
+    assert not pyclean.modern.Runner.unlink.called
+    assert not pyclean.modern.Runner.rmdir.called
+    assert pyclean.modern.log.mock_calls == [
+        call.debug('Ignoring %s', SymlinkMock('a-link')),
+    ]
+
+
+@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
+@pytest.mark.parametrize('unlink_failures,rmdir_failures', [(7, 0), (0, 3), (1, 1)])
+def test_report_failures(unlink_failures, rmdir_failures):
+    """
+    Are failures to delete a file or folder reported with ``log.debug``?
+    """
+    pyclean.modern.Runner.unlink_failed = unlink_failures
+    pyclean.modern.Runner.rmdir_failed = rmdir_failures
+    pyclean.modern.log = Mock()
+    args = Namespace(dry_run=True, ignore=[], directory=[], debris=[])
+
+    pyclean.modern.pyclean(args)
+
+    assert pyclean.modern.log.mock_calls[1] == call.debug(
+        '%d files, %d directories could not be removed.',
+        unlink_failures,
+        rmdir_failures,
+    )
+
+
+@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch('pyclean.modern.print_dirname')
 @patch('pyclean.modern.print_filename')
 @patch('pyclean.modern.remove_directory')
@@ -129,3 +204,48 @@ def test_dryrun(mock_real_unlink, mock_real_rmdir,
     assert not mock_real_rmdir.called
     assert mock_dry_unlink.called
     assert mock_dry_rmdir.called
+
+
+@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
+@pytest.mark.parametrize(
+    'options,scanned_topics',
+    [
+        ([], []),
+        (['-d'], ['build', 'cache', 'coverage', 'pytest']),
+        (['-d', 'build', 'coverage'], ['build', 'coverage']),
+    ]
+)
+@patch('pyclean.modern.remove_debris_for')
+@patch('pyclean.modern.descend_and_clean')
+def test_debris_calls(mock_descend, mock_debris, options, scanned_topics):
+    """
+    Does --debris execute the appropriate cleanup code?
+    """
+    with ArgvContext('pyclean', '.', *options):
+        pyclean.cli.main()
+
+    calls = [call_args[0][0] for call_args in mock_debris.call_args_list]
+
+    assert mock_descend.called
+    assert calls == scanned_topics
+
+
+@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
+@patch('pathlib.Path.glob', return_value=[DirectoryMock('a-dir'), FileMock('a-file')])
+def test_debris_loop(mock_glob):
+    """
+    Does --debris execute the appropriate cleanup code?
+    """
+    pyclean.modern.Runner.unlink = Mock()
+    pyclean.modern.Runner.rmdir = Mock()
+    directory = Path('.')
+
+    pyclean.modern.remove_debris_for('cache', directory)
+
+    assert mock_glob.called
+    assert pyclean.modern.Runner.unlink.call_args_list == [
+        call(FileMock('a-file')),
+    ]
+    assert pyclean.modern.Runner.rmdir.call_args_list == [
+        call(DirectoryMock('a-dir')),
+    ]

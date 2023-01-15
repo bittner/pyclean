@@ -9,6 +9,8 @@ except ImportError:  # Python 2.7, PyPy2
     from warnings import warn
     warn("Python 3 required for modern implementation. Python 2 is obsolete.")
 
+BYTECODE_FILES = ['.pyc', '.pyo']
+BYTECODE_DIRS = ['__pycache__']
 DEBRIS_TOPICS = {
     'build': [
         'dist/',
@@ -83,14 +85,11 @@ def pyclean(args):
     Runner.rmdir = print_dirname if args.dry_run else remove_directory
     Runner.ignore = args.ignore
 
-    bytecode_files = ['.pyc', '.pyo']
-    bytecode_dirs = ['__pycache__']
-
     for dir_name in args.directory:
         directory = Path(dir_name)
 
         log.info("Cleaning directory %s", directory)
-        descend_and_clean(directory, bytecode_files, bytecode_dirs)
+        descend_and_clean(directory, BYTECODE_FILES, BYTECODE_DIRS)
 
     for topic in args.debris:
         remove_debris_for(topic, directory)

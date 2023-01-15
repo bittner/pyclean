@@ -127,6 +127,15 @@ def test_debris_explicit_args():
     assert args.debris == ['build', 'pytest']
 
 
+def test_debris_invalid_args():
+    """
+    Does calling `pyclean --debris` with invalid arguments abort execution?
+    """
+    with ArgvContext('pyclean', 'foo', '--debris', 'not-a-tool-name'), \
+            pytest.raises(SystemExit):
+        pyclean.cli.parse_arguments()
+
+
 def test_version_option():
     """
     Does --version yield the expected information?
