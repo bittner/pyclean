@@ -19,7 +19,7 @@ import pyclean.modern
 
 
 @pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
-@patch('pyclean.modern.descend_and_clean_bytecode')
+@patch('pyclean.modern.descend_and_clean')
 def test_walks_tree(mock_descend):
     """
     Does pyclean walk the directory tree?
@@ -28,12 +28,12 @@ def test_walks_tree(mock_descend):
         pyclean.cli.main()
 
     assert mock_descend.mock_calls == [
-        call(Path('.')),
+        call(Path('.'), ['.pyc', '.pyo'], ['__pycache__']),
     ]
 
 
 @pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
-@patch('pyclean.modern.descend_and_clean_bytecode')
+@patch('pyclean.modern.descend_and_clean')
 def test_walks_all_trees(mock_descend):
     """
     Are all positional args evaluated?
@@ -42,15 +42,15 @@ def test_walks_all_trees(mock_descend):
         pyclean.cli.main()
 
     assert mock_descend.mock_calls == [
-        call(Path('foo')),
-        call(Path('bar')),
-        call(Path('baz')),
+        call(Path('foo'), ['.pyc', '.pyo'], ['__pycache__']),
+        call(Path('bar'), ['.pyc', '.pyo'], ['__pycache__']),
+        call(Path('baz'), ['.pyc', '.pyo'], ['__pycache__']),
     ]
 
 
 @pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch.object(pyclean.modern.logging, 'basicConfig')
-@patch('pyclean.modern.descend_and_clean_bytecode')
+@patch('pyclean.modern.descend_and_clean')
 def test_normal_logging(mock_descend, mock_logconfig):
     """
     Does a normal run use log level INFO?
@@ -65,7 +65,7 @@ def test_normal_logging(mock_descend, mock_logconfig):
 
 @pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch.object(pyclean.modern.logging, 'basicConfig')
-@patch('pyclean.modern.descend_and_clean_bytecode')
+@patch('pyclean.modern.descend_and_clean')
 def test_verbose_logging(mock_descend, mock_logconfig):
     """
     Does --verbose use log level DEBUG?
@@ -80,7 +80,7 @@ def test_verbose_logging(mock_descend, mock_logconfig):
 
 @pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch.object(pyclean.modern.logging, 'basicConfig')
-@patch('pyclean.modern.descend_and_clean_bytecode')
+@patch('pyclean.modern.descend_and_clean')
 def test_quiet_logging(mock_descend, mock_logconfig):
     """
     Does --quiet use log level FATAL?
