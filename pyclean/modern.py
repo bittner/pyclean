@@ -9,6 +9,29 @@ except ImportError:  # Python 2.7, PyPy2
     from warnings import warn
     warn("Python 3 required for modern implementation. Python 2 is obsolete.")
 
+DEBRIS_TOPICS = {
+    'build': [
+        'dist/',
+        'sdist/',
+        '*.egg-info/',
+    ],
+    'cache': [
+        '.cache/',
+    ],
+    'coverage': [
+        '.coverage',
+        'coverage.json',
+        'coverage.xml',
+        'htmlcov/',
+    ],
+    'pytest': [
+        '.pytest_cache/',
+    ],
+    'tox': [
+        '.tox/',
+    ],
+}
+
 log = logging.getLogger(__name__)
 
 
@@ -60,12 +83,17 @@ def pyclean(args):
     Runner.rmdir = print_dirname if args.dry_run else remove_directory
     Runner.ignore = args.ignore
 
-    for directory in args.directory:
+    bytecode_files = ['.pyc', '.pyo']
+    bytecode_dirs = ['__pycache__']
+
+    for dir_name in args.directory:
+        directory = Path(dir_name)
+
         log.info("Cleaning directory %s", directory)
-        descend_and_clean_bytecode(Path(directory))
+        descend_and_clean(directory, bytecode_files, bytecode_dirs)
 
     for topic in args.debris:
-        remove_debris_for(topic)
+        remove_debris_for(topic, directory)
 
     log.info("Total %d files, %d directories %s.",
              Runner.unlink_count, Runner.rmdir_count,
@@ -76,55 +104,38 @@ def pyclean(args):
                   Runner.unlink_failed, Runner.rmdir_failed)
 
 
-def descend_and_clean_bytecode(directory):
+def descend_and_clean(directory, file_types, dir_names):
     """
-    Walk and descend a directory tree, cleaning up bytecode files along
-    the way. Only delete bytecode folders if they are empty in the end.
+    Walk and descend a directory tree, cleaning up files of a certain type
+    along the way. Only delete directories if they are empty, in the end.
     """
-    for child in directory.iterdir():
+    for child in sorted(directory.iterdir()):
         if child.is_file():
-            if child.suffix in ['.pyc', '.pyo']:
+            if child.suffix in file_types:
                 Runner.unlink(child)
         elif child.is_dir():
             if child.name in Runner.ignore:
                 log.debug("Skipping %s", child)
             else:
-                descend_and_clean_bytecode(child)
+                descend_and_clean(child, file_types, dir_names)
 
-            if child.name == '__pycache__':
+            if child.name in dir_names:
                 Runner.rmdir(child)
         else:
             log.debug("Ignoring %s", child)
 
 
-def remove_debris_for(topic):
+def remove_debris_for(topic, directory):
     """
     Clean up debris for a specific topic.
     """
-    topics = {
-        'build': [
-            'dist',
-            'sdist',
-            '*.egg-info',
-        ],
-        'cache': [
-            '.cache',
-        ],
-        'coverage': [
-            '.coverage',
-            'coverage.json',
-            'coverage.xml',
-            'htmlcov',
-        ],
-        'pytest': [
-            '.pytest_cache',
-        ],
-        'tox': [
-            '.tox',
-        ],
-    }
+    log.debug("Scanning for debris of %s ...", topic.title())
 
-    log.debug("Cleaning up debris for %s ...", topic)
+    for path_glob in DEBRIS_TOPICS[topic]:
+        path_list = sorted(directory.glob(path_glob))
 
-    for pathname in topics[topic]:
-        log.debug(pathname)
+        for dir_object in path_list:
+            if dir_object.is_file():
+                Runner.unlink(dir_object)
+            elif dir_object.is_dir():
+                Runner.rmdir(dir_object)
