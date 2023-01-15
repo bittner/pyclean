@@ -15,6 +15,7 @@ color_output = true
 profile = "black"
 
 [tool.pylint.master]
+disable = ["consider-using-f-string"]
 ignore = ["py2clean.py","py3clean.py","pypyclean.py"]
 output-format = "colorized"
 
