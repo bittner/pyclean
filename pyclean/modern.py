@@ -13,24 +13,24 @@ BYTECODE_FILES = ['.pyc', '.pyo']
 BYTECODE_DIRS = ['__pycache__']
 DEBRIS_TOPICS = {
     'build': [
-        'dist/',
-        'sdist/',
-        '*.egg-info/',
+        'dist/**',
+        'sdist/**',
+        '*.egg-info/**',
     ],
     'cache': [
-        '.cache/',
+        '.cache/**',
     ],
     'coverage': [
         '.coverage',
         'coverage.json',
         'coverage.xml',
-        'htmlcov/',
+        'htmlcov/**',
     ],
     'pytest': [
-        '.pytest_cache/',
+        '.pytest_cache/**',
     ],
     'tox': [
-        '.tox/',
+        '.tox/**',
     ],
 }
 
