@@ -236,11 +236,12 @@ def test_debris_loop(mock_glob):
     """
     Does --debris execute the appropriate cleanup code?
     """
+    pyclean.modern.DEBRIS_TOPICS = {'foo': ['somedir/']}
     pyclean.modern.Runner.unlink = Mock()
     pyclean.modern.Runner.rmdir = Mock()
     directory = Path('.')
 
-    pyclean.modern.remove_debris_for('cache', directory)
+    pyclean.modern.remove_debris_for('foo', directory)
 
     assert mock_glob.called
     assert pyclean.modern.Runner.unlink.call_args_list == [
