@@ -16,6 +16,7 @@ def parse_arguments():
     """
     debris_default_topics = ['build', 'cache', 'coverage', 'pytest']
     debris_optional_topics = ['tox']
+    ignore_default_items = ['.git', '.tox', '.venv']
 
     parser = argparse.ArgumentParser(
         description='Remove byte-compiled files for a package or project.',
@@ -34,16 +35,16 @@ def parse_arguments():
     parser.add_argument('directory', nargs='*',
                         help='directory tree to traverse for byte-code')
     parser.add_argument('-i', '--ignore', metavar='DIRECTORY', action='extend',
-                        nargs='+', default=['.git', '.tox', '.venv'],
+                        nargs='+', default=ignore_default_items,
                         help='directory that should be ignored '
                              '(may be specified multiple times; '
-                             'default: %(default)s)')
+                             'default: %s)' % ' '.join(ignore_default_items))
     parser.add_argument('-d', '--debris', metavar='TOPIC', action='extend',
                         nargs='*', default=argparse.SUPPRESS,
                         choices=debris_default_topics + debris_optional_topics,
-                        help='remove typical leftovers from well-known '
-                             'programs (may be specified multiple times; '
-                             'default: %s)' % debris_default_topics)
+                        help='remove leftovers from popular Python development '
+                             'tools (may be specified multiple times; '
+                             'default: %s)' % ' '.join(debris_default_topics))
     parser.add_argument('--legacy', action='store_true',
                         help='use legacy Debian implementation (autodetect)')
     parser.add_argument('-n', '--dry-run', action='store_true',
