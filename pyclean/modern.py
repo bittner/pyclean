@@ -135,14 +135,22 @@ def descend_and_clean(directory, file_types, dir_names):
 def remove_debris_for(topic, directory):
     """
     Clean up debris for a specific topic.
+
+    Note that we sort the file system objects in *reverse order* and first
+    delete *all files* before removing directories. This way we make sure
+    that the directories that are deepest down in the hierarchy are empty
+    when we attempt to remove them.
     """
     log.debug("Scanning for debris of %s ...", topic.title())
 
     for path_glob in DEBRIS_TOPICS[topic]:
-        path_list = sorted(directory.glob(path_glob))
 
-        for dir_object in path_list:
-            if dir_object.is_dir():
-                Runner.rmdir(dir_object)
-            else:
-                Runner.unlink(dir_object)
+        all_names = sorted(directory.glob(path_glob), reverse=True)
+        dirs = (name for name in all_names if name.is_dir() and not name.is_symlink())
+        files = (name for name in all_names if not name.is_dir() or name.is_symlink())
+
+        for file_object in files:
+            Runner.unlink(file_object)
+
+        for dir_object in dirs:
+            Runner.rmdir(dir_object)
