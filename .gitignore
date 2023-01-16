@@ -31,11 +31,10 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
-nosetests.xml
-coverage.json
-coverage.xml
+coverage.*
 *.cover
 .hypothesis/
+nosetests.xml
 .pytest_cache/
 tests/junit-report.xml
 

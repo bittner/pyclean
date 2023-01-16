@@ -123,12 +123,25 @@ Clean up all bytecode for a Debian package: (may require root permissions)
 
     $ pyclean -p python3-keyring --legacy
 
-Dry-run cleanup of bytecode and leftovers from common Python development
-tools (to see what would be deleted):
+Clean up debris
+---------------
+
+PyClean can clean up leftovers, generated data and temporary files from
+popular Python development tools in their default locations, along with
+Python bytecode. The following topics are currently covered:
+
+- Cache (general purpose folder for several tools, e.g. Python eggs, legacy Pytest)
+- Coverage (coverage database, and supported file formats)
+- Packaging (build files and folders)
+- Pytest (build files and folders)
+- Tox (folder hosting Tox environments)
+
+*Example:* Dry-run a cleanup of bytecode and tool debris in verbose mode
+(to see what would be deleted):
 
 .. code:: console
 
-    $ pyclean . --debris --dry-run --verbose
+    $ pyclean . --debris --verbose --dry-run
 
 Use pyclean with Tox
 --------------------
