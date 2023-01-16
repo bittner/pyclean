@@ -4,6 +4,7 @@ Tests for the pyclean CLI
 import os
 import platform
 import sys
+from importlib import import_module
 
 try:
     from unittest.mock import patch
@@ -14,6 +15,21 @@ import pytest
 from cli_test_helpers import ArgvContext, shell
 
 import pyclean.cli
+
+
+def test_main_module():
+    """
+    Exercise (most of) the code in the ``__main__`` module.
+    """
+    import_module('pyclean.__main__')
+
+
+def test_runas_module():
+    """
+    Can this package be run as a Python module?
+    """
+    result = shell('python -m pyclean --help')
+    assert result.exit_code == 0
 
 
 def test_entrypoint():
