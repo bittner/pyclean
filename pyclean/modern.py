@@ -32,6 +32,10 @@ DEBRIS_TOPICS = {
         'htmlcov/**/*',
         'htmlcov/',
     ],
+    'jupyter': [
+        '.ipynb_checkpoints/**/*',
+        '.ipynb_checkpoints/',
+    ],
     'pytest': [
         '.pytest_cache/**/*',
         '.pytest_cache/',
