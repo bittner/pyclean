@@ -134,7 +134,8 @@ Python bytecode. The following topics are currently covered:
 - Coverage (coverage database, and supported file formats)
 - Packaging (build files and folders)
 - Pytest (build files and folders)
-- Tox (folder hosting Tox environments)
+- Jupyter (notebook checkpoints) – *optional*
+- Tox (tox environments) – *optional*
 
 *Example:* Dry-run a cleanup of bytecode and tool debris in verbose mode
 (to see what would be deleted):
