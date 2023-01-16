@@ -98,7 +98,7 @@ def test_ignore_option():
     """
     Does an --ignore option exist and append values to a list of defaults?
     """
-    default = ['.git', '.tox', '.venv']
+    default = ['.git', '.hg', '.svn', '.tox', '.venv', 'node_modules']
     expected_ignore_list = default + ['foo', 'bar']
 
     with ArgvContext('pyclean', '.', '--ignore', 'foo', 'bar'):
