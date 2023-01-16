@@ -155,7 +155,7 @@ If you want to avoid installing ``pyclean`` you can add it to your
     [testenv:clean]
     skip_install = true
     deps = pyclean
-    commands = pyclean {posargs:.}
+    commands = pyclean {posargs:. --debris}
 
 You'll then be able to run it with `Tox`_ like this:
 
