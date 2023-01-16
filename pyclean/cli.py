@@ -16,6 +16,7 @@ def parse_arguments():
     """
     debris_default_topics = ['build', 'cache', 'coverage', 'pytest']
     debris_optional_topics = ['tox']
+    debris_choices = ['all'] + debris_default_topics + debris_optional_topics
     ignore_default_items = ['.git', '.hg', '.svn', '.tox', '.venv', 'node_modules']
 
     parser = argparse.ArgumentParser(
@@ -40,8 +41,7 @@ def parse_arguments():
                              '(may be specified multiple times; '
                              'default: %s)' % ' '.join(ignore_default_items))
     parser.add_argument('-d', '--debris', metavar='TOPIC', action='extend',
-                        nargs='*', default=argparse.SUPPRESS,
-                        choices=debris_default_topics + debris_optional_topics,
+                        nargs='*', default=argparse.SUPPRESS, choices=debris_choices,
                         help='remove leftovers from popular Python development '
                              'tools (may be specified multiple times; '
                              'default: %s)' % ' '.join(debris_default_topics))
@@ -64,9 +64,11 @@ def parse_arguments():
                      'must be specified.')
 
     if 'debris' in args:
-        if args.debris == []:
+        if 'all' in args.debris:
+            args.debris = debris_default_topics + debris_optional_topics
+        elif not args.debris:
             args.debris = debris_default_topics
-        log.debug("Debris requested to clean up for: %s", ' '.join(args.debris))
+        log.debug("Debris topics to scan for: %s", ' '.join(args.debris))
     else:
         args.debris = []
 

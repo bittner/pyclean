@@ -133,6 +133,16 @@ def test_debris_default_args():
     assert args.debris == ['build', 'cache', 'coverage', 'pytest']
 
 
+def test_debris_all():
+    """
+    Does calling `pyclean --debris all` pick all topics?
+    """
+    with ArgvContext('pyclean', 'foo', '--debris', 'all'):
+        args = pyclean.cli.parse_arguments()
+
+    assert args.debris == ['build', 'cache', 'coverage', 'pytest', 'tox']
+
+
 def test_debris_explicit_args():
     """
     Does calling `pyclean --debris` with explicit arguments provide those?
