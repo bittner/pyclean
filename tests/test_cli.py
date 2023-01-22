@@ -100,6 +100,32 @@ def test_entrypoint_pypy_working(mock_import_module):
     assert args == ('pyclean.pypyclean',)
 
 
+@patch('pyclean.cli.modern.pyclean')
+@patch('pyclean.cli.compat.get_implementation')
+def test_mandatory_arg_missing(mock_getimpl, mock_modern):
+    """
+    Does CLI abort when neither a path nor a package is specified?
+    """
+    with ArgvContext('pyclean'), pytest.raises(SystemExit):
+        pyclean.cli.main()
+
+    assert not mock_getimpl.called
+    assert not mock_modern.called
+
+
+@pytest.mark.parametrize('options', (['.'], ['--package=foo'], ['.', '-p', 'foo']))
+@patch('pyclean.cli.modern.pyclean')
+@patch('pyclean.cli.compat.get_implementation')
+def test_mandatory_args(mock_getimpl, mock_modern, options):
+    """
+    Does CLI execute fine when a path or a package or both are specified?
+    """
+    with ArgvContext('pyclean', *options):
+        pyclean.cli.main()
+
+    assert mock_getimpl.called or mock_modern.called
+
+
 @pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 def test_dryrun_option():
     """
