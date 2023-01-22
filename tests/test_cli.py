@@ -188,6 +188,54 @@ def test_debris_invalid_args():
         pyclean.cli.parse_arguments()
 
 
+@pytest.mark.parametrize(
+    'cli_args,erase_result',
+    [
+        (['--erase', 'foo'], ['foo']),
+        (['--erase', 'a', 'b', 'c'], ['a', 'b', 'c']),
+        (['--erase=tmp/*', '--erase=tmp'], ['tmp/*', 'tmp']),
+        (['-e', 'x', '-e', 'y', 'z'], ['x', 'y', 'z']),
+    ]
+)
+def test_erase_multiple_args(cli_args, erase_result):
+    """
+    Does `--erase` accept multiple arguments, in different styles?
+    """
+    with ArgvContext('pyclean', '.', *cli_args):
+        args = pyclean.cli.parse_arguments()
+
+    assert args.erase == erase_result
+    assert not args.yes
+
+
+def test_erase_alone_aborts():
+    """
+    Does CLI abort when using `--erase` option without arguments?
+    """
+    with ArgvContext('pyclean', '.', '--erase'), pytest.raises(SystemExit):
+        pyclean.cli.parse_arguments()
+
+
+@pytest.mark.parametrize('option', ['--yes', '-y'])
+def test_yes_option(option):
+    """
+    Is `--yes` option available, in long and short form?
+    """
+    with ArgvContext('pyclean', '.', '-e', 'tmp', option):
+        args = pyclean.cli.parse_arguments()
+
+    assert args.yes
+    assert args.erase == ['tmp']
+
+
+def test_yes_aborts_without_erase():
+    """
+    Does CLI abort when `--yes` is specified without `--erase`?
+    """
+    with ArgvContext('pyclean', '.', '--yes'), pytest.raises(SystemExit):
+        pyclean.cli.parse_arguments()
+
+
 def test_version_option():
     """
     Does --version yield the expected information?

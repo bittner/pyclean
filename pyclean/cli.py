@@ -45,6 +45,11 @@ def parse_arguments():
                         help='remove leftovers from popular Python development '
                              'tools (may be specified multiple times; '
                              'default: %s)' % ' '.join(debris_default_topics))
+    parser.add_argument('-e', '--erase', metavar='PATTERN', action='extend',
+                        nargs='+',
+                        help='delete files or folders matching a globbing '
+                             'pattern (may be specified multiple times); '
+                             'this will be interactive unless --yes is used.')
     parser.add_argument('--legacy', action='store_true',
                         help='use legacy Debian implementation (autodetect)')
     parser.add_argument('-n', '--dry-run', action='store_true',
@@ -56,8 +61,14 @@ def parse_arguments():
     verbosity.add_argument('-v', '--verbose', action='store_true',
                            help='be more verbose')
 
+    parser.add_argument('-y', '--yes', action='store_true',
+                        help='assume yes as answer for interactive questions')
+
     args = parser.parse_args()
     init_logging(args)
+
+    if args.yes and not args.erase:
+        parser.error('Specifying --yes only makes sense with --erase.')
 
     if not (args.package or args.directory):
         parser.error('A directory (or files) or a list of packages '
