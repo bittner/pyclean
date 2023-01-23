@@ -17,6 +17,11 @@ from cli_test_helpers import ArgvContext
 
 import pyclean.cli
 import pyclean.modern
+from pyclean.modern import (
+    delete_filesystem_objects,
+    remove_debris_for,
+    remove_freeform_targets,
+)
 
 
 class FilesystemObjectMock(str):
@@ -157,7 +162,14 @@ def test_report_failures(unlink_failures, rmdir_failures):
     pyclean.modern.Runner.unlink_failed = unlink_failures
     pyclean.modern.Runner.rmdir_failed = rmdir_failures
     pyclean.modern.log = Mock()
-    args = Namespace(dry_run=True, ignore=[], directory=[], debris=[])
+    args = Namespace(
+        debris=[],
+        directory=[],
+        dry_run=True,
+        erase=[],
+        ignore=[],
+        yes=False,
+    )
 
     pyclean.modern.pyclean(args)
 
@@ -215,38 +227,98 @@ def test_dryrun(mock_real_unlink, mock_real_rmdir,
         (['-d', 'build', 'coverage'], ['build', 'coverage']),
     ]
 )
+@patch('pyclean.modern.remove_freeform_targets')
 @patch('pyclean.modern.remove_debris_for')
 @patch('pyclean.modern.descend_and_clean')
-def test_debris_calls(mock_descend, mock_debris, options, scanned_topics):
+def test_debris_option(mock_descend, mock_debris, mock_erase, options, scanned_topics):
     """
-    Does --debris execute the appropriate cleanup code?
+    Does ``--debris`` execute the appropriate cleanup code?
     """
     with ArgvContext('pyclean', '.', *options):
         pyclean.cli.main()
 
-    calls = [call_args[0][0] for call_args in mock_debris.call_args_list]
+    debris_calls = [call_args[0][0] for call_args in mock_debris.call_args_list]
 
     assert mock_descend.called
-    assert calls == scanned_topics
+    assert debris_calls == scanned_topics
+    assert mock_erase.called
 
 
 @pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
-@patch('pathlib.Path.glob', return_value=[DirectoryMock('a-dir'), FileMock('a-file')])
-def test_debris_loop(mock_glob):
+@patch('pyclean.modern.remove_freeform_targets')
+@patch('pyclean.modern.remove_debris_for')
+@patch('pyclean.modern.descend_and_clean')
+def test_erase_option(mock_descend, mock_debris, mock_erase):
     """
-    Does --debris execute the appropriate cleanup code?
+    Does ``--erase`` execute the appropriate cleanup code?
+    """
+    with ArgvContext('pyclean', '.', '--erase', 'tmp/**/*', 'tmp/'):
+        pyclean.cli.main()
+
+    erase_calls = [call_args[0][0] for call_args in mock_erase.call_args_list]
+
+    assert mock_descend.called
+    assert not mock_debris.called
+    assert erase_calls == [['tmp/**/*', 'tmp/']]
+
+
+@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
+@patch('pyclean.modern.delete_filesystem_objects')
+def test_debris_loop(mock_delete_fs_obj):
+    """
+    Does ``remove_debris_for()`` call filesystem object removal?
     """
     pyclean.modern.DEBRIS_TOPICS = {'foo': ['somedir/']}
+    directory = Path('.')
+
+    remove_debris_for('foo', directory)
+
+    assert mock_delete_fs_obj.call_args_list == [
+        call(directory, 'somedir/'),
+    ]
+
+
+@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
+@patch('pyclean.modern.delete_filesystem_objects')
+def test_erase_loop(mock_delete_fs_obj):
+    """
+    Does ``remove_freeform_targets()`` call filesystem object removal?
+    """
+    patterns = ['foo.txt']
+    directory = Path('.')
+
+    remove_freeform_targets(patterns, yes=False, directory=directory)
+
+    assert mock_delete_fs_obj.call_args_list == [
+        call(directory, 'foo.txt', prompt=True),
+    ]
+
+
+@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
+@patch('builtins.input', return_value='y')
+@patch(
+    'pathlib.Path.glob',
+    return_value=[
+        DirectoryMock('a-dir'),
+        SymlinkMock('a-symlink'),
+        FileMock('a-file'),
+    ]
+)
+def test_delete_filesdir_loop(mock_glob, mock_input):
+    """
+    Exercise the file and directory loop code.
+    """
     pyclean.modern.Runner.unlink = Mock()
     pyclean.modern.Runner.rmdir = Mock()
     directory = Path('.')
 
-    pyclean.modern.remove_debris_for('foo', directory)
+    delete_filesystem_objects(directory, 'tmp/**/*', prompt=True)
 
-    assert mock_glob.called
     assert pyclean.modern.Runner.unlink.call_args_list == [
+        call(SymlinkMock('a-symlink')),
         call(FileMock('a-file')),
     ]
     assert pyclean.modern.Runner.rmdir.call_args_list == [
         call(DirectoryMock('a-dir')),
     ]
+    assert mock_glob.called
