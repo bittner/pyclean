@@ -46,7 +46,7 @@ def parse_arguments():
                              'tools (may be specified multiple times; '
                              'default: %s)' % ' '.join(debris_default_topics))
     parser.add_argument('-e', '--erase', metavar='PATTERN', action='extend',
-                        nargs='+',
+                        nargs='+', default=[],
                         help='delete files or folders matching a globbing '
                              'pattern (may be specified multiple times); '
                              'this will be interactive unless --yes is used.')

@@ -105,7 +105,9 @@ def pyclean(args):
         descend_and_clean(directory, BYTECODE_FILES, BYTECODE_DIRS)
 
     for topic in args.debris:
-        remove_debris_for(topic, directory)
+        remove_debris_for(topic, args.directory)
+
+    remove_freeform_targets(args.erase, args.yes, args.directory)
 
     log.info("Total %d files, %d directories %s.",
              Runner.unlink_count, Runner.rmdir_count,
@@ -140,22 +142,63 @@ def descend_and_clean(directory, file_types, dir_names):
 def remove_debris_for(topic, directory):
     """
     Clean up debris for a specific topic.
-
-    Note that we sort the file system objects in *reverse order* and first
-    delete *all files* before removing directories. This way we make sure
-    that the directories that are deepest down in the hierarchy are empty
-    when we attempt to remove them.
     """
     log.debug("Scanning for debris of %s ...", topic.title())
 
     for path_glob in DEBRIS_TOPICS[topic]:
+        delete_filesystem_objects(directory, path_glob)
 
-        all_names = sorted(directory.glob(path_glob), reverse=True)
-        dirs = (name for name in all_names if name.is_dir() and not name.is_symlink())
-        files = (name for name in all_names if not name.is_dir() or name.is_symlink())
 
-        for file_object in files:
-            Runner.unlink(file_object)
+def remove_freeform_targets(glob_patterns, yes, directory):
+    """
+    Remove free-form targets using globbing.
 
-        for dir_object in dirs:
-            Runner.rmdir(dir_object)
+    This is **potentially dangerous** since users can delete everything
+    anywhere in their file system, including the entire project they're
+    working on. For this reason, the implementation imposes the following
+    (user experience-related) restrictions:
+
+    - Deleting (directories) is not recursive, directory contents must be
+      explicitly specified using globbing (e.g. ``dirname/**/*``).
+    - The user is responsible for the deletion order, so that a directory
+      is empty when it is attempted to be deleted.
+    - A confirmation prompt for the deletion of every single file system
+      object is shown (unless the ``--yes`` option is used, in addition).
+    """
+    for path_glob in glob_patterns:
+        log.debug("Erase file system objects matching: %s", path_glob)
+        delete_filesystem_objects(directory, path_glob, prompt=not yes)
+
+
+def delete_filesystem_objects(directory, path_glob, prompt=False):
+    """
+    Identifies all pathnames matching a specific glob pattern, and attempts
+    to delete them in the proper order, optionally asking for confirmation.
+
+    Implementation Note: We sort the file system objects in *reverse order*
+    and first delete *all files* before removing directories. This way we
+    make sure that the directories that are deepest down in the hierarchy
+    are empty (for both files & directories) when we attempt to remove them.
+    """
+    all_names = sorted(directory.glob(path_glob), reverse=True)
+    dirs = (name for name in all_names if name.is_dir() and not name.is_symlink())
+    files = (name for name in all_names if not name.is_dir() or name.is_symlink())
+
+    for file_object in files:
+        if prompt and not confirm('Delete %s %s' % (
+            'symlink' if file_object.is_symlink() else 'file',
+            file_object,
+        )):
+            continue
+        Runner.unlink(file_object)
+
+    for dir_object in dirs:
+        if prompt and not confirm('Remove empty directory %s' % dir_object):
+            continue
+        Runner.rmdir(dir_object)
+
+
+def confirm(message):
+    """An interactive confirmation prompt."""
+    answer = input("%s? " % message)
+    return answer.strip().lower() in ['y', 'yes']
