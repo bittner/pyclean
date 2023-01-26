@@ -19,15 +19,24 @@ import pyclean.cli
 import pyclean.modern
 from pyclean.modern import (
     delete_filesystem_objects,
+    initialize_runner,
     remove_debris_for,
     remove_freeform_targets,
 )
 
 
-class FilesystemObjectMock(str):
+class FilesystemObjectMock(Mock):
 
-    def __init__(self, name):
-        pass
+    def __init__(self, *args, **kwargs):
+        name = kwargs['name'] if 'name' in kwargs else args[0]
+        super().__init__(autospec=Path(name), **kwargs)
+        self.name = name
+
+    def __eq__(self, other):
+        return self.name == other.name
+
+    def __lt__(self, other):
+        return self.name < other.name
 
     def is_file(self):
         return False
@@ -41,17 +50,26 @@ class FilesystemObjectMock(str):
 
 class DirectoryMock(FilesystemObjectMock):
 
+    def __init__(self, **kwargs):
+        super().__init__('a-dir', **kwargs)
+
     def is_dir(self):
         return True
 
 
 class FileMock(FilesystemObjectMock):
 
+    def __init__(self, **kwargs):
+        super().__init__('a-file', **kwargs)
+
     def is_file(self):
         return True
 
 
 class SymlinkMock(FilesystemObjectMock):
+
+    def __init__(self, **kwargs):
+        super().__init__('a-symlink', **kwargs)
 
     def is_symlink(self):
         return True
@@ -133,7 +151,7 @@ def test_quiet_logging(mock_descend, mock_logconfig):
 
 
 @pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
-@patch('pathlib.Path.iterdir', return_value=[SymlinkMock('a-link')])
+@patch('pathlib.Path.iterdir', return_value=[SymlinkMock()])
 def test_ignore_otherobjects(mock_iterdir):
     """
     Is "ignoring" displayed for any uncommon file system object?
@@ -149,7 +167,7 @@ def test_ignore_otherobjects(mock_iterdir):
     assert not pyclean.modern.Runner.unlink.called
     assert not pyclean.modern.Runner.rmdir.called
     assert pyclean.modern.log.mock_calls == [
-        call.debug('Ignoring %s', SymlinkMock('a-link')),
+        call.debug('Ignoring %s', SymlinkMock()),
     ]
 
 
@@ -295,30 +313,36 @@ def test_erase_loop(mock_delete_fs_obj):
 
 
 @pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
+@patch('pyclean.modern.remove_directory')
+@patch('pyclean.modern.remove_file')
 @patch('builtins.input', return_value='y')
 @patch(
     'pathlib.Path.glob',
     return_value=[
-        DirectoryMock('a-dir'),
-        SymlinkMock('a-symlink'),
-        FileMock('a-file'),
+        DirectoryMock(),
+        SymlinkMock(),
+        FileMock(),
     ]
 )
-def test_delete_filesdir_loop(mock_glob, mock_input):
+def test_delete_filesdir_loop(mock_glob, mock_yes, mock_unlink, mock_rmdir):
     """
     Exercise the file and directory loop code.
     """
-    pyclean.modern.Runner.unlink = Mock()
-    pyclean.modern.Runner.rmdir = Mock()
+    args = Namespace(dry_run=False, ignore=[])
     directory = Path('.')
 
+    initialize_runner(args)
     delete_filesystem_objects(directory, 'tmp/**/*', prompt=True)
 
-    assert pyclean.modern.Runner.unlink.call_args_list == [
-        call(SymlinkMock('a-symlink')),
-        call(FileMock('a-file')),
-    ]
-    assert pyclean.modern.Runner.rmdir.call_args_list == [
-        call(DirectoryMock('a-dir')),
-    ]
     assert mock_glob.called
+    assert mock_yes.called
+    assert mock_unlink.called
+    assert mock_rmdir.called
+
+    assert mock_unlink.call_args_list == [
+        call(SymlinkMock()),
+        call(FileMock()),
+    ]
+    assert mock_rmdir.call_args_list == [
+        call(DirectoryMock()),
+    ]

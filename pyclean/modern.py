@@ -58,6 +58,13 @@ class Runner:  # pylint: disable=too-few-public-methods
     unlink_failed = 0
 
 
+def initialize_runner(args):
+    """Sets up the Runner class with static attributes."""
+    Runner.unlink = print_filename if args.dry_run else remove_file
+    Runner.rmdir = print_dirname if args.dry_run else remove_directory
+    Runner.ignore = args.ignore
+
+
 def remove_file(fileobj):
     """Attempt to delete a file object for real."""
     log.debug("Deleting file: %s", fileobj)
@@ -94,9 +101,7 @@ def print_dirname(dirobj):
 
 def pyclean(args):
     """Cross-platform cleaning of Python bytecode."""
-    Runner.unlink = print_filename if args.dry_run else remove_file
-    Runner.rmdir = print_dirname if args.dry_run else remove_directory
-    Runner.ignore = args.ignore
+    initialize_runner(args)
 
     for dir_name in args.directory:
         directory = Path(dir_name)
