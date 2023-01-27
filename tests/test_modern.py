@@ -22,6 +22,8 @@ from pyclean.modern import (
     delete_filesystem_objects,
     initialize_runner,
     remove_debris_for,
+    remove_directory,
+    remove_file,
     remove_freeform_targets,
 )
 
@@ -147,6 +149,67 @@ def test_report_failures(unlink_failures, rmdir_failures):
         unlink_failures,
         rmdir_failures,
     )
+
+
+@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
+@patch('pathlib.Path.unlink')
+def test_unlink_success(mock_unlink):
+    """
+    Walk the code of a successful deletion.
+    """
+    remove_file(Path('tmp'))
+
+    assert mock_unlink.called
+
+
+@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
+@patch('pathlib.Path.rmdir')
+def test_rmdir_success(mock_rmdir):
+    """
+    Walk the code of a successful deletion.
+    """
+    remove_directory(Path('tmp'))
+
+    assert mock_rmdir.called
+
+
+@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
+@patch('pyclean.modern.log')
+@patch('pathlib.Path.unlink', side_effect=OSError)
+def test_unlink_failure(mock_unlink, mock_log):
+    """
+    Is a deletion error caught and logged?
+    """
+    remove_file(Path('tmp'))
+
+    assert "debug('File not deleted." in str(mock_log.mock_calls[1])
+
+
+@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
+@patch('pyclean.modern.log')
+@patch('pathlib.Path.rmdir', side_effect=OSError)
+def test_rmdir_failure(mock_rmdir, mock_log):
+    """
+    Is a deletion error caught and logged?
+    """
+    remove_directory(Path('tmp'))
+
+    assert "debug('Directory not removed." in str(mock_log.mock_calls[1])
+
+
+@patch('pyclean.modern.log')
+def test_dryrun_output(mock_log):
+    """
+    Do we explain what would be done, when --dry-run is used?
+    """
+    args = Namespace(dry_run=True, ignore=[])
+
+    initialize_runner(args)
+    pyclean.modern.Runner.unlink(Path('tmp'))
+    pyclean.modern.Runner.rmdir(Path('tmp'))
+
+    assert "debug('Would delete file:" in str(mock_log.mock_calls[0])
+    assert "debug('Would delete directory:" in str(mock_log.mock_calls[1])
 
 
 @pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
