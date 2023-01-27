@@ -150,7 +150,7 @@ Remove arbitrary file system objects
 PyClean also lets you remove free-form targets using globbing. Note that
 this is **potentially dangerous**: You can delete everything anywhere in
 the file system, including the entire project you're working on. For this
-reason, the `--erase` option has a few artificial constraints:
+reason, the ``--erase`` option has a few artificial constraints:
 
 - It doesn't do recursive deletion by itself, which means that you have
   to specify the directory and its contents, separately and explicitly.
@@ -158,7 +158,7 @@ reason, the `--erase` option has a few artificial constraints:
   removal of a directory will only work if you asked to delete all files
   inside first.
 - You're prompted interactively to confirm deletion, unless you add the
-  `--yes` option, in addition.
+  ``--yes`` option, in addition.
 
 .. code:: console
 
