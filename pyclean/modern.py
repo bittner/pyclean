@@ -104,15 +104,15 @@ def pyclean(args):
     initialize_runner(args)
 
     for dir_name in args.directory:
-        directory = Path(dir_name)
+        dir_path = Path(dir_name)
 
-        log.info("Cleaning directory %s", directory)
-        descend_and_clean(directory, BYTECODE_FILES, BYTECODE_DIRS)
+        log.info("Cleaning directory %s", dir_path)
+        descend_and_clean(dir_path, BYTECODE_FILES, BYTECODE_DIRS)
 
-    for topic in args.debris:
-        remove_debris_for(topic, args.directory)
+        for topic in args.debris:
+            remove_debris_for(topic, dir_path)
 
-    remove_freeform_targets(args.erase, args.yes, args.directory)
+        remove_freeform_targets(args.erase, args.yes, dir_path)
 
     log.info("Total %d files, %d directories %s.",
              Runner.unlink_count, Runner.rmdir_count,

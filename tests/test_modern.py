@@ -217,8 +217,9 @@ def test_dryrun_output(mock_log):
 @patch('pyclean.modern.print_filename')
 @patch('pyclean.modern.remove_directory')
 @patch('pyclean.modern.remove_file')
-def test_delete(mock_real_unlink, mock_real_rmdir,
-                mock_dry_unlink, mock_dry_rmdir):
+def test_delete(
+    mock_real_unlink, mock_real_rmdir, mock_dry_unlink, mock_dry_rmdir
+):
     """
     Is actual deletion attempted w/o --dry-run?
     """
@@ -236,8 +237,9 @@ def test_delete(mock_real_unlink, mock_real_rmdir,
 @patch('pyclean.modern.print_filename')
 @patch('pyclean.modern.remove_directory')
 @patch('pyclean.modern.remove_file')
-def test_dryrun(mock_real_unlink, mock_real_rmdir,
-                mock_dry_unlink, mock_dry_rmdir):
+def test_dryrun(
+    mock_real_unlink, mock_real_rmdir, mock_dry_unlink, mock_dry_rmdir
+):
     """
     Does --dry-run option avoid real deletion?
     """
@@ -358,5 +360,65 @@ def test_delete_filesdir_loop(mock_glob, mock_yes, mock_unlink, mock_rmdir):
         call(FileMock()),
     ]
     assert mock_rmdir.call_args_list == [
+        call(DirectoryMock()),
+    ]
+
+
+@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
+@patch('pyclean.modern.remove_directory')
+@patch('pyclean.modern.remove_file')
+@patch('builtins.input', return_value='n')
+@patch(
+    'pathlib.Path.glob',
+    return_value=[
+        DirectoryMock(),
+        SymlinkMock(),
+        FileMock(),
+    ]
+)
+def test_no_skips_deletion(mock_glob, mock_no, mock_unlink, mock_rmdir):
+    """
+    Is deletion skipped with --erase when user says "no" at the prompt?
+    """
+    args = Namespace(dry_run=False, ignore=[])
+    directory = Path('.')
+
+    initialize_runner(args)
+    delete_filesystem_objects(directory, 'tmp/**/*', prompt=True)
+
+    assert mock_glob.called
+    assert mock_no.called
+    assert not mock_unlink.called
+    assert not mock_rmdir.called
+
+
+@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
+@patch('pyclean.modern.remove_directory')
+@patch('pyclean.modern.remove_file')
+@patch(
+    'pathlib.Path.glob',
+    return_value=[
+        DirectoryMock(),
+        SymlinkMock(),
+        FileMock(),
+    ]
+)
+@patch('pyclean.modern.remove_debris_for')
+@patch('pyclean.modern.descend_and_clean')
+def test_yes_skips_prompt(
+    mock_descend, mock_debris, mock_glob, mock_unlink, mock_rmdir
+):
+    """
+    Does --yes skip the confirmation prompt for --erase?
+    """
+    with ArgvContext('pyclean', '.', '--erase', 'tmp/*', '--yes'):
+        pyclean.cli.main()
+
+    assert mock_glob.called
+    assert mock_unlink.mock_calls == [
+        call(SymlinkMock()),
+        call(FileMock()),
+    ]
+    assert mock_rmdir.mock_calls == [
         call(DirectoryMock()),
     ]
