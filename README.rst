@@ -144,6 +144,31 @@ Python bytecode. The following topics are currently covered:
 
     $ pyclean . --debris --verbose --dry-run
 
+Remove arbitrary file system objects
+------------------------------------
+
+PyClean also lets you remove free-form targets using globbing. Note that
+this is **potentially dangerous**: You can delete everything anywhere in
+the file system, including the entire project you're working on. For this
+reason, the `--erase` option has a few artificial constraints:
+
+- It doesn't do recursive deletion by itself, which means that you have
+  to specify the directory and its contents, separately and explicitly.
+- The above entails that you're responsible for the deletion order, i.e.
+  removal of a directory will only work if you asked to delete all files
+  inside first.
+- You're prompted interactively to confirm deletion, unless you add the
+  `--yes` option, in addition.
+
+.. code:: console
+
+    $ pyclean . --erase tmp/**/* tmp/
+
+The above would delete the entire ``tmp/`` directory with all subdirectories
+inside the current folder. If you omit the final ``tmp/`` you'll leave the
+empty ``tmp`` directory in place. (**WARNING!** Don't put the ``.`` *after*
+the ``--erase`` option! Obviously, your project files will all be deleted.)
+
 Use pyclean with Tox
 --------------------
 
