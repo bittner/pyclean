@@ -205,5 +205,8 @@ def delete_filesystem_objects(directory, path_glob, prompt=False):
 
 def confirm(message):
     """An interactive confirmation prompt."""
-    answer = input("%s? " % message)
-    return answer.strip().lower() in ['y', 'yes']
+    try:
+        answer = input("%s? " % message)
+        return answer.strip().lower() in ['y', 'yes']
+    except KeyboardInterrupt:
+        raise SystemExit('Aborted by user.')

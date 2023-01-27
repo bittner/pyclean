@@ -422,3 +422,13 @@ def test_yes_skips_prompt(
     assert mock_rmdir.mock_calls == [
         call(DirectoryMock()),
     ]
+
+
+@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
+@patch('builtins.input', side_effect=KeyboardInterrupt)
+def test_abort_confirm(mock_input):
+    """
+    Does the CLI abort cleanly when user presses Ctrl+C on the keyboard?
+    """
+    with pytest.raises(SystemExit, match=r'^Aborted by user.$'):
+        pyclean.modern.confirm('Abort execution')
