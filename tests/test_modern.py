@@ -2,7 +2,6 @@
 Tests for the modern module
 """
 import logging
-import sys
 from argparse import Namespace
 
 import pytest
@@ -28,7 +27,6 @@ from pyclean.modern import (
 )
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch('pyclean.modern.descend_and_clean')
 def test_walks_tree(mock_descend):
     """
@@ -42,7 +40,6 @@ def test_walks_tree(mock_descend):
     ]
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch('pyclean.modern.descend_and_clean')
 def test_walks_all_trees(mock_descend):
     """
@@ -58,7 +55,6 @@ def test_walks_all_trees(mock_descend):
     ]
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch.object(pyclean.modern.logging, 'basicConfig')
 @patch('pyclean.modern.descend_and_clean')
 def test_normal_logging(mock_descend, mock_logconfig):
@@ -73,7 +69,6 @@ def test_normal_logging(mock_descend, mock_logconfig):
     ]
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch.object(pyclean.modern.logging, 'basicConfig')
 @patch('pyclean.modern.descend_and_clean')
 def test_verbose_logging(mock_descend, mock_logconfig):
@@ -88,7 +83,6 @@ def test_verbose_logging(mock_descend, mock_logconfig):
     ]
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch.object(pyclean.modern.logging, 'basicConfig')
 @patch('pyclean.modern.descend_and_clean')
 def test_quiet_logging(mock_descend, mock_logconfig):
@@ -103,7 +97,6 @@ def test_quiet_logging(mock_descend, mock_logconfig):
     ]
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch('pathlib.Path.iterdir', return_value=[SymlinkMock()])
 def test_ignore_otherobjects(mock_iterdir):
     """
@@ -124,7 +117,6 @@ def test_ignore_otherobjects(mock_iterdir):
     ]
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @pytest.mark.parametrize('unlink_failures,rmdir_failures', [(7, 0), (0, 3), (1, 1)])
 def test_report_failures(unlink_failures, rmdir_failures):
     """
@@ -151,7 +143,6 @@ def test_report_failures(unlink_failures, rmdir_failures):
     )
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch('pathlib.Path.unlink')
 def test_unlink_success(mock_unlink):
     """
@@ -162,7 +153,6 @@ def test_unlink_success(mock_unlink):
     assert mock_unlink.called
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch('pathlib.Path.rmdir')
 def test_rmdir_success(mock_rmdir):
     """
@@ -173,7 +163,6 @@ def test_rmdir_success(mock_rmdir):
     assert mock_rmdir.called
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch('pyclean.modern.log')
 @patch('pathlib.Path.unlink', side_effect=OSError)
 def test_unlink_failure(mock_unlink, mock_log):
@@ -185,7 +174,6 @@ def test_unlink_failure(mock_unlink, mock_log):
     assert "debug('File not deleted." in str(mock_log.mock_calls[1])
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch('pyclean.modern.log')
 @patch('pathlib.Path.rmdir', side_effect=OSError)
 def test_rmdir_failure(mock_rmdir, mock_log):
@@ -212,7 +200,6 @@ def test_dryrun_output(mock_log):
     assert "debug('Would delete directory:" in str(mock_log.mock_calls[1])
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch('pyclean.modern.print_dirname')
 @patch('pyclean.modern.print_filename')
 @patch('pyclean.modern.remove_directory')
@@ -232,7 +219,6 @@ def test_delete(
     assert not mock_dry_rmdir.called
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch('pyclean.modern.print_dirname')
 @patch('pyclean.modern.print_filename')
 @patch('pyclean.modern.remove_directory')
@@ -252,7 +238,6 @@ def test_dryrun(
     assert mock_dry_rmdir.called
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @pytest.mark.parametrize(
     'options,scanned_topics',
     [
@@ -278,7 +263,6 @@ def test_debris_option(mock_descend, mock_debris, mock_erase, options, scanned_t
     assert mock_erase.called
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch('pyclean.modern.remove_freeform_targets')
 @patch('pyclean.modern.remove_debris_for')
 @patch('pyclean.modern.descend_and_clean')
@@ -296,7 +280,6 @@ def test_erase_option(mock_descend, mock_debris, mock_erase):
     assert erase_calls == [['tmp/**/*', 'tmp/']]
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch('pyclean.modern.delete_filesystem_objects')
 def test_debris_loop(mock_delete_fs_obj):
     """
@@ -312,7 +295,6 @@ def test_debris_loop(mock_delete_fs_obj):
     ]
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch('pyclean.modern.delete_filesystem_objects')
 def test_erase_loop(mock_delete_fs_obj):
     """
@@ -328,7 +310,6 @@ def test_erase_loop(mock_delete_fs_obj):
     ]
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch('pyclean.modern.remove_directory')
 @patch('pyclean.modern.remove_file')
 @patch('builtins.input', return_value='y')
@@ -364,7 +345,6 @@ def test_delete_filesdir_loop(mock_glob, mock_yes, mock_unlink, mock_rmdir):
     ]
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch('pyclean.modern.remove_directory')
 @patch('pyclean.modern.remove_file')
 @patch('builtins.input', return_value='n')
@@ -392,7 +372,6 @@ def test_no_skips_deletion(mock_glob, mock_no, mock_unlink, mock_rmdir):
     assert not mock_rmdir.called
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch('pyclean.modern.remove_directory')
 @patch('pyclean.modern.remove_file')
 @patch(
@@ -424,7 +403,6 @@ def test_yes_skips_prompt(
     ]
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason="requires Python 3")
 @patch('builtins.input', side_effect=KeyboardInterrupt)
 def test_abort_confirm(mock_input):
     """
