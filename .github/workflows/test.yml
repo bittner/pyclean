@@ -39,7 +39,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install build tools
       run: |
-        python -m pip install --disable-pip-version-check tox-gh-actions wheel
+        python -m pip install tox-gh-actions wheel --disable-pip-version-check
     - name: Run tests
       run: tox
     - name: Upload coverage report

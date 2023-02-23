@@ -30,7 +30,6 @@ jobs:
         python-version: '3.9'
     - name: Install build tools
       run: |
-        python -m pip install --upgrade pip
-        python -m pip install --upgrade setuptools tox wheel
+        python -m pip install tox wheel --disable-pip-version-check
     - name: Run ${{ matrix.env }}
       run: tox -e ${{ matrix.env }}
