@@ -14,7 +14,7 @@ def parse_arguments():
     """
     Parse and handle CLI arguments
     """
-    debris_default_topics = ['build', 'cache', 'coverage', 'pytest']
+    debris_default_topics = ['cache', 'coverage', 'package', 'pytest']
     debris_optional_topics = ['jupyter', 'tox']
     debris_choices = ['all'] + debris_default_topics + debris_optional_topics
     ignore_default_items = ['.git', '.hg', '.svn', '.tox', '.venv', 'node_modules']

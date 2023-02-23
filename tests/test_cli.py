@@ -156,7 +156,7 @@ def test_debris_default_args():
     with ArgvContext('pyclean', 'foo', '--debris'):
         args = pyclean.cli.parse_arguments()
 
-    assert args.debris == ['build', 'cache', 'coverage', 'pytest']
+    assert args.debris == ['cache', 'coverage', 'package', 'pytest']
 
 
 def test_debris_all():
@@ -166,17 +166,17 @@ def test_debris_all():
     with ArgvContext('pyclean', 'foo', '--debris', 'all'):
         args = pyclean.cli.parse_arguments()
 
-    assert args.debris == ['build', 'cache', 'coverage', 'pytest', 'jupyter', 'tox']
+    assert args.debris == ['cache', 'coverage', 'package', 'pytest', 'jupyter', 'tox']
 
 
 def test_debris_explicit_args():
     """
     Does calling `pyclean --debris` with explicit arguments provide those?
     """
-    with ArgvContext('pyclean', 'foo', '--debris', 'build', 'pytest'):
+    with ArgvContext('pyclean', 'foo', '--debris', 'package', 'pytest'):
         args = pyclean.cli.parse_arguments()
 
-    assert args.debris == ['build', 'pytest']
+    assert args.debris == ['package', 'pytest']
 
 
 def test_debris_invalid_args():
