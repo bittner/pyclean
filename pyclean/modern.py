@@ -12,14 +12,6 @@ except ImportError:  # Python 2.7, PyPy2
 BYTECODE_FILES = ['.pyc', '.pyo']
 BYTECODE_DIRS = ['__pycache__']
 DEBRIS_TOPICS = {
-    'package': [
-        'dist/**/*',
-        'dist/',
-        'sdist/**/*',
-        'sdist/',
-        '*.egg-info/**/*',
-        '*.egg-info/',
-    ],
     'cache': [
         '.cache/**/*',
         '.cache/',
@@ -35,6 +27,14 @@ DEBRIS_TOPICS = {
     'jupyter': [
         '.ipynb_checkpoints/**/*',
         '.ipynb_checkpoints/',
+    ],
+    'package': [
+        'dist/**/*',
+        'dist/',
+        'sdist/**/*',
+        'sdist/',
+        '*.egg-info/**/*',
+        '*.egg-info/',
     ],
     'pytest': [
         '.pytest_cache/**/*',
