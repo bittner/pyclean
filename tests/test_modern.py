@@ -242,8 +242,8 @@ def test_dryrun(
     'options,scanned_topics',
     [
         ([], []),
-        (['-d'], ['build', 'cache', 'coverage', 'pytest']),
-        (['-d', 'build', 'coverage'], ['build', 'coverage']),
+        (['-d'], ['cache', 'coverage', 'package', 'pytest']),
+        (['-d', 'coverage', 'package'], ['coverage', 'package']),
     ]
 )
 @patch('pyclean.modern.remove_freeform_targets')

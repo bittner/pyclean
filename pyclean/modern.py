@@ -12,7 +12,7 @@ except ImportError:  # Python 2.7, PyPy2
 BYTECODE_FILES = ['.pyc', '.pyo']
 BYTECODE_DIRS = ['__pycache__']
 DEBRIS_TOPICS = {
-    'build': [
+    'package': [
         'dist/**/*',
         'dist/',
         'sdist/**/*',
