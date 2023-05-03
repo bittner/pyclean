@@ -1,7 +1,7 @@
 pyclean |latest-version|
 ========================
 
-|checks-status| |tests-status| |scrutinizer| |codacy| |python-versions| |python-impl| |license|
+|checks-status| |tests-status| |publish-status| |scrutinizer| |codacy| |python-versions| |python-impl| |license|
 
 Worried about ``.pyc`` files and ``__pycache__`` directories? Fear not!
 PyClean is here to help. Finally the single-command clean up for Python
@@ -14,11 +14,14 @@ bytecode files in your favorite directories. On any platform.
 .. |latest-version| image:: https://img.shields.io/pypi/v/pyclean.svg
    :target: https://pypi.org/project/pyclean
    :alt: Latest version on PyPI
-.. |checks-status| image:: https://img.shields.io/github/actions/workflow/status/bittner/pyclean/check.yml?branch=main&label=Checks&logo=github
+.. |checks-status| image:: https://github.com/bittner/pyclean/actions/workflows/check.yml/badge.svg
    :target: https://github.com/bittner/pyclean/actions/workflows/check.yml
    :alt: GitHub Workflow Status
-.. |tests-status| image:: https://img.shields.io/github/actions/workflow/status/bittner/pyclean/test.yml?branch=main&label=Tests&logo=github
+.. |tests-status| image:: https://github.com/bittner/pyclean/actions/workflows/test.yml/badge.svg
    :target: https://github.com/bittner/pyclean/actions/workflows/test.yml
+   :alt: GitHub Workflow Status
+.. |publish-status| image:: https://github.com/bittner/pyclean/actions/workflows/publish.yml/badge.svg
+   :target: https://github.com/bittner/pyclean/actions/workflows/publish.yml
    :alt: GitHub Workflow Status
 .. |scrutinizer| image:: https://img.shields.io/scrutinizer/build/g/bittner/pyclean/main?logo=scrutinizer&label=%22
    :target: https://scrutinizer-ci.com/g/bittner/pyclean/
