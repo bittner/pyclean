@@ -3,10 +3,11 @@ name: Publish
 on:
   push:
     tags:
-    - "*"
+    - '*'
 
 env:
-  PY_COLORS: "1"
+  PIP_DISABLE_PIP_VERSION_CHECK: '1'
+  PY_COLORS: '1'
 
 jobs:
   publish:
@@ -15,10 +16,10 @@ jobs:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.10'
     - name: Install build tools
       run: |
-        python -m pip install build twine wheel --disable-pip-version-check
+        python -m pip install build twine wheel
     - name: Build package
       run: python -m build
     - name: Upload to PyPI
