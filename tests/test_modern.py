@@ -19,7 +19,6 @@ import pyclean.cli
 import pyclean.modern
 from pyclean.modern import (
     delete_filesystem_objects,
-    initialize_runner,
     remove_debris_for,
     remove_directory,
     remove_file,
@@ -122,9 +121,6 @@ def test_report_failures(unlink_failures, rmdir_failures):
     """
     Are failures to delete a file or folder reported with ``log.debug``?
     """
-    pyclean.modern.Runner.unlink_failed = unlink_failures
-    pyclean.modern.Runner.rmdir_failed = rmdir_failures
-    pyclean.modern.log = Mock()
     args = Namespace(
         debris=[],
         directory=[],
@@ -133,13 +129,25 @@ def test_report_failures(unlink_failures, rmdir_failures):
         ignore=[],
         yes=False,
     )
+    pyclean.modern.Runner.configure(args)
+    pyclean.modern.Runner.unlink_failed = unlink_failures
+    pyclean.modern.Runner.rmdir_failed = rmdir_failures
+    pyclean.modern.log = Mock()
 
-    pyclean.modern.pyclean(args)
+    with patch('pyclean.modern.CleanupRunner.configure'):
+        pyclean.modern.pyclean(args)
 
     assert pyclean.modern.log.mock_calls[1] == call.debug(
-        '%d files, %d directories could not be removed.',
+        '%d files, %d directories %s not be removed.',
         unlink_failures,
         rmdir_failures,
+        'would',
+    )
+    assert pyclean.modern.log.mock_calls[1] == call.debug(
+        '%d files, %d directories %s not be removed.',
+        unlink_failures,
+        rmdir_failures,
+        'would',
     )
 
 
@@ -192,7 +200,7 @@ def test_dryrun_output(mock_log):
     """
     args = Namespace(dry_run=True, ignore=[])
 
-    initialize_runner(args)
+    pyclean.modern.Runner.configure(args)
     pyclean.modern.Runner.unlink(Path('tmp'))
     pyclean.modern.Runner.rmdir(Path('tmp'))
 
@@ -328,7 +336,7 @@ def test_delete_filesdir_loop(mock_glob, mock_yes, mock_unlink, mock_rmdir):
     args = Namespace(dry_run=False, ignore=[])
     directory = Path('.')
 
-    initialize_runner(args)
+    pyclean.modern.Runner.configure(args)
     delete_filesystem_objects(directory, 'tmp/**/*', prompt=True)
 
     assert mock_glob.called
@@ -363,13 +371,19 @@ def test_no_skips_deletion(mock_glob, mock_no, mock_unlink, mock_rmdir):
     args = Namespace(dry_run=False, ignore=[])
     directory = Path('.')
 
-    initialize_runner(args)
+    pyclean.modern.Runner.configure(args)
+
+    assert pyclean.modern.Runner.unlink_failed == 0
+    assert pyclean.modern.Runner.rmdir_failed == 0
+
     delete_filesystem_objects(directory, 'tmp/**/*', prompt=True)
 
     assert mock_glob.called
     assert mock_no.called
     assert not mock_unlink.called
     assert not mock_rmdir.called
+    assert pyclean.modern.Runner.unlink_failed > 0
+    assert pyclean.modern.Runner.rmdir_failed > 0
 
 
 @patch('pyclean.modern.remove_directory')

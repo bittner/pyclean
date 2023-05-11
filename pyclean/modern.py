@@ -52,22 +52,33 @@ DEBRIS_TOPICS = {
     ],
 }
 
-log = logging.getLogger(__name__)
 
-
-class Runner:  # pylint: disable=too-few-public-methods
+class CleanupRunner:  # pylint: disable=too-few-public-methods
     """Module-level configuration and value store."""
-    rmdir_count = 0
-    rmdir_failed = 0
-    unlink_count = 0
-    unlink_failed = 0
+
+    def __init__(self):
+        """Cleanup runner with optional dry-run behavior."""
+        self.unlink = None
+        self.rmdir = None
+        self.ignore = None
+        self.unlink_count = None
+        self.unlink_failed = None
+        self.rmdir_count = None
+        self.rmdir_failed = None
+
+    def configure(self, args):
+        """Set up runner according to command line options."""
+        self.unlink = print_filename if args.dry_run else remove_file
+        self.rmdir = print_dirname if args.dry_run else remove_directory
+        self.ignore = args.ignore
+        self.unlink_count = 0
+        self.unlink_failed = 0
+        self.rmdir_count = 0
+        self.rmdir_failed = 0
 
 
-def initialize_runner(args):
-    """Sets up the Runner class with static attributes."""
-    Runner.unlink = print_filename if args.dry_run else remove_file
-    Runner.rmdir = print_dirname if args.dry_run else remove_directory
-    Runner.ignore = args.ignore
+log = logging.getLogger(__name__)
+Runner = CleanupRunner()
 
 
 def remove_file(fileobj):
@@ -106,7 +117,7 @@ def print_dirname(dirobj):
 
 def pyclean(args):
     """Cross-platform cleaning of Python bytecode."""
-    initialize_runner(args)
+    Runner.configure(args)
 
     for dir_name in args.directory:
         dir_path = Path(dir_name)
@@ -124,8 +135,9 @@ def pyclean(args):
              "would be removed" if args.dry_run else "removed")
 
     if Runner.unlink_failed or Runner.rmdir_failed:
-        log.debug("%d files, %d directories could not be removed.",
-                  Runner.unlink_failed, Runner.rmdir_failed)
+        log.debug("%d files, %d directories %s not be removed.",
+                  Runner.unlink_failed, Runner.rmdir_failed,
+                  "would" if args.dry_run else "could")
 
 
 def descend_and_clean(directory, file_types, dir_names):
@@ -199,11 +211,13 @@ def delete_filesystem_objects(directory, path_glob, prompt=False):
             'symlink' if file_object.is_symlink() else 'file',
             file_object,
         )):
+            Runner.unlink_failed += 1
             continue
         Runner.unlink(file_object)
 
     for dir_object in dirs:
         if prompt and not confirm('Remove empty directory %s' % dir_object):
+            Runner.rmdir_failed += 1
             continue
         Runner.rmdir(dir_object)
 
