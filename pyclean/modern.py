@@ -29,6 +29,11 @@ DEBRIS_TOPICS = {
         '.ipynb_checkpoints/',
     ],
     'package': [
+        'build/bdist.*/**/*',
+        'build/bdist.*/',
+        'build/lib/**/*',
+        'build/lib/',
+        'build/',
         'dist/**/*',
         'dist/',
         'sdist/**/*',
