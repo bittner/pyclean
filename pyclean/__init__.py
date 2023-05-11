@@ -2,4 +2,4 @@
 Pure Python cross-platform pyclean. Clean up your Python bytecode.
 """
 
-__version__ = '2.7.1'
+__version__ = '2.7.2'
