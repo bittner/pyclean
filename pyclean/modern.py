@@ -28,6 +28,10 @@ DEBRIS_TOPICS = {
         '.ipynb_checkpoints/**/*',
         '.ipynb_checkpoints/',
     ],
+    'mypy': [
+        '.mypy_cache/**/*',
+        '.mypy_cache/',
+    ],
     'package': [
         'build/bdist.*/**/*',
         'build/bdist.*/',
