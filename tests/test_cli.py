@@ -166,7 +166,15 @@ def test_debris_all():
     with ArgvContext('pyclean', 'foo', '--debris', 'all'):
         args = pyclean.cli.parse_arguments()
 
-    assert args.debris == ['cache', 'coverage', 'package', 'pytest', 'jupyter', 'tox']
+    assert args.debris == [
+        'cache',
+        'coverage',
+        'package',
+        'pytest',
+        'jupyter',
+        'mypy',
+        'tox',
+    ]
 
 
 def test_debris_explicit_args():

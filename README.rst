@@ -138,6 +138,7 @@ Python bytecode. The following topics are currently covered:
 - Packaging (build files and folders)
 - Pytest (build files and folders)
 - Jupyter (notebook checkpoints) – *optional*
+- Mypy (mypy cache folder) – *optional*
 - Tox (tox environments) – *optional*
 
 *Example:* Dry-run a cleanup of bytecode and tool debris in verbose mode

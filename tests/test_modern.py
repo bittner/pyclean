@@ -252,6 +252,7 @@ def test_dryrun(
         ([], []),
         (['-d'], ['cache', 'coverage', 'package', 'pytest']),
         (['-d', 'coverage', 'package'], ['coverage', 'package']),
+        (['-d', 'jupyter', 'mypy', 'tox'], ['jupyter', 'mypy', 'tox']),
     ]
 )
 @patch('pyclean.modern.remove_freeform_targets')
@@ -288,19 +289,30 @@ def test_erase_option(mock_descend, mock_debris, mock_erase):
     assert erase_calls == [['tmp/**/*', 'tmp/']]
 
 
+@pytest.mark.parametrize(
+    'debris_topic',
+    [
+        'cache',
+        'coverage',
+        'package',
+        'pytest',
+        'jupyter',
+        'mypy',
+        'tox',
+    ]
+)
 @patch('pyclean.modern.delete_filesystem_objects')
-def test_debris_loop(mock_delete_fs_obj):
+def test_debris_loop(mock_delete_fs_obj, debris_topic):
     """
     Does ``remove_debris_for()`` call filesystem object removal?
     """
-    pyclean.modern.DEBRIS_TOPICS = {'foo': ['somedir/']}
+    fileobject_globs = pyclean.modern.DEBRIS_TOPICS[debris_topic]
     directory = Path('.')
+    expected_calls = [call(directory, pattern) for pattern in fileobject_globs]
 
-    remove_debris_for('foo', directory)
+    remove_debris_for(debris_topic, directory)
 
-    assert mock_delete_fs_obj.call_args_list == [
-        call(directory, 'somedir/'),
-    ]
+    assert mock_delete_fs_obj.call_args_list == expected_calls
 
 
 @patch('pyclean.modern.delete_filesystem_objects')
