@@ -26,6 +26,7 @@ setup(
     url='https://github.com/bittner/pyclean',
     packages=find_packages(exclude=['test*']),
     include_package_data=True,
+    license='GPL-3.0-or-later',
     keywords=['python', 'bytecode', 'cli', 'tools'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
