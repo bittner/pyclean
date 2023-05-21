@@ -28,10 +28,12 @@ Run the linters and our test suite using Tox, e.g.
 # show all Tox targets
 tox list
 ```
+
 ```console
-# run just flake8 and the test for Python 3.7
-tox -e flake8,3.7
+# run just flake8 and the tests for Python 3.10
+tox -e flake8,3.10
 ```
+
 ```console
 # run entire test suite
 tox
@@ -40,6 +42,13 @@ tox
 The entire suite will run against all supported target operating systems
 and Python versions when you create a PR on GitHub.
 Make sure all tests pass, otherwise the PR will likely not get merged.
+
+If you want to test against the various Python versions locally before
+pushing take a look at [pyenv][pyenv] or [rye][rye], which both allow you
+to install different Python versions on your computer in parallel.
+
+[pyenv]: https://github.com/pyenv/pyenv#installation
+[rye]: https://github.com/mitsuhiko/rye
 
 Developing locally
 ------------------
