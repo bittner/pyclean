@@ -26,11 +26,11 @@ Run the linters and our test suite using Tox, e.g.
 
 ```console
 # show all Tox targets
-tox -lv
+tox list
 ```
 ```console
 # run just flake8 and the test for Python 3.7
-tox -e flake8,py37
+tox -e flake8,3.7
 ```
 ```console
 # run entire test suite
