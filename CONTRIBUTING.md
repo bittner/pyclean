@@ -31,7 +31,12 @@ tox list
 
 ```console
 # run just flake8 and the tests for Python 3.10
-tox -e flake8,3.10
+tox -e flake8,py310
+```
+
+```console
+# run tests with your default Python (the one executing Tox)
+tox -e py
 ```
 
 ```console
