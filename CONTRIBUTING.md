@@ -67,8 +67,6 @@ python3 -m pyclean
 or you can make a so-called "editable install", for development:
 
 ```console
-python3 setup.py develop
-# or:
 python3 -m pip install -e .
 ```
 

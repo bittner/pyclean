@@ -1,3 +1,54 @@
+[build-system]
+requires = ["setuptools>=44"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyclean"
+version = "2.7.4"
+description = "Pure Python cross-platform pyclean. Clean up your Python bytecode."
+readme = "README.rst"
+license = {file = "LICENSE"}
+authors = [
+  {name = "Peter Bittner", email = "django@bittner.it"},
+]
+maintainers = [
+  {name = "Peter Bittner", email = "django@bittner.it"},
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 2",
+  "Programming Language :: Python :: 2.7",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.5",
+  "Programming Language :: Python :: 3.6",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+  "Topic :: Utilities",
+]
+keywords = [
+  "python",
+  "bytecode",
+  "cli",
+  "tools",
+]
+
+[project.scripts]
+pyclean = "pyclean.cli:main"
+py2clean = "pyclean.cli:py2clean"
+py3clean = "pyclean.cli:py3clean"
+pypyclean = "pyclean.cli:pypyclean"
+
+[project.urls]
+homepage = "https://github.com/bittner/pyclean"
+
 [tool.bandit]
 exclude_dirs = [".git",".github",".tox","tests","pyclean/py2clean.py","pyclean/py3clean.py","pyclean/pypyclean.py"]
 
@@ -21,3 +72,6 @@ output-format = "colorized"
 
 [tool.pytest.ini_options]
 addopts = "--color=yes --doctest-modules --ignore=pyclean/py2clean.py --ignore=pyclean/py3clean.py --ignore=pyclean/pypyclean.py --junitxml=tests/junit-report.xml --verbose"
+
+[tool.setuptools]
+packages = ["pyclean"]

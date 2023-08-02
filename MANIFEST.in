@@ -1,2 +1,4 @@
+exclude MANIFEST.in
 include LICENSE
 include README.rst
+prune tests
