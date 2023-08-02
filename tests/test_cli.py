@@ -2,7 +2,6 @@
 Tests for the pyclean CLI
 """
 import os
-import platform
 import sys
 from importlib import import_module
 
@@ -34,7 +33,7 @@ def test_runas_module():
 
 def test_entrypoint():
     """
-    Is entrypoint script installed? (setup.py)
+    Is entrypoint script installed? (pyproject.toml)
     """
     result = shell('pyclean --help')
     assert result.exit_code == 0
@@ -42,7 +41,7 @@ def test_entrypoint():
 
 def test_entrypoint_py2_installed():
     """
-    Is entrypoint script installed for Python 2? (setup.py)
+    Is entrypoint script installed for Python 2? (pyproject.toml)
     """
     result = shell('py2clean --help')
     assert result.exit_code == 0
@@ -62,7 +61,7 @@ def test_entrypoint_py2_working(mock_import_module):
 
 def test_entrypoint_py3_installed():
     """
-    Is entrypoint script installed for Python 3? (setup.py)
+    Is entrypoint script installed for Python 3? (pyproject.toml)
     """
     result = shell('py3clean --help')
     assert result.exit_code == 0
@@ -82,7 +81,7 @@ def test_entrypoint_py3_working(mock_import_module):
 
 def test_entrypoint_pypy_installed():
     """
-    Is entrypoint script installed for PyPy 2/3? (setup.py)
+    Is entrypoint script installed for PyPy 2/3? (pyproject.toml)
     """
     result = shell('pypyclean --help')
     assert result.exit_code == 0
@@ -248,8 +247,7 @@ def test_version_option():
     """
     Does --version yield the expected information?
     """
-    expected_output = '' if platform.python_version_tuple() < ('3',) \
-        else '%s%s' % (pyclean.__version__, os.linesep)
+    expected_output = '%s%s' % (pyclean.__version__, os.linesep)
 
     result = shell('pyclean --version')
 
