@@ -192,7 +192,7 @@ You'll then be able to run it with `Tox`_ like this:
 
     $ tox -e clean
 
-.. _Tox: https://tox.readthedocs.io/
+.. _Tox: https://tox.wiki/
 
 Development
 ===========
