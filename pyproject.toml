@@ -49,9 +49,6 @@ pypyclean = "pyclean.cli:pypyclean"
 [project.urls]
 homepage = "https://github.com/bittner/pyclean"
 
-[tool.bandit]
-exclude_dirs = [".git",".github",".tox","tests","pyclean/py2clean.py","pyclean/py3clean.py","pyclean/pypyclean.py"]
-
 [tool.black]
 color = true
 
@@ -61,17 +58,20 @@ source = ["pyclean"]
 [tool.coverage.report]
 show_missing = true
 
-[tool.isort]
-color_output = true
-profile = "black"
-
-[tool.pylint.master]
-disable = ["consider-using-f-string","raise-missing-from","use-dict-literal"]
-ignore = ["py2clean.py","py3clean.py","pypyclean.py"]
-output-format = "colorized"
-
 [tool.pytest.ini_options]
 addopts = "--color=yes --doctest-modules --ignore=pyclean/py2clean.py --ignore=pyclean/py3clean.py --ignore=pyclean/pypyclean.py --junitxml=tests/junit-report.xml --verbose"
+
+[tool.ruff]
+extend-exclude = []
+extend-select = ["B", "BLE", "C4", "C90", "COM", "DJ", "DTZ", "EM", "G", "I", "N", "PIE", "PL", "PT", "PTH", "R", "S", "SIM", "T10", "TID", "W", "YTT"]
+extend-ignore = []
+
+[tool.ruff.per-file-ignores]
+"pyclean/compat.py" = ["C408"]
+"pyclean/py2clean.py" = ["E402", "PTH"]
+"pyclean/py3clean.py" = ["BLE001", "C901", "E402", "PLR1722", "PTH", "S110", "SIM105"]
+"pyclean/pypyclean.py" = ["B007", "G002", "PTH", "S603"]
+"tests/*.py" = ["S101"]
 
 [tool.setuptools]
 packages = ["pyclean"]
