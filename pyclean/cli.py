@@ -106,9 +106,14 @@ def main(override=None):
     args = parse_arguments()
     if override or args.legacy:
         impl = compat.get_implementation(override=override)
-        impl.main(args)
+        pyclean_main = impl.main
     else:
-        modern.pyclean(args)
+        pyclean_main = modern.pyclean
+
+    try:
+        pyclean_main(args)
+    except Exception as err:
+        raise SystemExit(err)
 
 
 def py2clean():
