@@ -112,7 +112,14 @@ def test_mandatory_arg_missing(mock_getimpl, mock_modern):
     assert not mock_modern.called
 
 
-@pytest.mark.parametrize('options', (['.'], ['--package=foo'], ['.', '-p', 'foo']))
+@pytest.mark.parametrize(
+    'options',
+    [
+        ['.'],
+        ['--package=foo'],
+        ['.', '-p', 'foo'],
+    ],
+)
 @patch('pyclean.cli.modern.pyclean')
 @patch('pyclean.cli.compat.get_implementation')
 def test_mandatory_args(mock_getimpl, mock_modern, options):
@@ -196,13 +203,13 @@ def test_debris_invalid_args():
 
 
 @pytest.mark.parametrize(
-    'cli_args,erase_result',
+    ('cli_args', 'erase_result'),
     [
         (['--erase', 'foo'], ['foo']),
         (['--erase', 'a', 'b', 'c'], ['a', 'b', 'c']),
         (['--erase=tmp/*', '--erase=tmp'], ['tmp/*', 'tmp']),
         (['-e', 'x', '-e', 'y', 'z'], ['x', 'y', 'z']),
-    ]
+    ],
 )
 def test_erase_multiple_args(cli_args, erase_result):
     """
