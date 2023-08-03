@@ -67,6 +67,7 @@ extend-select = ["B", "BLE", "C4", "C90", "COM", "DJ", "DTZ", "EM", "G", "I", "N
 extend-ignore = []
 
 [tool.ruff.per-file-ignores]
+"pyclean/cli.py" = ["B904", "BLE001"]
 "pyclean/compat.py" = ["C408"]
 "pyclean/modern.py" = ["B028", "B904"]
 "pyclean/py2clean.py" = ["E402", "PTH"]

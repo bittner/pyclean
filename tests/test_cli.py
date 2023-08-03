@@ -2,6 +2,7 @@
 Tests for the pyclean CLI
 """
 import os
+import platform
 import sys
 from importlib import import_module
 
@@ -97,6 +98,19 @@ def test_entrypoint_pypy_working(mock_import_module):
 
     args, _ = mock_import_module.call_args
     assert args == ('pyclean.pypyclean',)
+
+
+@pytest.mark.skipif(platform.system() != 'Linux', reason="requires Debian Linux")
+def test_main_handles_exceptions():
+    """
+    The main CLI entry point handles exceptions gracefully.
+    """
+    impl = pyclean.compat.get_implementation()
+
+    with patch.object(impl, 'main', side_effect=Exception('Something went wrong.')), \
+            pytest.raises(SystemExit, match='Something went wrong.'), \
+            ArgvContext('pyclean', '--package=foo', '--legacy'):
+        pyclean.cli.main()
 
 
 @patch('pyclean.cli.modern.pyclean')
