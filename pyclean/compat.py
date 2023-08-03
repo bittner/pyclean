@@ -21,7 +21,7 @@ def get_implementation(override=None):
 
     detected_version = '%s%s' % (
         platform.python_implementation(),
-        sys.version[0],
+        sys.version_info.major,
     )
 
     module_name = implementation[override if override else detected_version]

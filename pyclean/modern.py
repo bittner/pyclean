@@ -232,4 +232,5 @@ def confirm(message):
         answer = input("%s? " % message)
         return answer.strip().lower() in ['y', 'yes']
     except KeyboardInterrupt:
-        raise SystemExit('Aborted by user.')
+        msg = 'Aborted by user.'
+        raise SystemExit(msg)

@@ -68,6 +68,7 @@ extend-ignore = []
 
 [tool.ruff.per-file-ignores]
 "pyclean/compat.py" = ["C408"]
+"pyclean/modern.py" = ["B028", "B904"]
 "pyclean/py2clean.py" = ["E402", "PTH"]
 "pyclean/py3clean.py" = ["BLE001", "C901", "E402", "PLR1722", "PTH", "S110", "SIM105"]
 "pyclean/pypyclean.py" = ["B007", "G002", "PTH", "S603"]
