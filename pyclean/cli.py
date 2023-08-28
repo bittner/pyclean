@@ -17,7 +17,15 @@ def parse_arguments():
     debris_default_topics = ['cache', 'coverage', 'package', 'pytest']
     debris_optional_topics = ['jupyter', 'mypy', 'tox']
     debris_choices = ['all'] + debris_default_topics + debris_optional_topics
-    ignore_default_items = ['.git', '.hg', '.svn', '.tox', '.venv', 'node_modules']
+    ignore_default_items = [
+        '.git',
+        '.hg',
+        '.svn',
+        '.tox',
+        '.venv',
+        'node_modules',
+        'venv',
+    ]
 
     parser = argparse.ArgumentParser(
         description='Remove byte-compiled files for a package or project.',
