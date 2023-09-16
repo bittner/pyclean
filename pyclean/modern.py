@@ -50,6 +50,10 @@ DEBRIS_TOPICS = {
         '.pytest_cache/',
         'pytestdebug.log',
     ],
+    'ruff': [
+        '.ruff_cache/**/*',
+        '.ruff_cache/',
+    ],
     'tox': [
         '.tox/**/*',
         '.tox/',
