@@ -193,6 +193,7 @@ def test_debris_all():
         'pytest',
         'jupyter',
         'mypy',
+        'ruff',
         'tox',
     ]
 

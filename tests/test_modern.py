@@ -305,6 +305,7 @@ def test_erase_option(mock_descend, mock_debris, mock_erase):
         'pytest',
         'jupyter',
         'mypy',
+        'ruff',
         'tox',
     ],
 )
