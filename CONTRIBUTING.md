@@ -52,9 +52,6 @@ If you want to test against the various Python versions locally before
 pushing take a look at [pyenv][pyenv] or [rye][rye], which both allow you
 to install different Python versions on your computer in parallel.
 
-[pyenv]: https://github.com/pyenv/pyenv#installation
-[rye]: https://github.com/mitsuhiko/rye
-
 Developing locally
 ------------------
 
@@ -91,3 +88,6 @@ Or, for a specific branch:
 ```console
 python3 -m pip install git+https://github.com/bittner/pyclean@feature-branch#egg=pyclean
 ```
+
+[pyenv]: https://github.com/pyenv/pyenv#installation
+[rye]: https://github.com/mitsuhiko/rye
