@@ -191,7 +191,7 @@ def test_debris_optional_args():
     )
 
     result = shell('pyclean --help')
-    normalized_stdout = re.sub(f'{os.linesep} *', ' ', result.stdout)
+    normalized_stdout = re.sub(os.linesep + ' *', ' ', result.stdout)
 
     assert expected_debris_options_help in normalized_stdout
 
