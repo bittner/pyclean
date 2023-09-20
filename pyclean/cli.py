@@ -52,7 +52,11 @@ def parse_arguments():
                         nargs='*', default=argparse.SUPPRESS, choices=debris_choices,
                         help='remove leftovers from popular Python development '
                              'tools (may be specified multiple times; '
-                             'default: %s)' % ' '.join(debris_default_topics))
+                             'optional: all %s; default: %s)' % (
+                                ' '.join(debris_optional_topics),
+                                ' '.join(debris_default_topics),
+                             ),
+                       )
     parser.add_argument('-e', '--erase', metavar='PATTERN', action='extend',
                         nargs='+', default=[],
                         help='delete files or folders matching a globbing '
