@@ -3,6 +3,7 @@ Tests for the pyclean CLI
 """
 import os
 import platform
+import re
 import sys
 from importlib import import_module
 
@@ -177,6 +178,22 @@ def test_debris_default_args():
         args = pyclean.cli.parse_arguments()
 
     assert args.debris == ['cache', 'coverage', 'package', 'pytest']
+
+
+def test_debris_optional_args():
+    """
+    Does the help screen explain all --debris options?
+    """
+    expected_debris_options_help = (
+        '(may be specified multiple times; '
+        'optional: all jupyter mypy ruff tox; '
+        'default: cache coverage package pytest)'
+    )
+
+    result = shell('pyclean --help')
+    normalized_stdout = re.sub(f'{os.linesep} *', ' ', result.stdout)
+
+    assert expected_debris_options_help in normalized_stdout
 
 
 def test_debris_all():
