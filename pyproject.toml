@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyclean"
-version = "2.7.5"
+version = "2.7.6"
 description = "Pure Python cross-platform pyclean. Clean up your Python bytecode."
 readme = "README.rst"
 license = {file = "LICENSE"}
@@ -38,6 +38,9 @@ keywords = [
   "bytecode",
   "cli",
   "tools",
+]
+dependencies = [
+  "importlib-metadata; python_version < '3.8'",
 ]
 
 [project.scripts]

@@ -257,7 +257,7 @@ def test_dryrun(
     ('options', 'scanned_topics'),
     [
         ([], []),
-        (['-d'], ['cache', 'coverage', 'package', 'pytest']),
+        (['-d'], ['cache', 'coverage', 'package', 'pytest', 'ruff']),
         (['-d', 'coverage', 'package'], ['coverage', 'package']),
         (['-d', 'jupyter', 'mypy', 'tox'], ['jupyter', 'mypy', 'tox']),
     ],
