@@ -5,17 +5,22 @@ import argparse
 import logging
 import sys
 
-from . import __version__, compat, modern
+try:
+    from importlib import metadata
+except ImportError:
+    import importlib_metadata as metadata
+
+from . import compat, modern
 
 log = logging.getLogger(__name__)
-
 
 def parse_arguments():
     """
     Parse and handle CLI arguments
     """
-    debris_default_topics = ['cache', 'coverage', 'package', 'pytest']
-    debris_optional_topics = ['jupyter', 'mypy', 'ruff', 'tox']
+    package_version = metadata.version('pyclean')
+    debris_default_topics = ['cache', 'coverage', 'package', 'pytest', 'ruff']
+    debris_optional_topics = ['jupyter', 'mypy', 'tox']
     debris_choices = ['all'] + debris_default_topics + debris_optional_topics
     ignore_default_items = [
         '.git',
@@ -34,7 +39,7 @@ def parse_arguments():
     if sys.version_info < (3, 8):
         parser.register('action', 'extend', compat.ExtendAction)
 
-    parser.add_argument('--version', action='version', version=__version__)
+    parser.add_argument('--version', action='version', version=package_version)
     parser.add_argument('-V', metavar='VERSION', dest='version',
                         help='specify Python version to clean')
     parser.add_argument('-p', '--package', metavar='PACKAGE',

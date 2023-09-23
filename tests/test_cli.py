@@ -8,6 +8,11 @@ import sys
 from importlib import import_module
 
 try:
+    from importlib import metadata
+except ImportError:
+    import importlib_metadata as metadata
+
+try:
     from unittest.mock import patch
 except ImportError:  # Python 2.7, PyPy2
     from mock import patch
@@ -177,7 +182,7 @@ def test_debris_default_args():
     with ArgvContext('pyclean', 'foo', '--debris'):
         args = pyclean.cli.parse_arguments()
 
-    assert args.debris == ['cache', 'coverage', 'package', 'pytest']
+    assert args.debris == ['cache', 'coverage', 'package', 'pytest', 'ruff']
 
 
 def test_debris_optional_args():
@@ -186,8 +191,8 @@ def test_debris_optional_args():
     """
     expected_debris_options_help = (
         '(may be specified multiple times; '
-        'optional: all jupyter mypy ruff tox; '
-        'default: cache coverage package pytest)'
+        'optional: all jupyter mypy tox; '
+        'default: cache coverage package pytest ruff)'
     )
 
     result = shell('pyclean --help')
@@ -208,9 +213,9 @@ def test_debris_all():
         'coverage',
         'package',
         'pytest',
+        'ruff',
         'jupyter',
         'mypy',
-        'ruff',
         'tox',
     ]
 
@@ -286,7 +291,8 @@ def test_version_option():
     """
     Does --version yield the expected information?
     """
-    expected_output = '%s%s' % (pyclean.__version__, os.linesep)
+    pkg_version = metadata.version('pyclean')
+    expected_output = '%s%s' % (pkg_version, os.linesep)
 
     result = shell('pyclean --version')
 
