@@ -63,9 +63,9 @@ show_missing = true
 addopts = "--color=yes --doctest-modules --ignore=pyclean/py2clean.py --ignore=pyclean/py3clean.py --ignore=pyclean/pypyclean.py --junitxml=tests/junit-report.xml --verbose"
 
 [tool.ruff]
-extend-exclude = []
-extend-select = ["B", "BLE", "C4", "C90", "COM", "DJ", "DTZ", "EM", "G", "I", "N", "PIE", "PL", "PT", "PTH", "R", "S", "SIM", "T10", "TID", "W", "YTT"]
-extend-ignore = []
+extend-exclude = ["py2clean.py", "py3clean.py", "pypyclean.py"]
+extend-select = ["ALL"]
+extend-ignore = ["ANN", "D", "FBT002", "INP001", "Q000", "TRY200", "UP"]
 
 [tool.ruff.format]
 quote-style = "single"
@@ -75,10 +75,7 @@ exclude = ["py2clean.py", "py3clean.py", "pypyclean.py"]
 "pyclean/cli.py" = ["B904", "BLE001"]
 "pyclean/compat.py" = ["C408"]
 "pyclean/modern.py" = ["B028", "B904"]
-"pyclean/py2clean.py" = ["E402", "PTH"]
-"pyclean/py3clean.py" = ["BLE001", "C901", "E402", "PLR1722", "PTH", "S110", "SIM105"]
-"pyclean/pypyclean.py" = ["B007", "G002", "PTH", "S603"]
-"tests/*.py" = ["S101"]
+"tests/*.py" = ["ARG001", "S101", "UP026"]
 
 [tool.setuptools]
 packages = ["pyclean"]
