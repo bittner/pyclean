@@ -8,11 +8,6 @@ import sys
 from importlib import import_module
 
 try:
-    from importlib import metadata
-except ImportError:
-    import importlib_metadata as metadata
-
-try:
     from unittest.mock import patch
 except ImportError:  # Python 2.7, PyPy2
     from mock import patch
@@ -20,6 +15,7 @@ except ImportError:  # Python 2.7, PyPy2
 import pytest
 from cli_test_helpers import ArgvContext, shell
 
+import pyclean
 import pyclean.cli
 
 
@@ -291,8 +287,7 @@ def test_version_option():
     """
     Does --version yield the expected information?
     """
-    pkg_version = metadata.version('pyclean')
-    expected_output = '%s%s' % (pkg_version, os.linesep)
+    expected_output = '%s%s' % (pyclean.__version__, os.linesep)
 
     result = shell('pyclean --version')
 
