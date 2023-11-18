@@ -34,7 +34,7 @@ class ExtendAction(AppendAction):
     A simplified backport from the Python standard library.
     """
 
-    def __call__(self, parser, namespace, values, option_string=None):
+    def __call__(self, parser, namespace, values, option_string=None):  # noqa: ARG002
         items = getattr(namespace, self.dest, None)
         items = [] if items is None else items[:]
         items.extend(values)

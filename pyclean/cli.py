@@ -16,7 +16,7 @@ def parse_arguments():
     """
     debris_default_topics = ['cache', 'coverage', 'package', 'pytest', 'ruff']
     debris_optional_topics = ['jupyter', 'mypy', 'tox']
-    debris_choices = ['all'] + debris_default_topics + debris_optional_topics
+    debris_choices = ['all', *debris_default_topics, *debris_optional_topics]
     ignore_default_items = [
         '.git',
         '.hg',
@@ -47,7 +47,7 @@ def parse_arguments():
         metavar='PACKAGE',
         action='append',
         default=[],
-        help='Debian package to byte-compile ' '(may be specified multiple times)',
+        help='Debian package to byte-compile (may be specified multiple times)',
     )
     parser.add_argument(
         'directory',
