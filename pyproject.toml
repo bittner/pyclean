@@ -39,9 +39,6 @@ keywords = [
   "cli",
   "tools",
 ]
-dependencies = [
-  "importlib-metadata; python_version < '3.8'",
-]
 
 [project.scripts]
 pyclean = "pyclean.cli:main"
@@ -80,3 +77,6 @@ extend-ignore = []
 
 [tool.setuptools]
 packages = ["pyclean"]
+
+[tool.setuptools.dynamic]
+version = {attr = "pyclean.__version__"}
