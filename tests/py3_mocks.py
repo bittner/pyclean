@@ -6,11 +6,11 @@ try:
     from unittest.mock import Mock
 except ImportError:  # Python 2.7, PyPy2
     import pytest
-    pytest.importorskip("pathlib")
+
+    pytest.importorskip('pathlib')
 
 
 class FilesystemObjectMock(Mock):
-
     def __init__(self, *args, **kwargs):
         name = kwargs['name'] if 'name' in kwargs else args[0]
         super().__init__(autospec=Path(name), **kwargs)
@@ -33,7 +33,6 @@ class FilesystemObjectMock(Mock):
 
 
 class DirectoryMock(FilesystemObjectMock):
-
     def __init__(self, **kwargs):
         super().__init__('a-dir', **kwargs)
 
@@ -42,7 +41,6 @@ class DirectoryMock(FilesystemObjectMock):
 
 
 class FileMock(FilesystemObjectMock):
-
     def __init__(self, **kwargs):
         super().__init__('a-file', **kwargs)
 
@@ -51,7 +49,6 @@ class FileMock(FilesystemObjectMock):
 
 
 class SymlinkMock(FilesystemObjectMock):
-
     def __init__(self, **kwargs):
         super().__init__('a-symlink', **kwargs)
 
