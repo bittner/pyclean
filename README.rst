@@ -137,9 +137,9 @@ Python bytecode. The following topics are currently covered:
 - Coverage (coverage database, and supported file formats)
 - Packaging (build files and folders)
 - Pytest (build files and folders)
+- Ruff (ruff cache folder)
 - Jupyter (notebook checkpoints) – *optional*
 - Mypy (mypy cache folder) – *optional*
-- Ruff (ruff cache folder) – *optional*
 - Tox (tox environments) – *optional*
 
 *Example:* Dry-run a cleanup of bytecode and tool debris in verbose mode
