@@ -50,9 +50,6 @@ pypyclean = "pyclean.cli:pypyclean"
 [project.urls]
 homepage = "https://github.com/bittner/pyclean"
 
-[tool.black]
-color = true
-
 [tool.coverage.run]
 source = ["pyclean"]
 
