@@ -30,8 +30,8 @@ tox list
 ```
 
 ```console
-# run just flake8 and the tests for Python 3.10
-tox -e flake8,py310
+# run just linting and the tests for Python 3.12
+tox -e lint,py312
 ```
 
 ```console

@@ -61,14 +61,16 @@ addopts = "--color=yes --doctest-modules --ignore=pyclean/py2clean.py --ignore=p
 
 [tool.ruff]
 extend-exclude = ["py2clean.py", "py3clean.py", "pypyclean.py"]
-extend-select = ["ALL"]
-extend-ignore = ["ANN", "D", "FBT002", "INP001", "Q000", "TRY200", "UP"]
 
 [tool.ruff.format]
 quote-style = "single"
 exclude = ["py2clean.py", "py3clean.py", "pypyclean.py"]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint]
+extend-select = ["ALL"]
+extend-ignore = ["ANN", "B904", "D", "FBT002", "INP001", "Q000", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
 "pyclean/cli.py" = ["B904", "BLE001"]
 "pyclean/compat.py" = ["C408"]
 "pyclean/modern.py" = ["B028", "B904"]
