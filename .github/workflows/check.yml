@@ -19,7 +19,8 @@ jobs:
       fail-fast: false
       matrix:
         env:
-        - ruff
+        - lint
+        - format
         - package
     steps:
     - uses: actions/checkout@v3
