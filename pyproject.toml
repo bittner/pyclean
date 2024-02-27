@@ -54,7 +54,9 @@ homepage = "https://github.com/bittner/pyclean"
 source = ["pyclean"]
 
 [tool.coverage.report]
+exclude_also = ["if __name__ == .__main__.:"]
 show_missing = true
+skip_covered = true
 
 [tool.pytest.ini_options]
 addopts = "--color=yes --doctest-modules --ignore=pyclean/py2clean.py --ignore=pyclean/py3clean.py --ignore=pyclean/pypyclean.py --junitxml=tests/junit-report.xml --verbose"
