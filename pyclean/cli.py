@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 def parse_arguments():
     """
-    Parse and handle CLI arguments
+    Parse and handle CLI arguments.
     """
     debris_default_topics = ['cache', 'coverage', 'package', 'pytest', 'ruff']
     debris_optional_topics = ['jupyter', 'mypy', 'tox']
@@ -36,22 +36,8 @@ def parse_arguments():
 
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument(
-        '-V',
-        metavar='VERSION',
-        dest='version',
-        help='specify Python version to clean',
-    )
-    parser.add_argument(
-        '-p',
-        '--package',
-        metavar='PACKAGE',
-        action='append',
-        default=[],
-        help='Debian package to byte-compile (may be specified multiple times)',
-    )
-    parser.add_argument(
         'directory',
-        nargs='*',
+        nargs='+',
         help='directory tree to traverse for byte-code',
     )
     parser.add_argument(
@@ -90,11 +76,6 @@ def parse_arguments():
         ' multiple times); this will be interactive unless --yes is used.',
     )
     parser.add_argument(
-        '--legacy',
-        action='store_true',
-        help='use legacy Debian implementation (autodetect)',
-    )
-    parser.add_argument(
         '-n',
         '--dry-run',
         action='store_true',
@@ -123,10 +104,6 @@ def parse_arguments():
     if args.yes and not args.erase:
         parser.error('Specifying --yes only makes sense with --erase.')
 
-    if not (args.package or args.directory):
-        msg = 'A directory (or files) or a list of packages must be specified.'
-        parser.error(msg)
-
     if 'debris' in args:
         if 'all' in args.debris:
             args.debris = debris_default_topics + debris_optional_topics
@@ -152,39 +129,13 @@ def init_logging(args):
     logging.basicConfig(level=log_level, format=log_format)
 
 
-def main(override=None):
+def main():
     """
-    Entry point for all scripts
+    Entry point for CLI application.
     """
     args = parse_arguments()
-    if override or args.legacy:
-        impl = compat.get_implementation(override=override)
-        pyclean_main = impl.main
-    else:
-        pyclean_main = modern.pyclean
 
     try:
-        pyclean_main(args)
+        modern.pyclean(args)
     except Exception as err:
         raise SystemExit(err)
-
-
-def py2clean():
-    """
-    Forces the use of the implementation for Python 2
-    """
-    main('CPython2')
-
-
-def py3clean():
-    """
-    Forces the use of the implementation for Python 3
-    """
-    main('CPython3')
-
-
-def pypyclean():
-    """
-    Forces the use of the implementation for PyPy (2+3)
-    """
-    main('PyPy2')

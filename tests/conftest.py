@@ -1,13 +1,8 @@
 """
 Mock objects for tests of the modern implementation.
 """
-try:
-    from pathlib import Path
-    from unittest.mock import Mock
-except ImportError:  # Python 2.7, PyPy2
-    import pytest
-
-    pytest.importorskip('pathlib')
+from pathlib import Path
+from unittest.mock import Mock
 
 
 class FilesystemObjectMock(Mock):

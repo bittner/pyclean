@@ -99,6 +99,12 @@ Installation
 
     $ pip install pyclean
 
+or
+
+.. code:: console
+
+    $ python -m pip install pyclean
+
 Usage
 =====
 
@@ -106,25 +112,17 @@ Usage
 
     $ pyclean --help
 
-If you want to explicitly operate the Debian-specific implementation:
+or
 
 .. code:: console
 
-    $ py2clean --help
-    $ py3clean --help
-    $ pypyclean --help
+    $ python -m pyclean --help
 
 Clean up all bytecode in the current directory tree, and explain verbosely:
 
 .. code:: console
 
     $ pyclean -v .
-
-Clean up all bytecode for a Debian package: (may require root permissions)
-
-.. code:: console
-
-    $ pyclean -p python3-keyring --legacy
 
 Clean up debris
 ---------------
@@ -162,8 +160,8 @@ reason, the ``--erase`` option has a few artificial constraints:
 - The above entails that you're responsible for the deletion order, i.e.
   removal of a directory will only work if you asked to delete all files
   inside first.
-- You're prompted interactively to confirm deletion, unless you add the
-  ``--yes`` option, in addition.
+- You're prompted interactively to confirm deletion, unless you specify
+  the ``--yes`` option, in addition.
 
 .. code:: console
 
@@ -201,14 +199,3 @@ Development
 If you want to help out please see our `contribution guide`_.
 
 .. _contribution guide: https://github.com/bittner/pyclean/blob/main/CONTRIBUTING.md
-
-Roadmap (for v3.0.0)
---------------------
-
-#. Replace original Debian scripts (current ``--legacy``) by a single,
-   pure Python, Python 3-only code base that serves all target platforms.
-#. Reduce the package dependencies to an absolute minimum for maximum
-   portability.
-#. Add additional CLI options to delete debris from builds, testing and
-   packaging (build/, .cache/, dist/, .pytest_cache/, .tox/ and
-   free-form targets).

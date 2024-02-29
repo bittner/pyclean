@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=44"]
 build-backend = "setuptools.build_meta"
+requires = ["setuptools>=44"]
 
 [project]
 name = "pyclean"
@@ -18,10 +18,10 @@ classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+  "Operating System :: OS Independent",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 2",
-  "Programming Language :: Python :: 2.7",
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.5",
   "Programming Language :: Python :: 3.6",
   "Programming Language :: Python :: 3.7",
@@ -43,9 +43,6 @@ keywords = [
 
 [project.scripts]
 pyclean = "pyclean.cli:main"
-py2clean = "pyclean.cli:py2clean"
-py3clean = "pyclean.cli:py3clean"
-pypyclean = "pyclean.cli:pypyclean"
 
 [project.urls]
 homepage = "https://github.com/bittner/pyclean"
@@ -54,29 +51,26 @@ homepage = "https://github.com/bittner/pyclean"
 source = ["pyclean"]
 
 [tool.coverage.report]
-exclude_also = ["if __name__ == .__main__.:"]
+exclude_lines = ["if __name__ == .__main__.:"]  # exclude_also for Python>3.6
 show_missing = true
 skip_covered = true
 
 [tool.pytest.ini_options]
-addopts = "--color=yes --doctest-modules --ignore=pyclean/py2clean.py --ignore=pyclean/py3clean.py --ignore=pyclean/pypyclean.py --junitxml=tests/junit-report.xml --verbose"
-
-[tool.ruff]
-extend-exclude = ["py2clean.py", "py3clean.py", "pypyclean.py"]
+addopts = "--color=yes --doctest-modules --junitxml=tests/junit-report.xml --verbose"
 
 [tool.ruff.format]
 quote-style = "single"
-exclude = ["py2clean.py", "py3clean.py", "pypyclean.py"]
 
 [tool.ruff.lint]
 extend-select = ["ALL"]
 extend-ignore = ["ANN", "B904", "D", "FBT002", "INP001", "Q000", "UP"]
 
+[tool.ruff.lint.flake8-quotes]
+inline-quotes="single"
+
 [tool.ruff.lint.per-file-ignores]
-"pyclean/cli.py" = ["B904", "BLE001"]
-"pyclean/compat.py" = ["C408"]
-"pyclean/modern.py" = ["B028", "B904"]
-"tests/*.py" = ["ARG001", "S101", "UP026"]
+"pyclean/cli.py" = ["BLE001"]
+"tests/*.py" = ["ARG001", "S101"]
 
 [tool.setuptools]
 packages = ["pyclean"]

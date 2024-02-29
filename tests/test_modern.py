@@ -3,17 +3,12 @@ Tests for the modern module
 """
 import logging
 from argparse import Namespace
+from pathlib import Path
+from unittest.mock import Mock, call, patch
 
 import pytest
-
-try:
-    from pathlib import Path
-    from unittest.mock import Mock, call, patch
-except ImportError:  # Python 2.7, PyPy2
-    pytest.importorskip('pathlib')
-
 from cli_test_helpers import ArgvContext
-from py3_mocks import DirectoryMock, FileMock, SymlinkMock
+from conftest import DirectoryMock, FileMock, SymlinkMock
 
 import pyclean.cli
 import pyclean.modern
