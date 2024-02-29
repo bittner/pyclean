@@ -1,6 +1,7 @@
 """
 Modern, cross-platform, pure-Python pyclean implementation.
 """
+
 import logging
 from pathlib import Path
 

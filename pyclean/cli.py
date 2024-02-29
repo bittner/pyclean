@@ -1,6 +1,7 @@
 """
 Command line interface implementation for pyclean.
 """
+
 import argparse
 import logging
 import sys

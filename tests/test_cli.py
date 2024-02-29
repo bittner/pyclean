@@ -1,6 +1,7 @@
 """
 Tests for the pyclean CLI.
 """
+
 import os
 import re
 import shutil
