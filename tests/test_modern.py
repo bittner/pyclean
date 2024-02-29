@@ -1,6 +1,7 @@
 """
 Tests for the modern module
 """
+
 import logging
 from argparse import Namespace
 from pathlib import Path

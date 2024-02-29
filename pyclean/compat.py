@@ -1,6 +1,7 @@
 """
 Cross-Python version compatibility.
 """
+
 from argparse import _AppendAction as AppendAction
 
 
