@@ -1,16 +1,12 @@
 """
-Tests for the pyclean CLI
+Tests for the pyclean CLI.
 """
 import os
-import platform
 import re
+import shutil
 import sys
 from importlib import import_module
-
-try:
-    from unittest.mock import patch
-except ImportError:  # Python 2.7, PyPy2
-    from mock import patch
+from unittest.mock import patch
 
 import pytest
 from cli_test_helpers import ArgvContext, shell
@@ -38,120 +34,38 @@ def test_entrypoint():
     """
     Is entrypoint script installed? (pyproject.toml)
     """
-    result = shell('pyclean --help')
-    assert result.exit_code == 0
+    assert shutil.which('pyclean')
 
 
-def test_entrypoint_py2_installed():
-    """
-    Is entrypoint script installed for Python 2? (pyproject.toml)
-    """
-    result = shell('py2clean --help')
-    assert result.exit_code == 0
-
-
-@patch('pyclean.compat.import_module')
-def test_entrypoint_py2_working(mock_import_module):
-    """
-    Is entrypoint overriding with Python 2 implementation?
-    """
-    with ArgvContext('py2clean', 'foo'):
-        pyclean.cli.py2clean()
-
-    args, _ = mock_import_module.call_args
-    assert args == ('pyclean.py2clean',)
-
-
-def test_entrypoint_py3_installed():
-    """
-    Is entrypoint script installed for Python 3? (pyproject.toml)
-    """
-    result = shell('py3clean --help')
-    assert result.exit_code == 0
-
-
-@patch('pyclean.compat.import_module')
-def test_entrypoint_py3_working(mock_import_module):
-    """
-    Is entrypoint overriding with Python 3 implementation?
-    """
-    with ArgvContext('py3clean', 'foo'):
-        pyclean.cli.py3clean()
-
-    args, _ = mock_import_module.call_args
-    assert args == ('pyclean.py3clean',)
-
-
-def test_entrypoint_pypy_installed():
-    """
-    Is entrypoint script installed for PyPy 2/3? (pyproject.toml)
-    """
-    result = shell('pypyclean --help')
-    assert result.exit_code == 0
-
-
-@patch('pyclean.compat.import_module')
-def test_entrypoint_pypy_working(mock_import_module):
-    """
-    Is entrypoint overriding with PyPy implementation?
-    """
-    with ArgvContext('pypyclean', 'foo'):
-        pyclean.cli.pypyclean()
-
-    args, _ = mock_import_module.call_args
-    assert args == ('pyclean.pypyclean',)
-
-
-@pytest.mark.skipif(platform.system() != 'Linux', reason='requires Debian Linux')
-def test_main_handles_exceptions():
+@patch('pyclean.cli.modern.pyclean', side_effect=Exception('Error test.'))
+def test_main_handles_exceptions(mock_modern):
     """
     The main CLI entry point handles exceptions gracefully.
     """
-    impl = pyclean.compat.get_implementation()
-
-    with patch.object(
-        impl,
-        'main',
-        side_effect=Exception('Something went wrong.'),
-    ), pytest.raises(SystemExit, match='Something went wrong.'), ArgvContext(
-        'pyclean',
-        '--package=foo',
-        '--legacy',
-    ):
+    with ArgvContext('pyclean', '.'), pytest.raises(SystemExit, match='Error test.'):
         pyclean.cli.main()
 
 
 @patch('pyclean.cli.modern.pyclean')
-@patch('pyclean.cli.compat.get_implementation')
-def test_mandatory_arg_missing(mock_getimpl, mock_modern):
+def test_mandatory_arg_missing(mock_modern):
     """
-    Does CLI abort when neither a path nor a package is specified?
+    Does CLI abort when no path is specified?
     """
     with ArgvContext('pyclean'), pytest.raises(SystemExit):
         pyclean.cli.main()
 
-    assert not mock_getimpl.called
     assert not mock_modern.called
 
 
-@pytest.mark.parametrize(
-    'options',
-    [
-        ['.'],
-        ['--package=foo'],
-        ['.', '-p', 'foo'],
-    ],
-)
 @patch('pyclean.cli.modern.pyclean')
-@patch('pyclean.cli.compat.get_implementation')
-def test_mandatory_args(mock_getimpl, mock_modern, options):
+def test_mandatory_args(mock_modern):
     """
-    Does CLI execute fine when a path or a package or both are specified?
+    Does CLI execute fine when a path is specified?
     """
-    with ArgvContext('pyclean', *options):
+    with ArgvContext('pyclean', '.'):
         pyclean.cli.main()
 
-    assert mock_getimpl.called or mock_modern.called
+    assert mock_modern.called
 
 
 @pytest.mark.skipif(sys.version_info < (3,), reason='requires Python 3')
@@ -187,6 +101,8 @@ def test_debris_default_args():
     assert args.debris == ['cache', 'coverage', 'package', 'pytest', 'ruff']
 
 
+@pytest.mark.skipif(sys.version_info < (3, 7), reason='re.sub bug in Python<3.7')
+# see also: https://bugs.python.org/issue32308
 def test_debris_optional_args():
     """
     Does the help screen explain all --debris options?
@@ -290,6 +206,7 @@ def test_yes_aborts_without_erase():
         pyclean.cli.parse_arguments()
 
 
+@pytest.mark.skipif(sys.version_info < (3, 7), reason='shell picks system pyclean')
 def test_version_option():
     """
     Does --version yield the expected information?
@@ -300,17 +217,6 @@ def test_version_option():
 
     assert result.stdout == expected_output
     assert result.exit_code == 0
-
-
-@patch('pyclean.compat.get_implementation')
-def test_legacy_calls_compat(mock_get_implementation):
-    """
-    Does calling `pyclean --legacy` invoke the compat layer?
-    """
-    with ArgvContext('pyclean', 'foo', '--legacy'):
-        pyclean.cli.main()
-
-    assert mock_get_implementation.called
 
 
 @patch('pyclean.modern.pyclean')

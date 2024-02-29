@@ -2,13 +2,7 @@
 Modern, cross-platform, pure-Python pyclean implementation.
 """
 import logging
-
-try:
-    from pathlib import Path
-except ImportError:  # Python 2.7, PyPy2
-    from warnings import warn
-
-    warn('Python 3 required for modern implementation. Python 2 is obsolete.')
+from pathlib import Path
 
 BYTECODE_FILES = ['.pyc', '.pyo']
 BYTECODE_DIRS = ['__pycache__']
