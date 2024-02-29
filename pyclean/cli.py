@@ -32,7 +32,7 @@ def parse_arguments():
         description='Remove byte-compiled files for a package or project.',
     )
 
-    if sys.version_info < (3, 8):
+    if sys.version_info < (3, 8):  # pragma: no-cover-gt-py37
         parser.register('action', 'extend', compat.ExtendAction)
 
     parser.add_argument('--version', action='version', version=__version__)

@@ -47,7 +47,11 @@ pyclean = "pyclean.cli:main"
 [project.urls]
 homepage = "https://github.com/bittner/pyclean"
 
+[tool.coverage.coverage_conditional_plugin.rules]
+no-cover-gt-py37 = "sys_version_info > (3, 7)"
+
 [tool.coverage.run]
+plugins = ["coverage_conditional_plugin"]
 source = ["pyclean"]
 
 [tool.coverage.report]

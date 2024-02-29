@@ -5,7 +5,7 @@ Cross-Python version compatibility.
 from argparse import _AppendAction as AppendAction
 
 
-class ExtendAction(AppendAction):
+class ExtendAction(AppendAction):  # pragma: no-cover-gt-py37
     """
     Argparse "extend" action for Python < 3.8.
     A simplified backport from the Python standard library.
