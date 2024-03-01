@@ -2,14 +2,14 @@ Contributing
 ============
 
 You can contribute to this project by opening a ticket or a pull request.
-Feel free to ask for clarification or help by creating a ticket before you
-start with a pull request!
+Feel free to ask for clarification or help by creating a ticket before
+you start with a pull request!
 
 Development
 -----------
 
-You only need Python 3 standard tools, Python 2 for backward compatibility,
-including Tox, for contributing code and running linting and tests.
+You only need popular Python 3 standard tooling, including [Tox][tox],
+for contributing code and running linting and tests.
 
 PyClean has no specific runtime dependencies, only for running the test
 suite you need packages such as `cli_test_helpers`. Those are installed
@@ -91,3 +91,4 @@ python3 -m pip install git+https://github.com/bittner/pyclean@feature-branch#egg
 
 [pyenv]: https://github.com/pyenv/pyenv#installation
 [rye]: https://github.com/mitsuhiko/rye
+[tox]: https://tox.wiki/
