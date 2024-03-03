@@ -1,5 +1,5 @@
-pyclean |latest-version|
-========================
+pyclean |pypi-latest| |conda-latest|
+====================================
 
 |checks-status| |tests-status| |publish-status| |scrutinizer| |codacy| |python-versions| |python-impl| |license|
 
@@ -11,9 +11,12 @@ bytecode files in your favorite directories. On any platform.
 
 `Presented at PyConX`_, Firenze 2019.
 
-.. |latest-version| image:: https://img.shields.io/pypi/v/pyclean.svg
+.. |pypi-latest| image:: https://img.shields.io/pypi/v/pyclean.svg
    :target: https://pypi.org/project/pyclean
    :alt: Latest version on PyPI
+.. |conda-latest| image:: https://img.shields.io/conda/vn/conda-forge/pyclean
+   :target: https://anaconda.org/conda-forge/pyclean
+   :alt: Latest version on Anaconda
 .. |checks-status| image:: https://github.com/bittner/pyclean/actions/workflows/check.yml/badge.svg
    :target: https://github.com/bittner/pyclean/actions/workflows/check.yml
    :alt: GitHub Workflow Status
