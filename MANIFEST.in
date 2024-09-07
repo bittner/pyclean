@@ -1,4 +1,8 @@
+# SPDX-FileCopyrightText: 2019 Peter Bittner <django@bittner.it>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 exclude MANIFEST.in
-include LICENSE
+include LICENSES/GPL-3.0-or-later.txt
 include README.rst
 prune tests

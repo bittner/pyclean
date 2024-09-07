@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 Peter Bittner <django@bittner.it>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """
 Mock objects for tests of the modern implementation.
 """
