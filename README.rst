@@ -1,3 +1,7 @@
+.. SPDX-FileCopyrightText: 2019 Peter Bittner <django@bittner.it>
+..
+.. SPDX-License-Identifier: GPL-3.0-or-later
+
 pyclean |pypi-latest| |conda-latest|
 ====================================
 
@@ -39,7 +43,7 @@ bytecode files in your favorite directories. On any platform.
    :target: https://pypi.org/project/pyclean
    :alt: Python implementations
 .. |license| image:: https://img.shields.io/pypi/l/pyclean.svg
-   :target: https://github.com/bittner/pyclean/blob/main/LICENSE
+   :target: https://github.com/bittner/pyclean/blob/main/LICENSES/GPL-3.0-or-later.txt
    :alt: Software license
 .. |video| image:: https://asciinema.org/a/g8Q2ljghA7W4RD9cb3Xz100Tl.svg
    :target: https://asciinema.org/a/g8Q2ljghA7W4RD9cb3Xz100Tl

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Peter Bittner <django@bittner.it>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 [build-system]
 build-backend = "setuptools.build_meta"
 requires = ["setuptools>=44"]
@@ -7,7 +11,7 @@ name = "pyclean"
 dynamic = ["version"]
 description = "Pure Python cross-platform pyclean. Clean up your Python bytecode."
 readme = "README.rst"
-license = {file = "LICENSE"}
+license = {file = "LICENSES/GPL-3.0-or-later.txt"}
 authors = [
   {name = "Peter Bittner", email = "django@bittner.it"},
 ]
