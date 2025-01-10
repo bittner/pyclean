@@ -7,8 +7,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
 Contributing
 ============
 
-You can contribute to this project by opening a ticket or a pull request.
-Feel free to ask for clarification or help by creating a ticket before
+You can contribute to this project by opening an issue or a pull request.
+Feel free to ask for clarification or help by creating an issue before
 you start with a pull request!
 
 Development
@@ -18,12 +18,12 @@ You only need popular Python 3 standard tooling, including [Tox][tox],
 for contributing code and running linting and tests.
 
 PyClean has no specific runtime dependencies, only for running the test
-suite you need packages such as `cli_test_helpers`. Those are installed
+suite you need packages such as `cli-test-helpers`. Those are installed
 automatically when you run `tox`.
 
 Tests are fundamental. When adding new features or changing existing
 functionality, you must add or adapt tests in the test suite. Please ask
-for help in your ticket or the pull request if you struggle with that.
+for help in your issue or the pull request if you struggle with that.
 
 Running tests
 -------------
@@ -55,7 +55,7 @@ and Python versions when you create a PR on GitHub.
 Make sure all tests pass, otherwise the PR will likely not get merged.
 
 If you want to test against the various Python versions locally before
-pushing take a look at [pyenv][pyenv] or [rye][rye], which both allow you
+pushing take a look at [uv][uv] or [pyenv][pyenv], which both allow you
 to install different Python versions on your computer in parallel.
 
 Developing locally
@@ -86,15 +86,15 @@ If you only want to install `pyclean` off the Git repository, e.g. in order
 to try out a feature branch, you can install it on your machine like this:
 
 ```console
-python3 -m pip install git+https://github.com/bittner/pyclean#egg=pyclean
+pip install git+https://github.com/bittner/pyclean#egg=pyclean
 ```
 
 Or, for a specific branch:
 
 ```console
-python3 -m pip install git+https://github.com/bittner/pyclean@feature-branch#egg=pyclean
+pip install git+https://github.com/bittner/pyclean@feature-branch#egg=pyclean
 ```
 
 [pyenv]: https://github.com/pyenv/pyenv#installation
-[rye]: https://github.com/mitsuhiko/rye
 [tox]: https://tox.wiki/
+[uv]: https://docs.astral.sh/uv/

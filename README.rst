@@ -8,7 +8,7 @@ pyclean |pypi-latest| |conda-latest|
 |checks-status| |tests-status| |publish-status| |scrutinizer| |codacy| |python-versions| |python-impl| |license|
 
 Worried about ``.pyc`` files and ``__pycache__`` directories? Fear not!
-PyClean is here to help. Finally the single-command clean up for Python
+PyClean is here to help. Finally, the single-command clean up for Python
 bytecode files in your favorite directories. On any platform.
 
 |video|
@@ -53,14 +53,13 @@ bytecode files in your favorite directories. On any platform.
 Wait! What is bytecode?
 -----------------------
 
-Bytecode is opcodes for the `Python Virtual Machine`_. -- Confused?
+Bytecode is opcodes for the Python Virtual Machine. -- Confused?
 
 If you want to deep-dive into the topic watch the 2013 EuroPython talk
 `"All Singing All Dancing Python Bytecode"`_ by Larry Hastings.
 Otherwise James Bennett's `"Introduction to Python bytecode"`_ should
 provide you with just the sound understanding of what it is all about.
 
-.. _Python Virtual Machine: https://www.ics.uci.edu/~brgallar/week9_3.html
 .. _"All Singing All Dancing Python Bytecode":
     https://www.youtube.com/watch?v=0IzXcjHs-P8
 .. _"Introduction to Python bytecode":
@@ -83,8 +82,8 @@ software!)
 .. _looking for a simple, concise solution for everybody:
     https://stackoverflow.com/questions/785519/how-do-i-remove-all-pyc-files-from-a-project
 
-Debian
-------
+Inspired by Debian
+------------------
 
 Just for reference, the Python scripts Debian ships with its
 `python-minimal`_ and `python3-minimal`_ packages can be found at:
@@ -111,6 +110,45 @@ or
 .. code:: console
 
     $ python -m pip install pyclean
+
+uv
+--
+
+If you work with ``uv`` you can install ``pyclean`` globally via uv's
+`tool interface`_, or use the ``uvx`` command and not care about installing:
+
+.. code:: console
+
+    $ uv tool install pyclean
+
+or
+
+.. code:: console
+
+    $ uvx pyclean
+
+.. _tool interface: https://docs.astral.sh/uv/concepts/tools/
+
+Tox
+---
+
+If you want to integrate ``pyclean`` in your Python development setup you
+can add it to your ``tox.ini`` file as follows:
+
+.. code:: ini
+
+    [testenv:clean]
+    skip_install = true
+    deps = pyclean
+    commands = pyclean {posargs:. --debris}
+
+You'll then be able to run it with `Tox`_ like this:
+
+.. code:: console
+
+    $ tox -e clean
+
+.. _Tox: https://tox.wiki/
 
 Usage
 =====
@@ -178,27 +216,6 @@ The above would delete the entire ``tmp/`` directory with all subdirectories
 inside the current folder. If you omit the final ``tmp/`` you'll leave the
 empty ``tmp`` directory in place. (**WARNING!** Don't put the ``.`` *after*
 the ``--erase`` option! Obviously, your project files will all be deleted.)
-
-Use pyclean with Tox
---------------------
-
-If you want to avoid installing ``pyclean`` you can add it to your
-``tox.ini`` file as follows:
-
-.. code:: ini
-
-    [testenv:clean]
-    skip_install = true
-    deps = pyclean
-    commands = pyclean {posargs:. --debris}
-
-You'll then be able to run it with `Tox`_ like this:
-
-.. code:: console
-
-    $ tox -e clean
-
-.. _Tox: https://tox.wiki/
 
 Development
 ===========
