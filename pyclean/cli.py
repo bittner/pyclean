@@ -33,7 +33,11 @@ def parse_arguments():
     ]
 
     parser = argparse.ArgumentParser(
-        description='Remove byte-compiled files for a package or project.',
+        description=(
+            'Remove bytecode files, cache directories, build and test artifacts '
+            'and other debris in your Python project or anywhere else.'
+        ),
+        epilog='Made with ♥­ by Painless Software, copyleft by Peter Bittner.',
     )
 
     if sys.version_info < (3, 8):  # pragma: no-cover-gt-py37
@@ -43,7 +47,7 @@ def parse_arguments():
     parser.add_argument(
         'directory',
         nargs='+',
-        help='directory tree to traverse for byte-code',
+        help='directory tree to traverse for bytecode and debris',
     )
     parser.add_argument(
         '-i',
