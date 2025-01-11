@@ -7,6 +7,7 @@ Modern, cross-platform, pure-Python pyclean implementation.
 """
 
 import logging
+import os
 from pathlib import Path
 
 BYTECODE_FILES = ['.pyc', '.pyo']
@@ -61,7 +62,7 @@ DEBRIS_TOPICS = {
 }
 
 
-class CleanupRunner:  # pylint: disable=too-few-public-methods
+class CleanupRunner:
     """Module-level configuration and value store."""
 
     def __init__(self):
@@ -182,7 +183,7 @@ def remove_debris_for(topic, directory):
     log.debug('Scanning for debris of %s ...', topic.title())
 
     for path_glob in DEBRIS_TOPICS[topic]:
-        delete_filesystem_objects(directory, path_glob)
+        delete_filesystem_objects(directory, path_glob, recursive=True)
 
 
 def remove_freeform_targets(glob_patterns, yes, directory):
@@ -206,7 +207,7 @@ def remove_freeform_targets(glob_patterns, yes, directory):
         delete_filesystem_objects(directory, path_glob, prompt=not yes)
 
 
-def delete_filesystem_objects(directory, path_glob, prompt=False):
+def delete_filesystem_objects(directory, path_glob, prompt=False, recursive=False):
     """
     Identifies all pathnames matching a specific glob pattern, and attempts
     to delete them in the proper order, optionally asking for confirmation.
@@ -232,6 +233,11 @@ def delete_filesystem_objects(directory, path_glob, prompt=False):
             Runner.rmdir_failed += 1
             continue
         Runner.rmdir(dir_object)
+
+    if recursive:
+        subdirs = (name.path for name in os.scandir(directory) if name.is_dir())
+        for subdir in subdirs:
+            delete_filesystem_objects(Path(subdir), path_glob, prompt, recursive)
 
 
 def confirm(message):

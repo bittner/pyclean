@@ -9,6 +9,7 @@ Tests for the modern module
 import logging
 from argparse import Namespace
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest.mock import Mock, call, patch
 
 import pytest
@@ -324,11 +325,39 @@ def test_debris_loop(mock_delete_fs_obj, debris_topic):
     """
     fileobject_globs = pyclean.modern.DEBRIS_TOPICS[debris_topic]
     directory = Path()
-    expected_calls = [call(directory, pattern) for pattern in fileobject_globs]
+    expected_calls = [
+        call(directory, pattern, recursive=True) for pattern in fileobject_globs
+    ]
 
     remove_debris_for(debris_topic, directory)
 
     assert mock_delete_fs_obj.call_args_list == expected_calls
+
+
+def test_debris_recursive():
+    """
+    Does ``delete_filesystem_objects`` walk through the folder hierarchy
+    when deleting debris?
+    """
+    topic = 'cache'
+    topic_globs = pyclean.modern.DEBRIS_TOPICS[topic]
+    topic_folder = topic_globs[1]
+
+    with TemporaryDirectory() as tmpdirname:
+        directory = Path(tmpdirname)
+        dir_topic = directory / topic_folder
+        dir_topic.mkdir()
+        dir_nested_topic = directory / 'nested' / topic_folder
+        dir_nested_topic.mkdir(parents=True)
+
+        assert dir_nested_topic.exists()
+        assert dir_topic.exists()
+
+        remove_debris_for(topic, directory)
+
+        assert not dir_topic.exists()
+        assert not dir_nested_topic.exists()
+        assert dir_nested_topic.parent.exists()
 
 
 @patch('pyclean.modern.delete_filesystem_objects')
@@ -341,7 +370,7 @@ def test_erase_loop(mock_delete_fs_obj):
 
     remove_freeform_targets(patterns, yes=False, directory=directory)
 
-    assert mock_delete_fs_obj.call_args_list == [
+    assert mock_delete_fs_obj.mock_calls == [
         call(directory, 'foo.txt', prompt=True),
     ]
 
