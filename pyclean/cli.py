@@ -35,9 +35,9 @@ def parse_arguments():
     parser = argparse.ArgumentParser(
         description=(
             'Remove bytecode files, cache directories, build and test artifacts '
-            'and other debris in your Python project or anywhere else.'
+            'and other debris in your Python project or elsewhere.'
         ),
-        epilog='Made with ♥­ by Painless Software, copyleft by Peter Bittner.',
+        epilog='Made with ♥ by Painless Software, 🄯 Peter Bittner.',
     )
 
     if sys.version_info < (3, 8):  # pragma: no-cover-gt-py37
