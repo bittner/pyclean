@@ -27,7 +27,6 @@ jobs:
         - macos-latest
         - windows-latest
         python-version:
-        - '3.7'
         - '3.8'
         - '3.9'
         - '3.10'
@@ -37,12 +36,10 @@ jobs:
         - pypy-3.8
         - pypy-3.9
         - pypy-3.10
-        exclude:  # Python < v3.8 does not support Apple Silicon ARM64
-        - platform: macos-latest
-          python-version: '3.7'
-        include:  # So run those legacy versions on Intel CPUs
-        - platform: macos-13
-          python-version: '3.7'
+        include:  # Python < 3.8 does not support Apple Silicon ARM64, run those legacy versions on Intel CPUs
+        - {python-version: '3.7', platform: macos-13}
+        - {python-version: '3.7', platform: ubuntu-20.04}
+        - {python-version: '3.7', platform: windows-latest}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
@@ -51,7 +48,7 @@ jobs:
     - name: Install build tools
       run: pip install tox
     - name: Run tests
-      run: tox run -e py
+      run: tox -e py
     - name: Upload coverage report
       uses: codacy/codacy-coverage-reporter-action@v1.3.0
       with:
