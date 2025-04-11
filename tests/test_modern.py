@@ -115,7 +115,7 @@ def test_ignore_otherobjects(mock_iterdir):
     assert not pyclean.modern.Runner.unlink.called
     assert not pyclean.modern.Runner.rmdir.called
     assert pyclean.modern.log.mock_calls == [
-        call.debug('Ignoring %s', SymlinkMock()),
+        call.debug('Ignoring %s (neither a file nor a folder)', SymlinkMock()),
     ]
 
 
