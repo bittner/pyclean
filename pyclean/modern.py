@@ -173,7 +173,7 @@ def descend_and_clean(directory, file_types, dir_names):
             if child.name in dir_names:
                 Runner.rmdir(child)
         else:
-            log.debug('Ignoring %s', child)
+            log.debug('Ignoring %s (neither a file nor a folder)', child)
 
 
 def remove_debris_for(topic, directory):
@@ -235,9 +235,12 @@ def delete_filesystem_objects(directory, path_glob, prompt=False, recursive=Fals
         Runner.rmdir(dir_object)
 
     if recursive:
-        subdirs = (name.path for name in os.scandir(directory) if name.is_dir())
+        subdirs = (Path(name.path) for name in os.scandir(directory) if name.is_dir())
         for subdir in subdirs:
-            delete_filesystem_objects(Path(subdir), path_glob, prompt, recursive)
+            if subdir.name in Runner.ignore:
+                log.debug('Skipping %s', subdir)
+            else:
+                delete_filesystem_objects(subdir, path_glob, prompt, recursive)
 
 
 def confirm(message):
