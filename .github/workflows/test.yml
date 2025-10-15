@@ -27,19 +27,15 @@ jobs:
         - macos-latest
         - windows-latest
         python-version:
-        - '3.8'
         - '3.9'
         - '3.10'
         - '3.11'
         - '3.12'
         - '3.13'
-        - pypy-3.8
+        - '3.14'
         - pypy-3.9
         - pypy-3.10
-        include:  # Python < 3.8 does not support Apple Silicon ARM64, run those legacy versions on Intel CPUs
-        - {python-version: '3.7', platform: macos-13}
-        - {python-version: '3.7', platform: ubuntu-20.04}
-        - {python-version: '3.7', platform: windows-latest}
+        - pypy-3.11
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5

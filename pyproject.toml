@@ -4,14 +4,15 @@
 
 [build-system]
 build-backend = "setuptools.build_meta"
-requires = ["setuptools>=44"]
+requires = ["setuptools>=77"]
 
 [project]
 name = "pyclean"
 dynamic = ["version"]
 description = "Pure Python cross-platform pyclean. Clean up your Python bytecode."
 readme = "README.rst"
-license = {file = "LICENSES/GPL-3.0-or-later.txt"}
+license = "GPL-3.0-or-later"
+license-files = ["LICENSES/GPL-3.0-or-later.txt"]
 authors = [
   {name = "Peter Bittner", email = "django@bittner.it"},
 ]
@@ -21,20 +22,16 @@ maintainers = [
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
   "Operating System :: OS Independent",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.5",
-  "Programming Language :: Python :: 3.6",
-  "Programming Language :: Python :: 3.7",
-  "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
   "Topic :: Utilities",
@@ -45,7 +42,7 @@ keywords = [
   "cli",
   "tools",
 ]
-requires-python = ">=3.5"
+requires-python = ">=3.9"
 
 [project.scripts]
 pyclean = "pyclean.cli:main"
@@ -53,15 +50,11 @@ pyclean = "pyclean.cli:main"
 [project.urls]
 homepage = "https://github.com/bittner/pyclean"
 
-[tool.coverage.coverage_conditional_plugin.rules]
-no-cover-gt-py37 = "sys_version_info > (3, 7)"
-
 [tool.coverage.run]
-plugins = ["coverage_conditional_plugin"]
 source = ["pyclean"]
 
 [tool.coverage.report]
-exclude_lines = ["if __name__ == .__main__.:"]  # exclude_also for Python>3.6
+exclude_also = ["if __name__ == .__main__.:"]
 show_missing = true
 skip_covered = true
 

@@ -8,9 +8,8 @@ Command line interface implementation for pyclean.
 
 import argparse
 import logging
-import sys
 
-from . import __version__, compat, modern
+from . import __version__, modern
 
 log = logging.getLogger(__name__)
 
@@ -39,9 +38,6 @@ def parse_arguments():
         ),
         epilog='Made with ♥ by Painless Software, 🄯 Peter Bittner.',
     )
-
-    if sys.version_info < (3, 8):  # pragma: no-cover-gt-py37
-        parser.register('action', 'extend', compat.ExtendAction)
 
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument(
