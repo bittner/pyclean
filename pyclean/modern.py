@@ -154,6 +154,10 @@ def pyclean(args):
             'would' if args.dry_run else 'could',
         )
 
+    # Suggest --debris option if it wasn't used
+    if not args.debris:
+        suggest_debris_option(args)
+
 
 def descend_and_clean(directory, file_types, dir_names):
     """
@@ -251,3 +255,51 @@ def confirm(message):
     except KeyboardInterrupt:
         msg = 'Aborted by user.'
         raise SystemExit(msg)
+
+
+def detect_debris_in_directory(directory):
+    """
+    Scan a directory for debris artifacts and return a list of detected topics.
+    """
+    detected_topics = []
+
+    for topic, patterns in DEBRIS_TOPICS.items():
+        for pattern in patterns:
+            # Skip patterns that are for recursive cleanup (contain **)
+            if '**' in pattern:
+                continue
+            # Check if the pattern matches anything in the directory
+            matches = list(directory.glob(pattern))
+            if matches:
+                detected_topics.append(topic)
+                break  # Found at least one match for this topic, move to next
+
+    return detected_topics
+
+
+def suggest_debris_option(args):
+    """
+    Suggest using the --debris option when it wasn't used.
+    Optionally provide targeted suggestions based on detected artifacts.
+    """
+    # Collect all detected debris topics across all directories
+    all_detected = set()
+    for dir_name in args.directory:
+        dir_path = Path(dir_name)
+        if dir_path.exists():
+            detected = detect_debris_in_directory(dir_path)
+            all_detected.update(detected)
+
+    if all_detected:
+        # Provide targeted suggestion
+        topics_str = ' '.join(sorted(all_detected))
+        log.info(
+            'Hint: Use --debris to also clean up build artifacts. Detected: %s',
+            topics_str,
+        )
+    else:
+        # Provide general suggestion
+        log.info(
+            'Hint: Use --debris to also clean up build artifacts '
+            'from common Python development tools.',
+        )

@@ -343,8 +343,8 @@ def test_debris_recursive():
     topic_globs = pyclean.modern.DEBRIS_TOPICS[topic]
     topic_folder = topic_globs[1]
 
-    with TemporaryDirectory() as tmpdirname:
-        directory = Path(tmpdirname)
+    with TemporaryDirectory() as tmp:
+        directory = Path(tmp)
         dir_topic = directory / topic_folder
         dir_topic.mkdir()
         dir_nested_topic = directory / 'nested' / topic_folder
@@ -485,3 +485,93 @@ def test_abort_confirm(mock_input):
     """
     with pytest.raises(SystemExit, match=r'^Aborted by user.$'):
         pyclean.modern.confirm('Abort execution')
+
+
+def test_detect_debris_in_directory():
+    """
+    Does ``detect_debris_in_directory()`` identify debris artifacts?
+    """
+    with TemporaryDirectory() as tmp:
+        directory = Path(tmp)
+
+        # Create some debris artifacts
+        build_dir = directory / 'build'
+        build_dir.mkdir()
+        cache_dir = directory / '.cache'
+        cache_dir.mkdir()
+        (directory / '.coverage').touch()
+
+        detected = pyclean.modern.detect_debris_in_directory(directory)
+
+        # Should detect cache, coverage, and package topics
+        assert 'cache' in detected
+        assert 'coverage' in detected
+        assert 'package' in detected
+        # Should not detect pytest (no pytest artifacts created)
+        assert 'pytest' not in detected
+
+
+def test_detect_no_debris_in_directory():
+    """
+    Does ``detect_debris_in_directory()`` return empty list when no debris?
+    """
+    with TemporaryDirectory() as tmp:
+        directory = Path(tmp)
+
+        # Create only non-debris files
+        (directory / 'test.py').touch()
+        (directory / 'README.md').touch()
+
+        detected = pyclean.modern.detect_debris_in_directory(directory)
+
+        assert detected == []
+
+
+@patch('pyclean.modern.log')
+@patch('pyclean.modern.descend_and_clean')
+def test_suggest_debris_without_artifacts(mock_descend, mock_log):
+    """
+    Does pyclean suggest --debris when executed without it and no artifacts present?
+    """
+    with TemporaryDirectory() as tmp, ArgvContext('pyclean', tmp):
+        pyclean.cli.main()
+
+    # Check that the suggestion was logged
+    log_messages = [str(call) for call in mock_log.mock_calls]
+    assert any('Hint: Use --debris' in msg for msg in log_messages)
+    assert any('common Python development tools' in msg for msg in log_messages)
+
+
+@patch('pyclean.modern.log')
+@patch('pyclean.modern.descend_and_clean')
+def test_suggest_debris_with_artifacts(mock_descend, mock_log):
+    """
+    Does pyclean suggest specific --debris topics when artifacts are detected?
+    """
+    with TemporaryDirectory() as tmp:
+        directory = Path(tmp)
+        # Create some debris
+        (directory / 'build').mkdir()
+        (directory / '.pytest_cache').mkdir()
+
+        with ArgvContext('pyclean', tmp):
+            pyclean.cli.main()
+
+    # Check that the suggestion was logged with detected topics
+    log_messages = [str(call) for call in mock_log.mock_calls]
+    assert any('Hint: Use --debris' in msg for msg in log_messages)
+    assert any('Detected:' in msg for msg in log_messages)
+
+
+@patch('pyclean.modern.log')
+@patch('pyclean.modern.descend_and_clean')
+def test_no_suggest_debris_when_used(mock_descend, mock_log):
+    """
+    Does pyclean NOT suggest --debris when it's already used?
+    """
+    with TemporaryDirectory() as tmp, ArgvContext('pyclean', tmp, '--debris'):
+        pyclean.cli.main()
+
+    # Check that the suggestion was NOT logged
+    log_messages = [str(call) for call in mock_log.mock_calls]
+    assert not any('Hint: Use --debris' in msg for msg in log_messages)
