@@ -17,7 +17,12 @@ class FilesystemObjectMock(Mock):
         self.name = name
 
     def __eq__(self, other):
+        if not isinstance(other, FilesystemObjectMock):
+            return NotImplemented
         return self.name == other.name
+
+    def __hash__(self):
+        return hash(self.name)
 
     def __lt__(self, other):
         return self.name < other.name
