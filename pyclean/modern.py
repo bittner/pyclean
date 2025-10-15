@@ -90,6 +90,47 @@ log = logging.getLogger(__name__)
 Runner = CleanupRunner()
 
 
+def normalize(path_pattern: str) -> str:
+    """
+    Normalize path separators in a pattern for cross-platform support.
+
+    On Windows, both forward slash and backslash are valid path separators.
+    On Unix/Posix, only forward slash is valid (backslash can be part of filename).
+    """
+    return path_pattern.replace(os.sep, os.altsep or os.sep)
+
+
+def should_ignore(path: Path, ignore_patterns: list[str]) -> bool:
+    """
+    Check if a path should be ignored based on ignore patterns.
+
+    Patterns can be:
+    - Simple names like 'bar': matches any directory with that name
+    - Paths like 'foo/bar': matches 'bar' directory inside 'foo' directory
+      and also ignores everything inside that directory
+    """
+    if not ignore_patterns:
+        return False
+
+    for pattern in ignore_patterns:
+        # Check if pattern has multiple components (is a path with separators)
+        pattern_parts = Path(normalize(pattern)).parts
+        if len(pattern_parts) > 1:
+            # Pattern contains path separator - match relative path
+            # Path must have at least as many parts as the pattern
+            if len(path.parts) < len(pattern_parts):
+                continue
+            # Check if pattern matches anywhere in the path hierarchy
+            for i in range(len(path.parts) - len(pattern_parts) + 1):
+                path_slice = path.parts[i : i + len(pattern_parts)]
+                if path_slice == pattern_parts:
+                    return True
+        # Simple name - match the directory name anywhere
+        elif path.name == pattern:
+            return True
+    return False
+
+
 def remove_file(fileobj):
     """Attempt to delete a file object for real."""
     log.debug('Deleting file: %s', fileobj)
@@ -169,7 +210,7 @@ def descend_and_clean(directory, file_types, dir_names):
             if child.suffix in file_types:
                 Runner.unlink(child)
         elif child.is_dir():
-            if child.name in Runner.ignore:
+            if should_ignore(child, Runner.ignore):
                 log.debug('Skipping %s', child)
             else:
                 descend_and_clean(child, file_types, dir_names)
@@ -241,7 +282,7 @@ def delete_filesystem_objects(directory, path_glob, prompt=False, recursive=Fals
     if recursive:
         subdirs = (Path(name.path) for name in os.scandir(directory) if name.is_dir())
         for subdir in subdirs:
-            if subdir.name in Runner.ignore:
+            if should_ignore(subdir, Runner.ignore):
                 log.debug('Skipping %s', subdir)
             else:
                 delete_filesystem_objects(subdir, path_glob, prompt, recursive)
