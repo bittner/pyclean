@@ -42,12 +42,12 @@ def test_entrypoint():
     assert shutil.which('pyclean')
 
 
-@patch('pyclean.cli.modern.pyclean', side_effect=Exception('Error test.'))
+@patch('pyclean.cli.modern.pyclean', side_effect=Exception('Error test'))
 def test_main_handles_exceptions(mock_modern):
     """
     The main CLI entry point handles exceptions gracefully.
     """
-    with ArgvContext('pyclean', '.'), pytest.raises(SystemExit, match='Error test.'):
+    with ArgvContext('pyclean', '.'), pytest.raises(SystemExit, match=r'Error test'):
         pyclean.cli.main()
 
 
