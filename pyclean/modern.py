@@ -178,7 +178,7 @@ def pyclean(args):
         for topic in args.debris:
             remove_debris_for(topic, dir_path)
 
-        remove_freeform_targets(args.erase, args.yes, dir_path)
+        remove_freeform_targets(dir_path, args.erase, args.yes, args.dry_run)
 
     log.info(
         'Total %d files, %d directories %s.',
@@ -231,7 +231,7 @@ def remove_debris_for(topic, directory):
     recursive_delete_debris(directory, patterns)
 
 
-def remove_freeform_targets(glob_patterns, yes, directory):
+def remove_freeform_targets(directory, glob_patterns, yes, dry_run=False):
     """
     Remove free-form targets using globbing.
 
@@ -249,7 +249,7 @@ def remove_freeform_targets(glob_patterns, yes, directory):
     """
     for path_glob in glob_patterns:
         log.debug('Erase file system objects matching: %s', path_glob)
-        delete_filesystem_objects(directory, path_glob, prompt=not yes)
+        delete_filesystem_objects(directory, path_glob, prompt=not yes, dry_run=dry_run)
 
 
 def recursive_delete_debris(directory, patterns):
@@ -277,7 +277,7 @@ def recursive_delete_debris(directory, patterns):
             recursive_delete_debris(subdir, patterns)
 
 
-def delete_filesystem_objects(directory, path_glob, prompt=False):
+def delete_filesystem_objects(directory, path_glob, prompt=False, dry_run=False):
     """
     Identifies all pathnames matching a specific glob pattern, and attempts
     to delete them in the proper order, optionally asking for confirmation.
@@ -293,13 +293,21 @@ def delete_filesystem_objects(directory, path_glob, prompt=False):
 
     for file_object in files:
         file_type = 'symlink' if file_object.is_symlink() else 'file'
-        if prompt and not confirm('Delete %s %s' % (file_type, file_object)):
+        if (
+            not dry_run
+            and prompt
+            and not confirm('Delete %s %s' % (file_type, file_object))
+        ):
             Runner.unlink_failed += 1
             continue
         Runner.unlink(file_object)
 
     for dir_object in dirs:
-        if prompt and not confirm('Remove empty directory %s' % dir_object):
+        if (
+            not dry_run
+            and prompt
+            and not confirm('Remove empty directory %s' % dir_object)
+        ):
             Runner.rmdir_failed += 1
             continue
         Runner.rmdir(dir_object)

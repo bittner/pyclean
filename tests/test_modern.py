@@ -305,7 +305,7 @@ def test_erase_option(mock_descend, mock_debris, mock_erase):
     with ArgvContext('pyclean', '.', '--erase', 'tmp/**/*', 'tmp/'):
         pyclean.cli.main()
 
-    erase_calls = [call_args[0][0] for call_args in mock_erase.call_args_list]
+    erase_calls = [call_args[0][1] for call_args in mock_erase.call_args_list]
 
     assert mock_descend.called
     assert not mock_debris.called
@@ -374,10 +374,10 @@ def test_erase_loop(mock_delete_fs_obj):
     patterns = ['foo.txt']
     directory = Path()
 
-    remove_freeform_targets(patterns, yes=False, directory=directory)
+    remove_freeform_targets(directory, patterns, yes=False, dry_run=False)
 
     assert mock_delete_fs_obj.mock_calls == [
-        call(directory, 'foo.txt', prompt=True),
+        call(directory, 'foo.txt', prompt=True, dry_run=False),
     ]
 
 
@@ -491,6 +491,53 @@ def test_abort_confirm(mock_input):
     """
     with pytest.raises(SystemExit, match=r'^Aborted by user.$'):
         pyclean.modern.confirm('Abort execution')
+
+
+@patch('pyclean.modern.print_dirname')
+@patch('pyclean.modern.print_filename')
+@patch('builtins.input')
+@patch('pathlib.Path.glob', return_value=[DirectoryMock(), FileMock()])
+def test_dryrun_no_prompt(mock_glob, mock_input, mock_print_file, mock_print_dir):
+    """
+    Does --dry-run skip the confirmation prompt for --erase?
+    This test verifies the fix for the issue where prompts were shown
+    even with --dry-run.
+    """
+    args = Namespace(dry_run=True, ignore=[])
+    directory = Path()
+
+    pyclean.modern.Runner.configure(args)
+    delete_filesystem_objects(directory, 'tmp/**/*', prompt=True, dry_run=True)
+
+    assert mock_glob.called
+    # input() should NOT be called with dry_run=True
+    assert not mock_input.called
+    # But the print functions should be called (since it's a dry run)
+    assert mock_print_file.called
+    assert mock_print_dir.called
+
+
+@patch('pyclean.modern.remove_directory')
+@patch('pyclean.modern.remove_file')
+@patch('builtins.input', return_value='y')
+@patch('pathlib.Path.glob', return_value=[DirectoryMock(), FileMock()])
+def test_no_dryrun_with_prompt(mock_glob, mock_input, mock_unlink, mock_rmdir):
+    """
+    Does non-dry-run mode show prompts when expected?
+    This test ensures the fix doesn't break normal prompt behavior.
+    """
+    args = Namespace(dry_run=False, ignore=[])
+    directory = Path()
+
+    pyclean.modern.Runner.configure(args)
+    delete_filesystem_objects(directory, 'tmp/**/*', prompt=True, dry_run=False)
+
+    assert mock_glob.called
+    # input() SHOULD be called with dry_run=False and prompt=True
+    assert mock_input.called
+    # The real deletion functions should be called (not dry-run)
+    assert mock_unlink.called
+    assert mock_rmdir.called
 
 
 def test_detect_debris_in_directory():
