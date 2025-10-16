@@ -227,8 +227,8 @@ def remove_debris_for(topic, directory):
     """
     log.debug('Scanning for debris of %s ...', topic.title())
 
-    for path_glob in DEBRIS_TOPICS[topic]:
-        delete_filesystem_objects(directory, path_glob, recursive=True)
+    patterns = DEBRIS_TOPICS[topic]
+    recursive_delete_debris(directory, patterns)
 
 
 def remove_freeform_targets(glob_patterns, yes, directory):
@@ -252,7 +252,32 @@ def remove_freeform_targets(glob_patterns, yes, directory):
         delete_filesystem_objects(directory, path_glob, prompt=not yes)
 
 
-def delete_filesystem_objects(directory, path_glob, prompt=False, recursive=False):
+def recursive_delete_debris(directory, patterns):
+    """
+    Recursively delete debris matching any of the given patterns.
+
+    This function walks the directory tree once and applies all patterns
+    at each level, avoiding redundant directory scans.
+    """
+    for pattern in patterns:
+        delete_filesystem_objects(directory, pattern)
+
+    try:
+        subdirs = (
+            Path(entry.path) for entry in os.scandir(directory) if entry.is_dir()
+        )
+    except (OSError, PermissionError) as err:
+        log.warning('Cannot access directory %s: %s', directory, err)
+        return
+
+    for subdir in subdirs:
+        if should_ignore(subdir, Runner.ignore):
+            log.debug('Skipping %s', subdir)
+        else:
+            recursive_delete_debris(subdir, patterns)
+
+
+def delete_filesystem_objects(directory, path_glob, prompt=False):
     """
     Identifies all pathnames matching a specific glob pattern, and attempts
     to delete them in the proper order, optionally asking for confirmation.
@@ -278,14 +303,6 @@ def delete_filesystem_objects(directory, path_glob, prompt=False, recursive=Fals
             Runner.rmdir_failed += 1
             continue
         Runner.rmdir(dir_object)
-
-    if recursive:
-        subdirs = (Path(name.path) for name in os.scandir(directory) if name.is_dir())
-        for subdir in subdirs:
-            if should_ignore(subdir, Runner.ignore):
-                log.debug('Skipping %s', subdir)
-            else:
-                delete_filesystem_objects(subdir, path_glob, prompt, recursive)
 
 
 def confirm(message):
