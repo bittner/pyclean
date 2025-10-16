@@ -85,7 +85,8 @@ software!)
 Inspired by Debian
 ------------------
 
-Just for reference, the Python scripts Debian ships with its
+On a nostalgic note, PyClean is somewhat the brainchild of Debian Python
+package maintenance.  The Python scripts Debian ships with its
 `python-minimal`_ and `python3-minimal`_ packages can be found at:
 
 - pyclean: `salsa.debian.org/cpython-team/python-defaults
@@ -98,36 +99,58 @@ Just for reference, the Python scripts Debian ships with its
 .. _python-minimal: https://packages.debian.org/stable/python-minimal
 .. _python3-minimal: https://packages.debian.org/stable/python3-minimal
 
+Alternatives
+------------
+
+PyClean tries to make your cleanup experience as convenient and safe as
+possible, but if you really can't live with using it, the only valid
+cross-platform alternative for you as a developer is probably `git-clean`_,
+e.g.
+
+.. code:: shell
+
+    git clean -dfx -e .idea -e .vscode -n
+
+.. _git-clean: https://git-scm.com/docs/git-clean
+
 Installation
 ============
 
-.. code:: console
+.. code:: shell
 
-    $ pip install pyclean
+    pip install pyclean
 
 or
 
-.. code:: console
+.. code:: shell
 
-    $ python -m pip install pyclean
+    python -m pip install pyclean
 
 uv
 --
 
 If you work with ``uv`` you can install ``pyclean`` globally via uv's
-`tool interface`_, or use the ``uvx`` command and not care about installing:
+`tool interface`_ and use it like a system command:
 
-.. code:: console
+.. code:: shell
 
-    $ uv tool install pyclean
+    uv tool install pyclean
+    pyclean
 
-or
+Or simply use the ``uvx`` command and don't care about installing at all:
 
-.. code:: console
+.. code:: shell
 
-    $ uvx pyclean
+    uvx pyclean
 
 .. _tool interface: https://docs.astral.sh/uv/concepts/tools/
+
+Conda
+-----
+
+.. code:: shell
+
+    conda install conda-forge::pyclean
 
 Tox
 ---
@@ -144,30 +167,30 @@ can add it to your ``tox.ini`` file as follows:
 
 You'll then be able to run it with `Tox`_ like this:
 
-.. code:: console
+.. code:: shell
 
-    $ tox -e clean
+    tox -e clean
 
 .. _Tox: https://tox.wiki/
 
 Usage
 =====
 
-.. code:: console
+.. code:: shell
 
-    $ pyclean --help
+    pyclean --help
 
 or
 
-.. code:: console
+.. code:: shell
 
-    $ python -m pyclean --help
+    python -m pyclean --help
 
 Clean up all bytecode in the current directory tree, and explain verbosely:
 
-.. code:: console
+.. code:: shell
 
-    $ pyclean -v .
+    pyclean -v .
 
 Clean up debris
 ---------------
@@ -188,9 +211,9 @@ Python bytecode. The following topics are currently covered:
 *Example:* Dry-run a cleanup of bytecode and tool debris in verbose mode
 (to see what would be deleted):
 
-.. code:: console
+.. code:: shell
 
-    $ pyclean . --debris --verbose --dry-run
+    pyclean . --debris --verbose --dry-run
 
 Remove arbitrary file system objects
 ------------------------------------
@@ -208,9 +231,9 @@ reason, the ``--erase`` option has a few artificial constraints:
 - You're prompted interactively to confirm deletion, unless you specify
   the ``--yes`` option, in addition.
 
-.. code:: console
+.. code:: shell
 
-    $ pyclean . --erase tmp/**/* tmp/
+    pyclean . --erase tmp/**/* tmp/
 
 The above would delete the entire ``tmp/`` directory with all subdirectories
 inside the current folder. If you omit the final ``tmp/`` you'll leave the

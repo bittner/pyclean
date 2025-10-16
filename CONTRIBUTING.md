@@ -30,22 +30,22 @@ Running tests
 
 Run the linters and our test suite using Tox, e.g.
 
-```console
+```shell
 # show all Tox targets
 tox list
 ```
 
-```console
+```shell
 # run just linting and the tests for Python 3.12
 tox -e lint,py312
 ```
 
-```console
+```shell
 # run tests with your default Python (the one executing Tox)
 tox -e py
 ```
 
-```console
+```shell
 # run entire test suite
 tox
 ```
@@ -63,19 +63,19 @@ Developing locally
 
 You can try out the CLI by running the application as a module, e.g.
 
-```console
+```shell
 python3 -m pyclean
 ```
 
 or you can make a so-called "editable install", for development:
 
-```console
+```shell
 python3 -m pip install -e .
 ```
 
 Then run as usual:
 
-```console
+```shell
 pyclean --help
 ```
 
@@ -85,13 +85,13 @@ Install from repository
 If you only want to install `pyclean` off the Git repository, e.g. in order
 to try out a feature branch, you can install it on your machine like this:
 
-```console
+```shell
 pip install git+https://github.com/bittner/pyclean#egg=pyclean
 ```
 
 Or, for a specific branch:
 
-```console
+```shell
 pip install git+https://github.com/bittner/pyclean@feature-branch#egg=pyclean
 ```
 
