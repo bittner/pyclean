@@ -113,8 +113,8 @@ e.g.
 
 .. _git-clean: https://git-scm.com/docs/git-clean
 
-Installation
-============
+Installation 🧑‍💻
+==================
 
 .. code:: shell
 
@@ -173,8 +173,8 @@ You'll then be able to run it with `Tox`_ like this:
 
 .. _Tox: https://tox.wiki/
 
-Usage
-=====
+Usage ✨
+========
 
 .. code:: shell
 
@@ -192,8 +192,8 @@ Clean up all bytecode in the current directory tree, and explain verbosely:
 
     pyclean -v .
 
-Clean up debris
----------------
+Clean up debris 💩
+------------------
 
 PyClean can clean up leftovers, generated data and temporary files from
 popular Python development tools in their default locations, along with
@@ -215,8 +215,8 @@ Python bytecode. The following topics are currently covered:
 
     pyclean . --debris --verbose --dry-run
 
-Remove arbitrary file system objects
-------------------------------------
+Remove arbitrary file system objects 🐊
+---------------------------------------
 
 PyClean also lets you remove free-form targets using globbing. Note that
 this is **potentially dangerous**: You can delete everything anywhere in
