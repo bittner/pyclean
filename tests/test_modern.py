@@ -150,13 +150,7 @@ def test_report_failures(unlink_failures, rmdir_failures):
     with patch('pyclean.modern.CleanupRunner.configure'):
         pyclean.modern.pyclean(args)
 
-    assert pyclean.modern.log.mock_calls[1] == call.debug(
-        '%d files, %d directories %s not be removed.',
-        unlink_failures,
-        rmdir_failures,
-        'would',
-    )
-    assert pyclean.modern.log.mock_calls[1] == call.debug(
+    pyclean.modern.log.debug.assert_called_with(
         '%d files, %d directories %s not be removed.',
         unlink_failures,
         rmdir_failures,
@@ -190,9 +184,13 @@ def test_unlink_failure(mock_unlink, mock_log):
     """
     Is a deletion error caught and logged?
     """
+    args = Namespace(dry_run=False, ignore=[])
+    pyclean.modern.Runner.configure(args)
+
     remove_file(Path('tmp'))
 
-    assert "debug('File not deleted." in str(mock_log.mock_calls[1])
+    mock_log.debug.assert_called()
+    assert 'File not deleted.' in str(mock_log.debug.call_args)
 
 
 @patch('pyclean.modern.log')
@@ -201,9 +199,13 @@ def test_rmdir_failure(mock_rmdir, mock_log):
     """
     Is a deletion error caught and logged?
     """
+    args = Namespace(dry_run=False, ignore=[])
+    pyclean.modern.Runner.configure(args)
+
     remove_directory(Path('tmp'))
 
-    assert "debug('Directory not removed." in str(mock_log.mock_calls[1])
+    mock_log.debug.assert_called()
+    assert 'Directory not removed.' in str(mock_log.debug.call_args)
 
 
 @patch('pyclean.modern.log')
@@ -211,14 +213,16 @@ def test_dryrun_output(mock_log):
     """
     Do we explain what would be done, when --dry-run is used?
     """
+    expected_debug_log_count = 2
     args = Namespace(dry_run=True, ignore=[])
 
     pyclean.modern.Runner.configure(args)
     pyclean.modern.Runner.unlink(Path('tmp'))
     pyclean.modern.Runner.rmdir(Path('tmp'))
 
-    assert "debug('Would delete file:" in str(mock_log.mock_calls[0])
-    assert "debug('Would delete directory:" in str(mock_log.mock_calls[1])
+    assert mock_log.debug.call_count == expected_debug_log_count
+    assert 'Would delete file:' in str(mock_log.debug.call_args_list[0])
+    assert 'Would delete directory:' in str(mock_log.debug.call_args_list[1])
 
 
 @patch('pyclean.modern.print_dirname')
@@ -321,20 +325,19 @@ def test_erase_option(mock_descend, mock_debris, mock_erase):
         'tox',
     ],
 )
-@patch('pyclean.modern.delete_filesystem_objects')
-def test_debris_loop(mock_delete_fs_obj, debris_topic):
+@patch('pyclean.modern.recursive_delete_debris')
+def test_debris_loop(mock_recursive_delete_debris, debris_topic):
     """
-    Does ``remove_debris_for()`` call filesystem object removal?
+    Does ``remove_debris_for()`` call debris cleanup with all patterns?
     """
     fileobject_globs = pyclean.modern.DEBRIS_TOPICS[debris_topic]
     directory = Path()
-    expected_calls = [
-        call(directory, pattern, recursive=True) for pattern in fileobject_globs
-    ]
 
     remove_debris_for(debris_topic, directory)
 
-    assert mock_delete_fs_obj.call_args_list == expected_calls
+    # Should call recursive_delete_debris once with all patterns
+    assert mock_recursive_delete_debris.call_count == 1
+    assert mock_recursive_delete_debris.call_args == call(directory, fileobject_globs)
 
 
 def test_debris_recursive():
@@ -540,9 +543,9 @@ def test_suggest_debris_without_artifacts(mock_descend, mock_log):
         pyclean.cli.main()
 
     # Check that the suggestion was logged
-    log_messages = [str(call) for call in mock_log.mock_calls]
-    assert any('Hint: Use --debris' in msg for msg in log_messages)
-    assert any('common Python development tools' in msg for msg in log_messages)
+    log_info_calls = [str(call) for call in mock_log.info.call_args_list]
+    assert any('Hint: Use --debris' in msg for msg in log_info_calls)
+    assert any('common Python development tools' in msg for msg in log_info_calls)
 
 
 @patch('pyclean.modern.log')
@@ -561,9 +564,9 @@ def test_suggest_debris_with_artifacts(mock_descend, mock_log):
             pyclean.cli.main()
 
     # Check that the suggestion was logged with detected topics
-    log_messages = [str(call) for call in mock_log.mock_calls]
-    assert any('Hint: Use --debris' in msg for msg in log_messages)
-    assert any('Detected:' in msg for msg in log_messages)
+    log_info_calls = [str(call) for call in mock_log.info.call_args_list]
+    assert any('Hint: Use --debris' in msg for msg in log_info_calls)
+    assert any('Detected:' in msg for msg in log_info_calls)
 
 
 @patch('pyclean.modern.log')
@@ -576,8 +579,8 @@ def test_no_suggest_debris_when_used(mock_descend, mock_log):
         pyclean.cli.main()
 
     # Check that the suggestion was NOT logged
-    log_messages = [str(call) for call in mock_log.mock_calls]
-    assert not any('Hint: Use --debris' in msg for msg in log_messages)
+    log_info_calls = [str(call) for call in mock_log.info.call_args_list]
+    assert not any('Hint: Use --debris' in msg for msg in log_info_calls)
 
 
 @pytest.mark.parametrize(
@@ -740,3 +743,73 @@ def test_ignore_with_debris_cleanup():
         assert not (directory / '.cache').exists()
         assert (directory / 'foo' / '.cache').exists()
         assert (directory / 'foo' / '.cache' / 'test.txt').exists()
+
+
+def test_debris_cleanup_scans_directories_once():
+    """
+    Does debris cleanup scan each directory only once per topic,
+    rather than once per glob pattern?
+    """
+    with TemporaryDirectory() as tmp:
+        directory = Path(tmp)
+
+        # Create a directory structure with ignored directories
+        (directory / '.git').mkdir()
+        (directory / 'subdir1').mkdir()
+        (directory / 'subdir2').mkdir()
+
+        # Mock the should_ignore function to count calls
+        original_should_ignore = pyclean.modern.should_ignore
+        call_count = {'total': 0, 'git_checks': 0}
+
+        def counting_should_ignore(path, patterns):
+            call_count['total'] += 1
+            if path.name == '.git':
+                call_count['git_checks'] += 1
+            return original_should_ignore(path, patterns)
+
+        args = Namespace(dry_run=False, ignore=['.git'])
+        pyclean.modern.Runner.configure(args)
+
+        with patch('pyclean.modern.should_ignore', side_effect=counting_should_ignore):
+            # Remove debris for a topic with multiple patterns ('cache' has 2 patterns)
+            pyclean.modern.remove_debris_for('cache', directory)
+
+        # Each subdirectory should be checked once per directory traversal,
+        # not once per glob pattern
+        # With 3 subdirs (.git, subdir1, subdir2), we expect:
+        # - 1 check for .git at root level
+        # - 1 check for .git inside subdir1
+        # - 1 check for .git inside subdir2
+        # Total: at most 3 checks for .git (not 6 if it were called for each pattern)
+        assert call_count['git_checks'] == 1, (
+            f'Expected 1 check for .git directory, but got {call_count["git_checks"]}'
+        )
+
+
+@pytest.mark.parametrize(
+    ('system_error'),
+    [
+        PermissionError('Permission denied'),
+        OSError('I/O error'),
+    ],
+)
+@patch('pyclean.modern.log')
+def test_recursive_delete_debris_error(mock_log, system_error):
+    """
+    Does recursive_delete_debris log a warning when directory access fails?
+    """
+    args = Namespace(dry_run=False, ignore=[])
+    pyclean.modern.Runner.configure(args)
+
+    directory = Path('/nonexistent/test/directory')
+    patterns = ['.cache/**/*', '.cache/']
+
+    with patch('os.scandir', side_effect=system_error) as mock_scandir:
+        pyclean.modern.recursive_delete_debris(directory, patterns)
+
+    mock_log.warning.assert_called_once_with(
+        'Cannot access directory %s: %s',
+        directory,
+        mock_scandir.side_effect,
+    )
