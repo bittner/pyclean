@@ -9,7 +9,6 @@ Tests for the pyclean CLI.
 import os
 import re
 import shutil
-import sys
 from importlib import import_module
 from unittest.mock import patch
 
@@ -73,7 +72,6 @@ def test_mandatory_args(mock_modern):
     assert mock_modern.called
 
 
-@pytest.mark.skipif(sys.version_info < (3,), reason='requires Python 3')
 def test_dryrun_option():
     """
     Does a --dry-run option exist?
@@ -106,8 +104,6 @@ def test_debris_default_args():
     assert args.debris == ['cache', 'coverage', 'package', 'pytest', 'ruff']
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason='re.sub bug in Python<3.7')
-# see also: https://bugs.python.org/issue32308
 def test_debris_optional_args():
     """
     Does the help screen explain all --debris options?
@@ -211,7 +207,6 @@ def test_yes_aborts_without_erase():
         pyclean.cli.parse_arguments()
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason='shell picks system pyclean')
 def test_version_option():
     """
     Does --version yield the expected information?
