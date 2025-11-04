@@ -8,6 +8,7 @@ Command line interface implementation for pyclean.
 
 import argparse
 import logging
+import shutil
 
 from . import __version__, modern
 
@@ -46,16 +47,6 @@ def parse_arguments():
         help='directory tree to traverse for bytecode and debris',
     )
     parser.add_argument(
-        '-i',
-        '--ignore',
-        metavar='DIRECTORY',
-        action='extend',
-        nargs='+',
-        default=ignore_default_items,
-        help='directory that should be ignored (may be specified multiple times;'
-        ' default: %s)' % ' '.join(ignore_default_items),
-    )
-    parser.add_argument(
         '-d',
         '--debris',
         metavar='TOPIC',
@@ -87,6 +78,23 @@ def parse_arguments():
         help='remove empty directories',
     )
     parser.add_argument(
+        '-g',
+        '--git-clean',
+        action='store_true',
+        default=False,
+        help='run git clean to remove untracked files',
+    )
+    parser.add_argument(
+        '-i',
+        '--ignore',
+        metavar='DIRECTORY',
+        action='extend',
+        nargs='+',
+        default=ignore_default_items,
+        help='directory that should be ignored (may be specified multiple times;'
+        ' default: %s)' % ' '.join(ignore_default_items),
+    )
+    parser.add_argument(
         '-n',
         '--dry-run',
         action='store_true',
@@ -112,8 +120,11 @@ def parse_arguments():
     args = parser.parse_args()
     init_logging(args)
 
-    if args.yes and not args.erase:
-        parser.error('Specifying --yes only makes sense with --erase.')
+    if args.git_clean and not shutil.which('git') is not None:
+        parser.error('Git is not available. Install Git to use --git-clean.')
+
+    if args.yes and not args.erase and not args.git_clean:
+        parser.error('Specifying --yes only makes sense with --erase or --git-clean.')
 
     if 'debris' in args:
         if 'all' in args.debris:
@@ -150,3 +161,6 @@ def main():
         modern.pyclean(args)
     except Exception as err:
         raise SystemExit(err)
+    except KeyboardInterrupt:
+        msg = 'Aborted by user.'
+        raise SystemExit(msg)
