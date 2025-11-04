@@ -240,6 +240,28 @@ inside the current folder. If you omit the final ``tmp/`` you'll leave the
 empty ``tmp`` directory in place. (**WARNING!** Don't put the ``.`` *after*
 the ``--erase`` option! Obviously, your project files will all be deleted.)
 
+Git-clean integration 🏷️
+--------------------------
+
+PyClean integrates with Git's ``git clean`` command to remove untracked
+files from version-controlled directories. The ``--git-clean`` (or ``-g``)
+flag runs after all other cleanup operations.
+
+By default, Git prompts interactively to confirm which files to delete.
+Use ``--dry-run`` to preview, or ``--yes`` to force deletion without prompts.
+The ``--ignore`` patterns are honored as exclusions.
+
+.. code:: shell
+
+    pyclean . --git-clean --dry-run
+
+.. code:: shell
+
+    pyclean . --debris --git-clean --yes
+
+**Note:** Git must be installed for this feature. If a directory is not
+under version control, a warning is logged and pyclean continues.
+
 Development
 ===========
 

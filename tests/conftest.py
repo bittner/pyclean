@@ -6,8 +6,17 @@
 Mock objects for tests of the modern implementation.
 """
 
+import shutil
 from pathlib import Path
 from unittest.mock import Mock
+
+import pytest
+
+# Decorator for tests that require git
+skip_if_no_git = pytest.mark.skipif(
+    shutil.which('git') is None,
+    reason='Git not installed',
+)
 
 
 class FilesystemObjectMock(Mock):

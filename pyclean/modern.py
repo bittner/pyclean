@@ -8,10 +8,11 @@ Modern, cross-platform, pure-Python pyclean implementation.
 
 import logging
 import os
+import subprocess
 from pathlib import Path
 
-BYTECODE_FILES = ['.pyc', '.pyo']
 BYTECODE_DIRS = ['__pycache__']
+BYTECODE_FILES = ['.pyc', '.pyo']
 DEBRIS_TOPICS = {
     'cache': [
         '.cache/**/*',
@@ -60,6 +61,7 @@ DEBRIS_TOPICS = {
         '.tox/',
     ],
 }
+GIT_FATAL_ERROR = 128
 
 
 class CleanupRunner:
@@ -184,19 +186,26 @@ def pyclean(args):
             log.debug('Removing empty directories...')
             remove_empty_directories(dir_path)
 
+        if args.git_clean:
+            execute_git_clean(dir_path, args)
+
+    git_clean_note = ' (Not counting git clean)' if args.git_clean else ''
+
     log.info(
-        'Total %d files, %d directories %s.',
+        'Total %d files, %d directories %s.%s',
         Runner.unlink_count,
         Runner.rmdir_count,
         'would be removed' if args.dry_run else 'removed',
+        git_clean_note,
     )
 
     if Runner.unlink_failed or Runner.rmdir_failed:
         log.debug(
-            '%d files, %d directories %s not be removed.',
+            '%d files, %d directories %s not be removed.%s',
             Runner.unlink_failed,
             Runner.rmdir_failed,
             'would' if args.dry_run else 'could',
+            git_clean_note,
         )
 
     # Suggest --debris option if it wasn't used
@@ -400,3 +409,33 @@ def suggest_debris_option(args):
             'Hint: Use --debris to also clean up build artifacts '
             'from common Python development tools.',
         )
+
+
+def build_git_clean_command(
+    ignore_patterns: list[str],
+    dry_run=False,
+    force=False,
+) -> list[str]:
+    """Build the git clean command with appropriate flags."""
+    exclude = (item for pattern in ignore_patterns for item in ['-e', pattern])
+    mode = '-n' if dry_run else '-f' if force else '-i'
+    return ['git', 'clean', '-dx', *exclude, mode]
+
+
+def execute_git_clean(directory, args):
+    """
+    Execute git clean in the specified directory.
+    """
+    log.info('Executing git clean...')
+    cmd = build_git_clean_command(args.ignore, dry_run=args.dry_run, force=args.yes)
+
+    log.debug('Run: %s', ' '.join(cmd))
+    result = subprocess.run(cmd, cwd=directory, check=False)  # noqa: S603
+
+    if result.returncode == GIT_FATAL_ERROR:
+        log.warning(
+            'Directory %s is not under version control. Skipping git clean.',
+            directory,
+        )
+    elif result.returncode:
+        raise SystemExit(result.returncode)

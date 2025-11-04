@@ -14,6 +14,7 @@ from unittest.mock import patch
 
 import pytest
 from cli_test_helpers import ArgvContext, shell
+from conftest import skip_if_no_git
 
 import pyclean
 import pyclean.cli
@@ -249,3 +250,50 @@ def test_folders_default():
         args = pyclean.cli.parse_arguments()
 
     assert not args.folders
+
+
+@skip_if_no_git
+@pytest.mark.parametrize('option', ['--git-clean', '-g'])
+def test_git_clean_option_short_and_long(option):
+    """
+    Is `--git-clean` option available in both short and long form?
+    """
+    with ArgvContext('pyclean', '.', option):
+        args = pyclean.cli.parse_arguments()
+
+    assert args.git_clean
+
+
+def test_git_clean_default():
+    """
+    Does `--git-clean` default to False when not specified?
+    """
+    with ArgvContext('pyclean', '.'):
+        args = pyclean.cli.parse_arguments()
+
+    assert not args.git_clean
+
+
+@skip_if_no_git
+def test_yes_works_with_git_clean():
+    """
+    Does `--yes` work with `--git-clean` option?
+    """
+    with ArgvContext('pyclean', '.', '--git-clean', '--yes'):
+        args = pyclean.cli.parse_arguments()
+
+    assert args.git_clean
+    assert args.yes
+
+
+@skip_if_no_git
+def test_yes_with_git_clean_and_erase():
+    """
+    Does `--yes` work with both `--git-clean` and `--erase`?
+    """
+    with ArgvContext('pyclean', '.', '--git-clean', '--erase', 'tmp', '--yes'):
+        args = pyclean.cli.parse_arguments()
+
+    assert args.git_clean
+    assert args.erase == ['tmp']
+    assert args.yes

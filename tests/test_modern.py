@@ -15,7 +15,7 @@ from unittest.mock import Mock, call, patch
 
 import pytest
 from cli_test_helpers import ArgvContext
-from conftest import DirectoryMock, FileMock, SymlinkMock
+from conftest import DirectoryMock, FileMock, SymlinkMock, skip_if_no_git
 
 import pyclean.cli
 import pyclean.modern
@@ -123,14 +123,15 @@ def test_ignore_otherobjects(mock_iterdir):
 
 
 @pytest.mark.parametrize(
-    ('unlink_failures', 'rmdir_failures'),
+    ('unlink_failures', 'rmdir_failures', 'git_clean', 'explanation'),
     [
-        (7, 0),
-        (0, 3),
-        (1, 1),
+        (7, 0, False, ''),
+        (0, 3, False, ''),
+        (1, 1, False, ''),
+        (42, 42, True, ' (Not counting git clean)'),
     ],
 )
-def test_report_failures(unlink_failures, rmdir_failures):
+def test_report_failures(unlink_failures, rmdir_failures, git_clean, explanation):
     """
     Are failures to delete a file or folder reported with ``log.debug``?
     """
@@ -139,6 +140,7 @@ def test_report_failures(unlink_failures, rmdir_failures):
         directory=[],
         dry_run=True,
         erase=[],
+        git_clean=git_clean,
         ignore=[],
         yes=False,
     )
@@ -147,14 +149,25 @@ def test_report_failures(unlink_failures, rmdir_failures):
     pyclean.modern.Runner.rmdir_failed = rmdir_failures
     pyclean.modern.log = Mock()
 
-    with patch('pyclean.modern.CleanupRunner.configure'):
+    with (
+        patch('pyclean.modern.CleanupRunner.configure'),
+        patch('pyclean.modern.suggest_debris_option'),
+    ):
         pyclean.modern.pyclean(args)
 
     pyclean.modern.log.debug.assert_called_with(
-        '%d files, %d directories %s not be removed.',
+        '%d files, %d directories %s not be removed.%s',
         unlink_failures,
         rmdir_failures,
         'would',
+        explanation,
+    )
+    pyclean.modern.log.info.assert_called_with(
+        'Total %d files, %d directories %s.%s',
+        0,
+        0,
+        'would be removed',
+        explanation,
     )
 
 
@@ -965,3 +978,104 @@ def test_remove_empty_directories_error(mock_log, system_error):
         directory,
         mock_scandir.side_effect,
     )
+
+
+@patch('pyclean.modern.subprocess.run')
+def test_run_git_clean_dry_run(mock_run):
+    """
+    Does build_git_clean_command generate correct command for dry-run?
+    """
+    cmd = pyclean.modern.build_git_clean_command(
+        ignore_patterns=['.idea', '.vscode'],
+        dry_run=True,
+        force=False,
+    )
+
+    cmd_str = ' '.join(cmd)
+    assert cmd_str.startswith('git clean -dx')
+    assert ' -e .idea' in cmd_str
+    assert ' -e .vscode' in cmd_str
+    assert '-n' in cmd
+
+
+@patch('pyclean.modern.subprocess.run')
+def test_run_git_clean_force(mock_run):
+    """
+    Does build_git_clean_command generate correct command for force mode?
+    """
+    cmd = pyclean.modern.build_git_clean_command(
+        ignore_patterns=['.tox'],
+        dry_run=False,
+        force=True,
+    )
+
+    cmd_str = ' '.join(cmd)
+    assert cmd_str.startswith('git clean -dx')
+    assert ' -e .tox' in cmd_str
+    assert '-f' in cmd
+
+
+@patch('pyclean.modern.subprocess.run')
+def test_run_git_clean_interactive(mock_run):
+    """
+    Does build_git_clean_command generate correct command for interactive mode?
+    """
+    cmd = pyclean.modern.build_git_clean_command(
+        ignore_patterns=[],
+        dry_run=False,
+        force=False,
+    )
+
+    cmd_str = ' '.join(cmd)
+    assert cmd_str.startswith('git clean -dx')
+    assert '-i' in cmd
+
+
+@skip_if_no_git
+@patch('pyclean.modern.log')
+@patch(
+    'pyclean.modern.subprocess.run',
+    return_value=Mock(returncode=pyclean.modern.GIT_FATAL_ERROR),
+)
+def test_execute_git_clean_not_a_git_repo(mock_run, mock_log):
+    """
+    Does execute_git_clean handle "not a git directory" gracefully?
+    """
+    args = Namespace(ignore=[], git_clean=True, dry_run=False, yes=False)
+
+    pyclean.modern.execute_git_clean('/not/a/repo', args)
+
+    assert mock_run.called
+    mock_log.warning.assert_called_once_with(
+        'Directory %s is not under version control. Skipping git clean.',
+        '/not/a/repo',
+    )
+
+
+@skip_if_no_git
+@patch('pyclean.modern.execute_git_clean')
+@patch('pyclean.modern.descend_and_clean')
+def test_pyclean_with_git_clean(mock_descend, mock_git_clean):
+    """
+    Does pyclean call execute_git_clean when --git-clean flag is used?
+    """
+    with ArgvContext('pyclean', '.', '--git-clean'):
+        pyclean.cli.main()
+
+    assert mock_git_clean.called
+
+
+@skip_if_no_git
+@patch('pyclean.modern.execute_git_clean', side_effect=SystemExit(42))
+@patch('pyclean.modern.descend_and_clean')
+def test_pyclean_git_clean_exit_nonzero_raises(mock_descend, mock_git_clean):
+    """
+    Does pyclean exit with git-clean's status code when git clean fails?
+    """
+    with (
+        ArgvContext('pyclean', '.', '--git-clean'),
+        pytest.raises(SystemExit) as exc_info,
+    ):
+        pyclean.cli.main()
+
+    assert exc_info.value.code == 42  # noqa: PLR2004
