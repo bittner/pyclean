@@ -228,3 +228,24 @@ def test_default_modern(mock_modern_pyclean):
         pyclean.cli.main()
 
     assert mock_modern_pyclean.called
+
+
+@pytest.mark.parametrize('option', ['--folders', '-f'])
+def test_folders_option(option):
+    """
+    Is `--folders` option available, in long and short form?
+    """
+    with ArgvContext('pyclean', '.', option):
+        args = pyclean.cli.parse_arguments()
+
+    assert args.folders
+
+
+def test_folders_default():
+    """
+    Does `--folders` default to False when not specified?
+    """
+    with ArgvContext('pyclean', '.'):
+        args = pyclean.cli.parse_arguments()
+
+    assert not args.folders
