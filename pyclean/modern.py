@@ -243,7 +243,9 @@ def remove_empty_directories(directory):
     remove directories that are empty.
     """
     try:
-        subdirs = [child for child in directory.iterdir() if child.is_dir()]
+        subdirs = [
+            Path(entry.path) for entry in os.scandir(directory) if entry.is_dir()
+        ]
     except (OSError, PermissionError) as err:
         log.warning('Cannot access directory %s: %s', directory, err)
         return
