@@ -957,11 +957,11 @@ def test_remove_empty_directories_error(mock_log, system_error):
 
     directory = Path('/nonexistent/test/directory')
 
-    with patch('pathlib.Path.iterdir', side_effect=system_error) as mock_iterdir:
+    with patch('os.scandir', side_effect=system_error) as mock_scandir:
         pyclean.modern.remove_empty_directories(directory)
 
     mock_log.warning.assert_called_once_with(
         'Cannot access directory %s: %s',
         directory,
-        mock_iterdir.side_effect,
+        mock_scandir.side_effect,
     )
