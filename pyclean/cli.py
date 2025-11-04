@@ -81,6 +81,12 @@ def parse_arguments():
         ' multiple times); this will be interactive unless --yes is used.',
     )
     parser.add_argument(
+        '-f',
+        '--folders',
+        action='store_true',
+        help='remove empty directories',
+    )
+    parser.add_argument(
         '-n',
         '--dry-run',
         action='store_true',

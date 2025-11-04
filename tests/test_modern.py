@@ -860,3 +860,108 @@ def test_recursive_delete_debris_error(mock_log, system_error):
         directory,
         mock_scandir.side_effect,
     )
+
+
+def test_remove_empty_directories():
+    """
+    Does remove_empty_directories remove nested empty directories?
+    """
+    with TemporaryDirectory() as tmp:
+        directory = Path(tmp)
+        (directory / 'empty1' / 'empty2' / 'empty3').mkdir(parents=True)
+        (directory / 'nonempty').mkdir()
+        (directory / 'nonempty' / 'file.txt').write_text('content')
+
+        args = Namespace(dry_run=False, ignore=[])
+        pyclean.modern.Runner.configure(args)
+        pyclean.modern.remove_empty_directories(directory)
+
+        assert not (directory / 'empty1').exists()
+        assert not (directory / 'empty1' / 'empty2').exists()
+        assert not (directory / 'empty1' / 'empty2' / 'empty3').exists()
+        assert (directory / 'nonempty').exists()
+        assert (directory / 'nonempty' / 'file.txt').exists()
+
+
+def test_remove_empty_directories_with_ignore():
+    """
+    Does remove_empty_directories respect ignore patterns?
+    """
+    with TemporaryDirectory() as tmp:
+        directory = Path(tmp)
+        (directory / 'empty1').mkdir()
+        (directory / '.venv' / 'empty2').mkdir(parents=True)
+
+        args = Namespace(dry_run=False, ignore=['.venv'])
+        pyclean.modern.Runner.configure(args)
+        pyclean.modern.remove_empty_directories(directory)
+
+        assert not (directory / 'empty1').exists()
+        assert (directory / '.venv').exists()
+        assert (directory / '.venv' / 'empty2').exists()
+
+
+def test_remove_empty_directories_dry_run():
+    """
+    Does remove_empty_directories honor dry-run mode?
+    """
+    with TemporaryDirectory() as tmp:
+        directory = Path(tmp)
+        (directory / 'empty').mkdir()
+
+        args = Namespace(dry_run=True, ignore=[])
+        pyclean.modern.Runner.configure(args)
+        pyclean.modern.remove_empty_directories(directory)
+
+        assert (directory / 'empty').exists()
+
+
+@patch('pyclean.modern.remove_empty_directories')
+@patch('pyclean.modern.descend_and_clean')
+def test_folders_option_calls_remove_empty(mock_descend, mock_remove_empty):
+    """
+    Does the --folders option trigger empty directory removal?
+    """
+    with ArgvContext('pyclean', '.', '--folders'):
+        pyclean.cli.main()
+
+    assert mock_remove_empty.called
+
+
+@patch('pyclean.modern.remove_empty_directories')
+@patch('pyclean.modern.descend_and_clean')
+def test_no_folders_option_skips_remove_empty(mock_descend, mock_remove_empty):
+    """
+    Does pyclean skip empty directory removal without --folders?
+    """
+    with ArgvContext('pyclean', '.'):
+        pyclean.cli.main()
+
+    assert not mock_remove_empty.called
+
+
+@pytest.mark.parametrize(
+    ('system_error'),
+    [
+        PermissionError('Permission denied'),
+        OSError('I/O error'),
+    ],
+)
+@patch('pyclean.modern.log')
+def test_remove_empty_directories_error(mock_log, system_error):
+    """
+    Does remove_empty_directories log a warning when directory access fails?
+    """
+    args = Namespace(dry_run=False, ignore=[])
+    pyclean.modern.Runner.configure(args)
+
+    directory = Path('/nonexistent/test/directory')
+
+    with patch('pathlib.Path.iterdir', side_effect=system_error) as mock_iterdir:
+        pyclean.modern.remove_empty_directories(directory)
+
+    mock_log.warning.assert_called_once_with(
+        'Cannot access directory %s: %s',
+        directory,
+        mock_iterdir.side_effect,
+    )

@@ -180,6 +180,10 @@ def pyclean(args):
 
         remove_freeform_targets(dir_path, args.erase, args.yes, args.dry_run)
 
+        if args.folders:
+            log.debug('Removing empty directories...')
+            remove_empty_directories(dir_path)
+
     log.info(
         'Total %d files, %d directories %s.',
         Runner.unlink_count,
@@ -229,6 +233,31 @@ def remove_debris_for(topic, directory):
 
     patterns = DEBRIS_TOPICS[topic]
     recursive_delete_debris(directory, patterns)
+
+
+def remove_empty_directories(directory):
+    """
+    Recursively remove empty directories in the given directory tree.
+
+    This walks the directory tree in post-order (bottom-up), attempting to
+    remove directories that are empty.
+    """
+    try:
+        subdirs = [child for child in directory.iterdir() if child.is_dir()]
+    except (OSError, PermissionError) as err:
+        log.warning('Cannot access directory %s: %s', directory, err)
+        return
+
+    for subdir in subdirs:
+        if should_ignore(subdir, Runner.ignore):
+            log.debug('Skipping %s', subdir)
+        else:
+            remove_empty_directories(subdir)  # recurse down the hierarchy
+            try:
+                if next(subdir.iterdir(), None) is None:
+                    Runner.rmdir(subdir)
+            except (OSError, PermissionError) as err:
+                log.debug('Cannot check or remove directory %s: %s', subdir, err)
 
 
 def remove_freeform_targets(directory, glob_patterns, yes, dry_run=False):
