@@ -114,3 +114,30 @@ def test_remove_empty_directories_error(mock_log, system_error):
         directory,
         mock_scandir.side_effect,
     )
+
+
+@pytest.mark.parametrize(
+    ('system_error'),
+    [
+        PermissionError('Permission denied'),
+        OSError('I/O error'),
+    ],
+)
+@patch('pyclean.folders.log')
+def test_remove_empty_directories_with_nested_error(mock_log, system_error):
+    args = Namespace(dry_run=False, ignore=[], verbose=True)
+    pyclean.main.Runner.configure(args)
+
+    with TemporaryDirectory() as tmp:
+        directory = Path(tmp)
+        subdir = directory / 'child'
+        subdir.mkdir()
+
+        with patch('pyclean.main.Runner.rmdir', side_effect=system_error):
+            remove_empty_directories(directory)
+
+        mock_log.debug.assert_called_once_with(
+            'Cannot check or remove directory %s: %s',
+            subdir,
+            system_error,
+        )
