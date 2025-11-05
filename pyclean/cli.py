@@ -10,7 +10,8 @@ import argparse
 import logging
 import shutil
 
-from . import __version__, modern
+from . import __version__
+from . import main as main_module
 
 log = logging.getLogger(__name__)
 
@@ -158,7 +159,7 @@ def main():
     args = parse_arguments()
 
     try:
-        modern.pyclean(args)
+        main_module.pyclean(args)
     except Exception as err:
         raise SystemExit(err)
     except KeyboardInterrupt:
