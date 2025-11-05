@@ -120,7 +120,7 @@ def parse_arguments():
     args = parser.parse_args()
     init_logging(args)
 
-    if args.git_clean and not shutil.which('git') is not None:
+    if args.git_clean and not shutil.which('git'):
         parser.error('Git is not available. Install Git to use --git-clean.')
 
     if args.yes and not args.erase and not args.git_clean:
