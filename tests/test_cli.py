@@ -2,9 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""
-Tests for the pyclean CLI.
-"""
+"""Tests for the pyclean CLI."""
 
 import os
 import re
