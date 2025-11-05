@@ -14,21 +14,23 @@ from cli_test_helpers import ArgvContext
 
 import pyclean.cli
 import pyclean.main
+from pyclean.folders import remove_empty_directories
 
 
 def test_remove_empty_directories():
     """
     Does remove_empty_directories remove nested empty directories?
     """
+    args = Namespace(dry_run=False, ignore=[])
+    pyclean.main.Runner.configure(args)
+
     with TemporaryDirectory() as tmp:
         directory = Path(tmp)
         (directory / 'empty1' / 'empty2' / 'empty3').mkdir(parents=True)
         (directory / 'nonempty').mkdir()
         (directory / 'nonempty' / 'file.txt').write_text('content')
 
-        args = Namespace(dry_run=False, ignore=[])
-        pyclean.main.Runner.configure(args)
-        pyclean.main.remove_empty_directories(directory)
+        remove_empty_directories(directory)
 
         assert not (directory / 'empty1').exists()
         assert not (directory / 'empty1' / 'empty2').exists()
@@ -41,14 +43,15 @@ def test_remove_empty_directories_with_ignore():
     """
     Does remove_empty_directories respect ignore patterns?
     """
+    args = Namespace(dry_run=False, ignore=['.venv'])
+    pyclean.main.Runner.configure(args)
+
     with TemporaryDirectory() as tmp:
         directory = Path(tmp)
         (directory / 'empty1').mkdir()
         (directory / '.venv' / 'empty2').mkdir(parents=True)
 
-        args = Namespace(dry_run=False, ignore=['.venv'])
-        pyclean.main.Runner.configure(args)
-        pyclean.main.remove_empty_directories(directory)
+        remove_empty_directories(directory)
 
         assert not (directory / 'empty1').exists()
         assert (directory / '.venv').exists()
@@ -59,13 +62,14 @@ def test_remove_empty_directories_dry_run():
     """
     Does remove_empty_directories honor dry-run mode?
     """
+    args = Namespace(dry_run=True, ignore=[])
+    pyclean.main.Runner.configure(args)
+
     with TemporaryDirectory() as tmp:
         directory = Path(tmp)
         (directory / 'empty').mkdir()
 
-        args = Namespace(dry_run=True, ignore=[])
-        pyclean.main.Runner.configure(args)
-        pyclean.main.remove_empty_directories(directory)
+        remove_empty_directories(directory)
 
         assert (directory / 'empty').exists()
 
@@ -103,7 +107,7 @@ def test_remove_empty_directories_error(mock_log, system_error):
     directory = Path('/nonexistent/test/directory')
 
     with patch('os.scandir', side_effect=system_error) as mock_scandir:
-        pyclean.main.remove_empty_directories(directory)
+        remove_empty_directories(directory)
 
     mock_log.warning.assert_called_once_with(
         'Cannot access directory %s: %s',
