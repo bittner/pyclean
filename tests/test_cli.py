@@ -51,6 +51,18 @@ def test_main_handles_exceptions(mock_modern):
         pyclean.cli.main()
 
 
+@patch('pyclean.cli.main_module.pyclean', side_effect=KeyboardInterrupt)
+def test_main_handles_keyboard_interrupt(mock_pyclean):
+    """
+    Does the main CLI entry point handle KeyboardInterrupt gracefully?
+    """
+    with (
+        ArgvContext('pyclean', '.', '--git-clean'),
+        pytest.raises(SystemExit, match=r'Aborted by user.'),
+    ):
+        pyclean.cli.main()
+
+
 @patch('pyclean.cli.main_module.pyclean')
 def test_mandatory_arg_missing(mock_modern):
     """
@@ -203,7 +215,7 @@ def test_yes_option(option):
 
 def test_yes_aborts_without_erase():
     """
-    Does CLI abort when `--yes` is specified without `--erase`?
+    Does CLI abort when `--yes` is specified without `--erase` or `--git-clean`?
     """
     with ArgvContext('pyclean', '.', '--yes'), pytest.raises(SystemExit):
         pyclean.cli.parse_arguments()
@@ -298,3 +310,15 @@ def test_yes_with_git_clean_and_erase():
     assert args.git_clean
     assert args.erase == ['tmp']
     assert args.yes
+
+
+@patch('shutil.which', return_value=None)
+def test_git_clean_without_git(mock_which, capsys):
+    """
+    Does --git-clean fail gracefully when git is not available?
+    """
+    with ArgvContext('pyclean', '.', '--git-clean'), pytest.raises(SystemExit):
+        pyclean.cli.main()
+
+    captured = capsys.readouterr()
+    assert 'Git is not available' in captured.err
