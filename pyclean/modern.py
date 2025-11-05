@@ -47,6 +47,13 @@ DEBRIS_TOPICS = {
         '*.egg-info/**/*',
         '*.egg-info/',
     ],
+    'pyright': [
+        '.pyright-app-cache-*/**/*',
+        '.pyright-app-cache-*/',
+        '.pyright-stubs-*/**/*',
+        '.pyright-stubs-*/',
+        '.pyright/',
+    ],
     'pytest': [
         '.pytest_cache/**/*',
         '.pytest_cache/',
@@ -55,13 +62,6 @@ DEBRIS_TOPICS = {
     'ruff': [
         '.ruff_cache/**/*',
         '.ruff_cache/',
-    ],
-    'pyright': [
-        '.pyright-app-cache-*/**/*',
-        '.pyright-app-cache-*/',
-        '.pyright-stubs-*/**/*',
-        '.pyright-stubs-*/',
-        '.pyright/',
     ],
     'tox': [
         '.tox/**/*',
