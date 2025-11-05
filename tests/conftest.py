@@ -2,9 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""
-Mock objects for tests of the modern implementation.
-"""
+"""Mock objects for the pyclean test suite."""
 
 import shutil
 from pathlib import Path

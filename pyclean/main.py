@@ -2,9 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""
-Main orchestration of the pyclean cleanup process.
-"""
+"""Main orchestration of the pyclean cleanup process."""
 
 import logging
 from pathlib import Path

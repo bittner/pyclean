@@ -2,9 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""
-Command line interface implementation for pyclean.
-"""
+"""Command line interface implementation for pyclean."""
 
 import argparse
 import logging
