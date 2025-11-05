@@ -206,6 +206,7 @@ Python bytecode. The following topics are currently covered:
 - Ruff (ruff cache folder)
 - Jupyter (notebook checkpoints) – *optional*
 - Mypy (mypy cache folder) – *optional*
+- Pyright (pyright app cache folder) – *optional*
 - Tox (tox environments) – *optional*
 
 *Example:* Dry-run a cleanup of bytecode and tool debris in verbose mode

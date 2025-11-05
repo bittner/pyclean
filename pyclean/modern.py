@@ -57,9 +57,9 @@ DEBRIS_TOPICS = {
         '.ruff_cache/',
     ],
     'pyright': [
-        '.pyright-app-cache-**/*',
+        '.pyright-app-cache-*/**/*',
         '.pyright-app-cache-*/',
-        '.pyright-stubs-**/*',
+        '.pyright-stubs-*/**/*',
         '.pyright-stubs-*/',
         '.pyright/',
     ],

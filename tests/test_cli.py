@@ -111,7 +111,7 @@ def test_debris_optional_args():
     """
     expected_debris_options_help = (
         '(may be specified multiple times; '
-        'optional: all jupyter mypy tox; '
+        'optional: all jupyter mypy pyright tox; '
         'default: cache coverage package pytest ruff)'
     )
 
@@ -136,6 +136,7 @@ def test_debris_all():
         'ruff',
         'jupyter',
         'mypy',
+        'pyright',
         'tox',
     ]
 
