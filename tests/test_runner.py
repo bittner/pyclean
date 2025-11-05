@@ -12,7 +12,7 @@ from cli_test_helpers import ArgvContext
 
 import pyclean.cli
 import pyclean.main
-from pyclean.main import remove_directory, remove_file
+from pyclean.runner import remove_directory, remove_file
 
 
 @patch('pathlib.Path.unlink')
@@ -63,8 +63,8 @@ def test_rmdir_failure(mock_rmdir, mock_log):
 def test_dryrun_output(mock_log):
     expected_debug_log_count = 2
     args = Namespace(dry_run=True, ignore=[])
-
     pyclean.main.Runner.configure(args)
+
     pyclean.main.Runner.unlink(Path('tmp'))
     pyclean.main.Runner.rmdir(Path('tmp'))
 

@@ -14,7 +14,8 @@ import pytest
 from conftest import SymlinkMock
 
 import pyclean.main
-from pyclean.main import normalize, should_ignore
+from pyclean.bytecode import BYTECODE_DIRS, BYTECODE_FILES
+from pyclean.traversal import descend_and_clean, normalize, should_ignore
 
 
 @patch('pyclean.traversal.log')
@@ -23,11 +24,7 @@ def test_ignore_otherobjects(mock_iterdir, mock_log):
     pyclean.main.Runner.unlink = Mock()
     pyclean.main.Runner.rmdir = Mock()
 
-    pyclean.main.descend_and_clean(
-        Path(),
-        pyclean.main.BYTECODE_FILES,
-        pyclean.main.BYTECODE_DIRS,
-    )
+    descend_and_clean(Path(), BYTECODE_FILES, BYTECODE_DIRS)
 
     assert not pyclean.main.Runner.unlink.called
     assert not pyclean.main.Runner.rmdir.called
@@ -127,6 +124,9 @@ def test_ignore_with_simple_name():
     """
     Does --ignore with a simple name match directories anywhere?
     """
+    args = Namespace(dry_run=False, ignore=['bar'])
+    pyclean.main.Runner.configure(args)
+
     with TemporaryDirectory() as tmp:
         directory = Path(tmp)
 
@@ -136,13 +136,7 @@ def test_ignore_with_simple_name():
         (directory / 'foo' / 'bar' / 'test.pyc').write_text('test')
         (directory / 'baz' / 'bar' / 'test.pyc').write_text('test')
 
-        args = Namespace(dry_run=False, ignore=['bar'])
-        pyclean.main.Runner.configure(args)
-        pyclean.main.descend_and_clean(
-            directory,
-            pyclean.main.BYTECODE_FILES,
-            pyclean.main.BYTECODE_DIRS,
-        )
+        descend_and_clean(directory, BYTECODE_FILES, BYTECODE_DIRS)
 
         # Both bar directories should be ignored
         assert (directory / 'foo' / 'bar' / 'test.pyc').exists()
@@ -153,6 +147,9 @@ def test_ignore_with_path_pattern():
     """
     Does --ignore with a path pattern match specific paths?
     """
+    args = Namespace(dry_run=False, ignore=['foo/bar'])
+    pyclean.main.Runner.configure(args)
+
     with TemporaryDirectory() as tmp:
         directory = Path(tmp)
 
@@ -162,13 +159,7 @@ def test_ignore_with_path_pattern():
         (directory / 'foo' / 'bar' / 'test.pyc').write_text('test')
         (directory / 'baz' / 'bar' / 'test.pyc').write_text('test')
 
-        args = Namespace(dry_run=False, ignore=['foo/bar'])
-        pyclean.main.Runner.configure(args)
-        pyclean.main.descend_and_clean(
-            directory,
-            pyclean.main.BYTECODE_FILES,
-            pyclean.main.BYTECODE_DIRS,
-        )
+        descend_and_clean(directory, BYTECODE_FILES, BYTECODE_DIRS)
 
         # Only foo/bar should be ignored, baz/bar should be cleaned
         assert (directory / 'foo' / 'bar' / 'test.pyc').exists()

@@ -14,7 +14,7 @@ from conftest import DirectoryMock, FileMock, SymlinkMock
 
 import pyclean.cli
 import pyclean.main
-from pyclean.main import confirm, delete_filesystem_objects, remove_freeform_targets
+from pyclean.erase import confirm, delete_filesystem_objects, remove_freeform_targets
 
 
 @patch('pyclean.main.remove_freeform_targets')
@@ -89,20 +89,15 @@ def test_delete_filesdir_loop(mock_glob, mock_yes, mock_unlink, mock_rmdir):
 @patch('builtins.input', return_value='n')
 @patch(
     'pathlib.Path.glob',
-    return_value=[
-        DirectoryMock(),
-        SymlinkMock(),
-        FileMock(),
-    ],
+    return_value=[DirectoryMock(), SymlinkMock(), FileMock()],
 )
 def test_no_skips_deletion(mock_glob, mock_no, mock_unlink, mock_rmdir):
     """
     Is deletion skipped with --erase when user says "no" at the prompt?
     """
     args = Namespace(dry_run=False, ignore=[])
-    directory = Path()
-
     pyclean.main.Runner.configure(args)
+    directory = Path()
 
     assert pyclean.main.Runner.unlink_failed == 0
     assert pyclean.main.Runner.rmdir_failed == 0
@@ -121,11 +116,7 @@ def test_no_skips_deletion(mock_glob, mock_no, mock_unlink, mock_rmdir):
 @patch('pyclean.runner.remove_file')
 @patch(
     'pathlib.Path.glob',
-    return_value=[
-        DirectoryMock(),
-        SymlinkMock(),
-        FileMock(),
-    ],
+    return_value=[DirectoryMock(), SymlinkMock(), FileMock()],
 )
 @patch('pyclean.main.remove_debris_for')
 @patch('pyclean.main.descend_and_clean')
@@ -158,7 +149,7 @@ def test_abort_confirm(mock_input):
     Does the CLI abort cleanly when user presses Ctrl+C on the keyboard?
     """
     with pytest.raises(SystemExit, match=r'^Aborted by user.$'):
-        pyclean.main.confirm('Abort execution')
+        confirm('Abort execution')
 
 
 @patch('pyclean.runner.print_dirname')
@@ -172,9 +163,9 @@ def test_dryrun_no_prompt(mock_glob, mock_input, mock_print_file, mock_print_dir
     even with --dry-run.
     """
     args = Namespace(dry_run=True, ignore=[])
+    pyclean.main.Runner.configure(args)
     directory = Path()
 
-    pyclean.main.Runner.configure(args)
     delete_filesystem_objects(directory, 'tmp/**/*', prompt=True, dry_run=True)
 
     assert mock_glob.called
@@ -195,9 +186,9 @@ def test_no_dryrun_with_prompt(mock_glob, mock_input, mock_unlink, mock_rmdir):
     This test ensures the fix doesn't break normal prompt behavior.
     """
     args = Namespace(dry_run=False, ignore=[])
+    pyclean.main.Runner.configure(args)
     directory = Path()
 
-    pyclean.main.Runner.configure(args)
     delete_filesystem_objects(directory, 'tmp/**/*', prompt=True, dry_run=False)
 
     assert mock_glob.called

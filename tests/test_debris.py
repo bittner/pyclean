@@ -15,6 +15,12 @@ from cli_test_helpers import ArgvContext
 import pyclean.cli
 import pyclean.main
 import pyclean.traversal
+from pyclean.debris import (
+    DEBRIS_TOPICS,
+    detect_debris_in_directory,
+    recursive_delete_debris,
+    remove_debris_for,
+)
 
 
 @pytest.mark.parametrize(
@@ -61,10 +67,10 @@ def test_debris_loop(mock_recursive_delete_debris, debris_topic):
     """
     Does ``remove_debris_for()`` call debris cleanup with all patterns?
     """
-    fileobject_globs = pyclean.main.DEBRIS_TOPICS[debris_topic]
+    fileobject_globs = DEBRIS_TOPICS[debris_topic]
     directory = Path()
 
-    pyclean.main.remove_debris_for(debris_topic, directory)
+    remove_debris_for(debris_topic, directory)
 
     # Should call recursive_delete_debris once with all patterns
     assert mock_recursive_delete_debris.call_count == 1
@@ -77,7 +83,7 @@ def test_debris_recursive():
     when deleting debris?
     """
     topic = 'cache'
-    topic_globs = pyclean.main.DEBRIS_TOPICS[topic]
+    topic_globs = DEBRIS_TOPICS[topic]
     topic_folder = topic_globs[1]
 
     with TemporaryDirectory() as tmp:
@@ -90,7 +96,7 @@ def test_debris_recursive():
         assert dir_nested_topic.exists()
         assert dir_topic.exists()
 
-        pyclean.main.remove_debris_for(topic, directory)
+        remove_debris_for(topic, directory)
 
         assert not dir_topic.exists()
         assert not dir_nested_topic.exists()
@@ -103,7 +109,6 @@ def test_detect_debris_in_directory():
     """
     with TemporaryDirectory() as tmp:
         directory = Path(tmp)
-
         # Create some debris artifacts
         build_dir = directory / 'build'
         build_dir.mkdir()
@@ -111,7 +116,7 @@ def test_detect_debris_in_directory():
         cache_dir.mkdir()
         (directory / '.coverage').touch()
 
-        detected = pyclean.main.detect_debris_in_directory(directory)
+        detected = detect_debris_in_directory(directory)
 
         # Should detect cache, coverage, and package topics
         assert 'cache' in detected
@@ -127,12 +132,11 @@ def test_detect_no_debris_in_directory():
     """
     with TemporaryDirectory() as tmp:
         directory = Path(tmp)
-
         # Create only non-debris files
         (directory / 'test.py').touch()
         (directory / 'README.md').touch()
 
-        detected = pyclean.main.detect_debris_in_directory(directory)
+        detected = detect_debris_in_directory(directory)
 
         assert detected == []
 
@@ -191,18 +195,18 @@ def test_ignore_with_debris_cleanup():
     """
     Does --ignore work correctly during debris cleanup?
     """
+    args = Namespace(dry_run=False, ignore=['foo'])
+    pyclean.main.Runner.configure(args)
+
     with TemporaryDirectory() as tmp:
         directory = Path(tmp)
-
         # Create .cache directories in different locations
         (directory / '.cache').mkdir()
         (directory / 'foo' / '.cache').mkdir(parents=True)
         (directory / '.cache' / 'test.txt').write_text('test')
         (directory / 'foo' / '.cache' / 'test.txt').write_text('test')
 
-        args = Namespace(dry_run=False, ignore=['foo'])
-        pyclean.main.Runner.configure(args)
-        pyclean.main.remove_debris_for('cache', directory)
+        remove_debris_for('cache', directory)
 
         # Root .cache should be removed, foo/.cache should remain
         assert not (directory / '.cache').exists()
@@ -213,7 +217,6 @@ def test_ignore_with_debris_cleanup():
 def test_debris_cleanup_scans_directories_once():
     with TemporaryDirectory() as tmp:
         directory = Path(tmp)
-
         (directory / '.git').mkdir()
         (directory / 'subdir1').mkdir()
         (directory / 'subdir2').mkdir()
@@ -231,7 +234,7 @@ def test_debris_cleanup_scans_directories_once():
         pyclean.main.Runner.configure(args)
 
         with patch('pyclean.debris.should_ignore', side_effect=counting_should_ignore):
-            pyclean.main.remove_debris_for('cache', directory)
+            remove_debris_for('cache', directory)
 
         assert call_count['git_checks'] == 1, (
             f'Expected 1 check for .git directory, but got {call_count["git_checks"]}'
@@ -254,7 +257,7 @@ def test_recursive_delete_debris_error(mock_log, system_error):
     patterns = ['.cache/**/*', '.cache/']
 
     with patch('os.scandir', side_effect=system_error) as mock_scandir:
-        pyclean.main.recursive_delete_debris(directory, patterns)
+        recursive_delete_debris(directory, patterns)
 
     mock_log.warning.assert_called_once_with(
         'Cannot access directory %s: %s',

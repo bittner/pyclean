@@ -12,11 +12,11 @@ from cli_test_helpers import ArgvContext
 from conftest import skip_if_no_git
 
 import pyclean.cli
-import pyclean.main
+from pyclean.gitclean import GIT_FATAL_ERROR, build_git_clean_command, execute_git_clean
 
 
 def test_run_git_clean_dry_run():
-    cmd = pyclean.main.build_git_clean_command(
+    cmd = build_git_clean_command(
         ignore_patterns=['.idea', '.vscode'],
         dry_run=True,
         force=False,
@@ -30,7 +30,7 @@ def test_run_git_clean_dry_run():
 
 
 def test_run_git_clean_force():
-    cmd = pyclean.main.build_git_clean_command(
+    cmd = build_git_clean_command(
         ignore_patterns=['.tox'],
         dry_run=False,
         force=True,
@@ -43,11 +43,7 @@ def test_run_git_clean_force():
 
 
 def test_run_git_clean_interactive():
-    cmd = pyclean.main.build_git_clean_command(
-        ignore_patterns=[],
-        dry_run=False,
-        force=False,
-    )
+    cmd = build_git_clean_command(ignore_patterns=[], dry_run=False, force=False)
 
     cmd_str = ' '.join(cmd)
     assert cmd_str.startswith('git clean -dx')
@@ -58,12 +54,12 @@ def test_run_git_clean_interactive():
 @patch('pyclean.gitclean.log')
 @patch(
     'pyclean.gitclean.subprocess.run',
-    return_value=Mock(returncode=pyclean.main.GIT_FATAL_ERROR),
+    return_value=Mock(returncode=GIT_FATAL_ERROR),
 )
 def test_execute_git_clean_not_a_git_repo(mock_run, mock_log):
     args = Namespace(ignore=[], git_clean=True, dry_run=False, yes=False)
 
-    pyclean.main.execute_git_clean('/not/a/repo', args)
+    execute_git_clean('/not/a/repo', args)
 
     assert mock_run.called
     mock_log.warning.assert_called_once_with(
