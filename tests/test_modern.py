@@ -18,8 +18,9 @@ from cli_test_helpers import ArgvContext
 from conftest import DirectoryMock, FileMock, SymlinkMock, skip_if_no_git
 
 import pyclean.cli
-import pyclean.modern
-from pyclean.modern import (
+import pyclean.main
+import pyclean.traversal
+from pyclean.main import (
     delete_filesystem_objects,
     normalize,
     remove_debris_for,
@@ -30,7 +31,7 @@ from pyclean.modern import (
 )
 
 
-@patch('pyclean.modern.descend_and_clean')
+@patch('pyclean.main.descend_and_clean')
 def test_walks_tree(mock_descend):
     """
     Does pyclean walk the directory tree?
@@ -43,7 +44,7 @@ def test_walks_tree(mock_descend):
     ]
 
 
-@patch('pyclean.modern.descend_and_clean')
+@patch('pyclean.main.descend_and_clean')
 def test_walks_all_trees(mock_descend):
     """
     Are all positional args evaluated?
@@ -58,8 +59,8 @@ def test_walks_all_trees(mock_descend):
     ]
 
 
-@patch.object(pyclean.modern.logging, 'basicConfig')
-@patch('pyclean.modern.descend_and_clean')
+@patch.object(pyclean.main.logging, 'basicConfig')
+@patch('pyclean.main.descend_and_clean')
 def test_normal_logging(mock_descend, mock_logconfig):
     """
     Does a normal run use log level INFO?
@@ -72,8 +73,8 @@ def test_normal_logging(mock_descend, mock_logconfig):
     ]
 
 
-@patch.object(pyclean.modern.logging, 'basicConfig')
-@patch('pyclean.modern.descend_and_clean')
+@patch.object(pyclean.main.logging, 'basicConfig')
+@patch('pyclean.main.descend_and_clean')
 def test_verbose_logging(mock_descend, mock_logconfig):
     """
     Does --verbose use log level DEBUG?
@@ -86,8 +87,8 @@ def test_verbose_logging(mock_descend, mock_logconfig):
     ]
 
 
-@patch.object(pyclean.modern.logging, 'basicConfig')
-@patch('pyclean.modern.descend_and_clean')
+@patch.object(pyclean.main.logging, 'basicConfig')
+@patch('pyclean.main.descend_and_clean')
 def test_quiet_logging(mock_descend, mock_logconfig):
     """
     Does --quiet use log level FATAL?
@@ -100,24 +101,21 @@ def test_quiet_logging(mock_descend, mock_logconfig):
     ]
 
 
+@patch('pyclean.traversal.log')
 @patch('pathlib.Path.iterdir', return_value=[SymlinkMock()])
-def test_ignore_otherobjects(mock_iterdir):
-    """
-    Is "ignoring" displayed for any uncommon file system object?
-    """
-    pyclean.modern.Runner.unlink = Mock()
-    pyclean.modern.Runner.rmdir = Mock()
-    pyclean.modern.log = Mock()
+def test_ignore_otherobjects(mock_iterdir, mock_log):
+    pyclean.main.Runner.unlink = Mock()
+    pyclean.main.Runner.rmdir = Mock()
 
-    pyclean.modern.descend_and_clean(
+    pyclean.main.descend_and_clean(
         Path(),
-        pyclean.modern.BYTECODE_FILES,
-        pyclean.modern.BYTECODE_DIRS,
+        pyclean.main.BYTECODE_FILES,
+        pyclean.main.BYTECODE_DIRS,
     )
 
-    assert not pyclean.modern.Runner.unlink.called
-    assert not pyclean.modern.Runner.rmdir.called
-    assert pyclean.modern.log.mock_calls == [
+    assert not pyclean.main.Runner.unlink.called
+    assert not pyclean.main.Runner.rmdir.called
+    assert mock_log.mock_calls == [
         call.debug('Ignoring %s (neither a file nor a folder)', SymlinkMock()),
     ]
 
@@ -131,10 +129,18 @@ def test_ignore_otherobjects(mock_iterdir):
         (42, 42, True, ' (Not counting git clean)'),
     ],
 )
-def test_report_failures(unlink_failures, rmdir_failures, git_clean, explanation):
-    """
-    Are failures to delete a file or folder reported with ``log.debug``?
-    """
+@patch('pyclean.main.suggest_debris_option')
+@patch('pyclean.main.CleanupRunner.configure')
+@patch('pyclean.main.log')
+def test_report_failures(  # noqa: PLR0913
+    mock_log,
+    mock_configure,
+    mock_suggest,
+    unlink_failures,
+    rmdir_failures,
+    git_clean,
+    explanation,
+):
     args = Namespace(
         debris=[],
         directory=[],
@@ -144,25 +150,20 @@ def test_report_failures(unlink_failures, rmdir_failures, git_clean, explanation
         ignore=[],
         yes=False,
     )
-    pyclean.modern.Runner.configure(args)
-    pyclean.modern.Runner.unlink_failed = unlink_failures
-    pyclean.modern.Runner.rmdir_failed = rmdir_failures
-    pyclean.modern.log = Mock()
+    pyclean.main.Runner.configure(args)
+    pyclean.main.Runner.unlink_failed = unlink_failures
+    pyclean.main.Runner.rmdir_failed = rmdir_failures
 
-    with (
-        patch('pyclean.modern.CleanupRunner.configure'),
-        patch('pyclean.modern.suggest_debris_option'),
-    ):
-        pyclean.modern.pyclean(args)
+    pyclean.main.pyclean(args)
 
-    pyclean.modern.log.debug.assert_called_with(
+    mock_log.debug.assert_called_with(
         '%d files, %d directories %s not be removed.%s',
         unlink_failures,
         rmdir_failures,
         'would',
         explanation,
     )
-    pyclean.modern.log.info.assert_called_with(
+    mock_log.info.assert_called_with(
         'Total %d files, %d directories %s.%s',
         0,
         0,
@@ -191,14 +192,11 @@ def test_rmdir_success(mock_rmdir):
     assert mock_rmdir.called
 
 
-@patch('pyclean.modern.log')
+@patch('pyclean.runner.log')
 @patch('pathlib.Path.unlink', side_effect=OSError)
 def test_unlink_failure(mock_unlink, mock_log):
-    """
-    Is a deletion error caught and logged?
-    """
     args = Namespace(dry_run=False, ignore=[])
-    pyclean.modern.Runner.configure(args)
+    pyclean.main.Runner.configure(args)
 
     remove_file(Path('tmp'))
 
@@ -206,14 +204,11 @@ def test_unlink_failure(mock_unlink, mock_log):
     assert 'File not deleted.' in str(mock_log.debug.call_args)
 
 
-@patch('pyclean.modern.log')
+@patch('pyclean.runner.log')
 @patch('pathlib.Path.rmdir', side_effect=OSError)
 def test_rmdir_failure(mock_rmdir, mock_log):
-    """
-    Is a deletion error caught and logged?
-    """
     args = Namespace(dry_run=False, ignore=[])
-    pyclean.modern.Runner.configure(args)
+    pyclean.main.Runner.configure(args)
 
     remove_directory(Path('tmp'))
 
@@ -221,36 +216,30 @@ def test_rmdir_failure(mock_rmdir, mock_log):
     assert 'Directory not removed.' in str(mock_log.debug.call_args)
 
 
-@patch('pyclean.modern.log')
+@patch('pyclean.runner.log')
 def test_dryrun_output(mock_log):
-    """
-    Do we explain what would be done, when --dry-run is used?
-    """
     expected_debug_log_count = 2
     args = Namespace(dry_run=True, ignore=[])
 
-    pyclean.modern.Runner.configure(args)
-    pyclean.modern.Runner.unlink(Path('tmp'))
-    pyclean.modern.Runner.rmdir(Path('tmp'))
+    pyclean.main.Runner.configure(args)
+    pyclean.main.Runner.unlink(Path('tmp'))
+    pyclean.main.Runner.rmdir(Path('tmp'))
 
     assert mock_log.debug.call_count == expected_debug_log_count
     assert 'Would delete file:' in str(mock_log.debug.call_args_list[0])
     assert 'Would delete directory:' in str(mock_log.debug.call_args_list[1])
 
 
-@patch('pyclean.modern.print_dirname')
-@patch('pyclean.modern.print_filename')
-@patch('pyclean.modern.remove_directory')
-@patch('pyclean.modern.remove_file')
+@patch('pyclean.runner.print_dirname')
+@patch('pyclean.runner.print_filename')
+@patch('pyclean.runner.remove_directory')
+@patch('pyclean.runner.remove_file')
 def test_delete(
     mock_real_unlink,
     mock_real_rmdir,
     mock_dry_unlink,
     mock_dry_rmdir,
 ):
-    """
-    Is actual deletion attempted w/o --dry-run?
-    """
     with ArgvContext('pyclean', '.'):
         pyclean.cli.main()
 
@@ -260,19 +249,16 @@ def test_delete(
     assert not mock_dry_rmdir.called
 
 
-@patch('pyclean.modern.print_dirname')
-@patch('pyclean.modern.print_filename')
-@patch('pyclean.modern.remove_directory')
-@patch('pyclean.modern.remove_file')
+@patch('pyclean.runner.print_dirname')
+@patch('pyclean.runner.print_filename')
+@patch('pyclean.runner.remove_directory')
+@patch('pyclean.runner.remove_file')
 def test_dryrun(
     mock_real_unlink,
     mock_real_rmdir,
     mock_dry_unlink,
     mock_dry_rmdir,
 ):
-    """
-    Does --dry-run option avoid real deletion?
-    """
     with ArgvContext('pyclean', '.', '--dry-run'):
         pyclean.cli.main()
 
@@ -291,9 +277,9 @@ def test_dryrun(
         (['-d', 'jupyter', 'mypy', 'tox'], ['jupyter', 'mypy', 'tox']),
     ],
 )
-@patch('pyclean.modern.remove_freeform_targets')
-@patch('pyclean.modern.remove_debris_for')
-@patch('pyclean.modern.descend_and_clean')
+@patch('pyclean.main.remove_freeform_targets')
+@patch('pyclean.main.remove_debris_for')
+@patch('pyclean.main.descend_and_clean')
 def test_debris_option(mock_descend, mock_debris, mock_erase, options, scanned_topics):
     """
     Does ``--debris`` execute the appropriate cleanup code?
@@ -308,9 +294,9 @@ def test_debris_option(mock_descend, mock_debris, mock_erase, options, scanned_t
     assert mock_erase.called
 
 
-@patch('pyclean.modern.remove_freeform_targets')
-@patch('pyclean.modern.remove_debris_for')
-@patch('pyclean.modern.descend_and_clean')
+@patch('pyclean.main.remove_freeform_targets')
+@patch('pyclean.main.remove_debris_for')
+@patch('pyclean.main.descend_and_clean')
 def test_erase_option(mock_descend, mock_debris, mock_erase):
     """
     Does ``--erase`` execute the appropriate cleanup code?
@@ -338,12 +324,12 @@ def test_erase_option(mock_descend, mock_debris, mock_erase):
         'tox',
     ],
 )
-@patch('pyclean.modern.recursive_delete_debris')
+@patch('pyclean.debris.recursive_delete_debris')
 def test_debris_loop(mock_recursive_delete_debris, debris_topic):
     """
     Does ``remove_debris_for()`` call debris cleanup with all patterns?
     """
-    fileobject_globs = pyclean.modern.DEBRIS_TOPICS[debris_topic]
+    fileobject_globs = pyclean.main.DEBRIS_TOPICS[debris_topic]
     directory = Path()
 
     remove_debris_for(debris_topic, directory)
@@ -359,7 +345,7 @@ def test_debris_recursive():
     when deleting debris?
     """
     topic = 'cache'
-    topic_globs = pyclean.modern.DEBRIS_TOPICS[topic]
+    topic_globs = pyclean.main.DEBRIS_TOPICS[topic]
     topic_folder = topic_globs[1]
 
     with TemporaryDirectory() as tmp:
@@ -379,7 +365,7 @@ def test_debris_recursive():
         assert dir_nested_topic.parent.exists()
 
 
-@patch('pyclean.modern.delete_filesystem_objects')
+@patch('pyclean.erase.delete_filesystem_objects')
 def test_erase_loop(mock_delete_fs_obj):
     """
     Does ``remove_freeform_targets()`` call filesystem object removal?
@@ -394,8 +380,8 @@ def test_erase_loop(mock_delete_fs_obj):
     ]
 
 
-@patch('pyclean.modern.remove_directory')
-@patch('pyclean.modern.remove_file')
+@patch('pyclean.runner.remove_directory')
+@patch('pyclean.runner.remove_file')
 @patch('builtins.input', return_value='y')
 @patch(
     'pathlib.Path.glob',
@@ -412,7 +398,7 @@ def test_delete_filesdir_loop(mock_glob, mock_yes, mock_unlink, mock_rmdir):
     args = Namespace(dry_run=False, ignore=[])
     directory = Path()
 
-    pyclean.modern.Runner.configure(args)
+    pyclean.main.Runner.configure(args)
     delete_filesystem_objects(directory, 'tmp/**/*', prompt=True)
 
     assert mock_glob.called
@@ -429,8 +415,8 @@ def test_delete_filesdir_loop(mock_glob, mock_yes, mock_unlink, mock_rmdir):
     ]
 
 
-@patch('pyclean.modern.remove_directory')
-@patch('pyclean.modern.remove_file')
+@patch('pyclean.runner.remove_directory')
+@patch('pyclean.runner.remove_file')
 @patch('builtins.input', return_value='n')
 @patch(
     'pathlib.Path.glob',
@@ -447,10 +433,10 @@ def test_no_skips_deletion(mock_glob, mock_no, mock_unlink, mock_rmdir):
     args = Namespace(dry_run=False, ignore=[])
     directory = Path()
 
-    pyclean.modern.Runner.configure(args)
+    pyclean.main.Runner.configure(args)
 
-    assert pyclean.modern.Runner.unlink_failed == 0
-    assert pyclean.modern.Runner.rmdir_failed == 0
+    assert pyclean.main.Runner.unlink_failed == 0
+    assert pyclean.main.Runner.rmdir_failed == 0
 
     delete_filesystem_objects(directory, 'tmp/**/*', prompt=True)
 
@@ -458,12 +444,12 @@ def test_no_skips_deletion(mock_glob, mock_no, mock_unlink, mock_rmdir):
     assert mock_no.called
     assert not mock_unlink.called
     assert not mock_rmdir.called
-    assert pyclean.modern.Runner.unlink_failed > 0
-    assert pyclean.modern.Runner.rmdir_failed > 0
+    assert pyclean.main.Runner.unlink_failed > 0
+    assert pyclean.main.Runner.rmdir_failed > 0
 
 
-@patch('pyclean.modern.remove_directory')
-@patch('pyclean.modern.remove_file')
+@patch('pyclean.runner.remove_directory')
+@patch('pyclean.runner.remove_file')
 @patch(
     'pathlib.Path.glob',
     return_value=[
@@ -472,8 +458,8 @@ def test_no_skips_deletion(mock_glob, mock_no, mock_unlink, mock_rmdir):
         FileMock(),
     ],
 )
-@patch('pyclean.modern.remove_debris_for')
-@patch('pyclean.modern.descend_and_clean')
+@patch('pyclean.main.remove_debris_for')
+@patch('pyclean.main.descend_and_clean')
 def test_yes_skips_prompt(
     mock_descend,
     mock_debris,
@@ -503,11 +489,11 @@ def test_abort_confirm(mock_input):
     Does the CLI abort cleanly when user presses Ctrl+C on the keyboard?
     """
     with pytest.raises(SystemExit, match=r'^Aborted by user.$'):
-        pyclean.modern.confirm('Abort execution')
+        pyclean.main.confirm('Abort execution')
 
 
-@patch('pyclean.modern.print_dirname')
-@patch('pyclean.modern.print_filename')
+@patch('pyclean.runner.print_dirname')
+@patch('pyclean.runner.print_filename')
 @patch('builtins.input')
 @patch('pathlib.Path.glob', return_value=[DirectoryMock(), FileMock()])
 def test_dryrun_no_prompt(mock_glob, mock_input, mock_print_file, mock_print_dir):
@@ -519,7 +505,7 @@ def test_dryrun_no_prompt(mock_glob, mock_input, mock_print_file, mock_print_dir
     args = Namespace(dry_run=True, ignore=[])
     directory = Path()
 
-    pyclean.modern.Runner.configure(args)
+    pyclean.main.Runner.configure(args)
     delete_filesystem_objects(directory, 'tmp/**/*', prompt=True, dry_run=True)
 
     assert mock_glob.called
@@ -530,8 +516,8 @@ def test_dryrun_no_prompt(mock_glob, mock_input, mock_print_file, mock_print_dir
     assert mock_print_dir.called
 
 
-@patch('pyclean.modern.remove_directory')
-@patch('pyclean.modern.remove_file')
+@patch('pyclean.runner.remove_directory')
+@patch('pyclean.runner.remove_file')
 @patch('builtins.input', return_value='y')
 @patch('pathlib.Path.glob', return_value=[DirectoryMock(), FileMock()])
 def test_no_dryrun_with_prompt(mock_glob, mock_input, mock_unlink, mock_rmdir):
@@ -542,7 +528,7 @@ def test_no_dryrun_with_prompt(mock_glob, mock_input, mock_unlink, mock_rmdir):
     args = Namespace(dry_run=False, ignore=[])
     directory = Path()
 
-    pyclean.modern.Runner.configure(args)
+    pyclean.main.Runner.configure(args)
     delete_filesystem_objects(directory, 'tmp/**/*', prompt=True, dry_run=False)
 
     assert mock_glob.called
@@ -567,7 +553,7 @@ def test_detect_debris_in_directory():
         cache_dir.mkdir()
         (directory / '.coverage').touch()
 
-        detected = pyclean.modern.detect_debris_in_directory(directory)
+        detected = pyclean.main.detect_debris_in_directory(directory)
 
         # Should detect cache, coverage, and package topics
         assert 'cache' in detected
@@ -588,13 +574,13 @@ def test_detect_no_debris_in_directory():
         (directory / 'test.py').touch()
         (directory / 'README.md').touch()
 
-        detected = pyclean.modern.detect_debris_in_directory(directory)
+        detected = pyclean.main.detect_debris_in_directory(directory)
 
         assert detected == []
 
 
-@patch('pyclean.modern.log')
-@patch('pyclean.modern.descend_and_clean')
+@patch('pyclean.debris.log')
+@patch('pyclean.main.descend_and_clean')
 def test_suggest_debris_without_artifacts(mock_descend, mock_log):
     """
     Does pyclean suggest --debris when executed without it and no artifacts present?
@@ -608,8 +594,8 @@ def test_suggest_debris_without_artifacts(mock_descend, mock_log):
     assert any('common Python development tools' in msg for msg in log_info_calls)
 
 
-@patch('pyclean.modern.log')
-@patch('pyclean.modern.descend_and_clean')
+@patch('pyclean.debris.log')
+@patch('pyclean.main.descend_and_clean')
 def test_suggest_debris_with_artifacts(mock_descend, mock_log):
     """
     Does pyclean suggest specific --debris topics when artifacts are detected?
@@ -629,8 +615,8 @@ def test_suggest_debris_with_artifacts(mock_descend, mock_log):
     assert any('Detected:' in msg for msg in log_info_calls)
 
 
-@patch('pyclean.modern.log')
-@patch('pyclean.modern.descend_and_clean')
+@patch('pyclean.debris.log')
+@patch('pyclean.main.descend_and_clean')
 def test_no_suggest_debris_when_used(mock_descend, mock_log):
     """
     Does pyclean NOT suggest --debris when it's already used?
@@ -744,11 +730,11 @@ def test_ignore_with_simple_name():
         (directory / 'baz' / 'bar' / 'test.pyc').write_text('test')
 
         args = Namespace(dry_run=False, ignore=['bar'])
-        pyclean.modern.Runner.configure(args)
-        pyclean.modern.descend_and_clean(
+        pyclean.main.Runner.configure(args)
+        pyclean.main.descend_and_clean(
             directory,
-            pyclean.modern.BYTECODE_FILES,
-            pyclean.modern.BYTECODE_DIRS,
+            pyclean.main.BYTECODE_FILES,
+            pyclean.main.BYTECODE_DIRS,
         )
 
         # Both bar directories should be ignored
@@ -770,11 +756,11 @@ def test_ignore_with_path_pattern():
         (directory / 'baz' / 'bar' / 'test.pyc').write_text('test')
 
         args = Namespace(dry_run=False, ignore=['foo/bar'])
-        pyclean.modern.Runner.configure(args)
-        pyclean.modern.descend_and_clean(
+        pyclean.main.Runner.configure(args)
+        pyclean.main.descend_and_clean(
             directory,
-            pyclean.modern.BYTECODE_FILES,
-            pyclean.modern.BYTECODE_DIRS,
+            pyclean.main.BYTECODE_FILES,
+            pyclean.main.BYTECODE_DIRS,
         )
 
         # Only foo/bar should be ignored, baz/bar should be cleaned
@@ -796,8 +782,8 @@ def test_ignore_with_debris_cleanup():
         (directory / 'foo' / '.cache' / 'test.txt').write_text('test')
 
         args = Namespace(dry_run=False, ignore=['foo'])
-        pyclean.modern.Runner.configure(args)
-        pyclean.modern.remove_debris_for('cache', directory)
+        pyclean.main.Runner.configure(args)
+        pyclean.main.remove_debris_for('cache', directory)
 
         # Root .cache should be removed, foo/.cache should remain
         assert not (directory / '.cache').exists()
@@ -806,20 +792,14 @@ def test_ignore_with_debris_cleanup():
 
 
 def test_debris_cleanup_scans_directories_once():
-    """
-    Does debris cleanup scan each directory only once per topic,
-    rather than once per glob pattern?
-    """
     with TemporaryDirectory() as tmp:
         directory = Path(tmp)
 
-        # Create a directory structure with ignored directories
         (directory / '.git').mkdir()
         (directory / 'subdir1').mkdir()
         (directory / 'subdir2').mkdir()
 
-        # Mock the should_ignore function to count calls
-        original_should_ignore = pyclean.modern.should_ignore
+        original_should_ignore = pyclean.traversal.should_ignore
         call_count = {'total': 0, 'git_checks': 0}
 
         def counting_should_ignore(path, patterns):
@@ -829,19 +809,11 @@ def test_debris_cleanup_scans_directories_once():
             return original_should_ignore(path, patterns)
 
         args = Namespace(dry_run=False, ignore=['.git'])
-        pyclean.modern.Runner.configure(args)
+        pyclean.main.Runner.configure(args)
 
-        with patch('pyclean.modern.should_ignore', side_effect=counting_should_ignore):
-            # Remove debris for a topic with multiple patterns ('cache' has 2 patterns)
-            pyclean.modern.remove_debris_for('cache', directory)
+        with patch('pyclean.debris.should_ignore', side_effect=counting_should_ignore):
+            pyclean.main.remove_debris_for('cache', directory)
 
-        # Each subdirectory should be checked once per directory traversal,
-        # not once per glob pattern
-        # With 3 subdirs (.git, subdir1, subdir2), we expect:
-        # - 1 check for .git at root level
-        # - 1 check for .git inside subdir1
-        # - 1 check for .git inside subdir2
-        # Total: at most 3 checks for .git (not 6 if it were called for each pattern)
         assert call_count['git_checks'] == 1, (
             f'Expected 1 check for .git directory, but got {call_count["git_checks"]}'
         )
@@ -854,19 +826,16 @@ def test_debris_cleanup_scans_directories_once():
         OSError('I/O error'),
     ],
 )
-@patch('pyclean.modern.log')
+@patch('pyclean.debris.log')
 def test_recursive_delete_debris_error(mock_log, system_error):
-    """
-    Does recursive_delete_debris log a warning when directory access fails?
-    """
     args = Namespace(dry_run=False, ignore=[])
-    pyclean.modern.Runner.configure(args)
+    pyclean.main.Runner.configure(args)
 
     directory = Path('/nonexistent/test/directory')
     patterns = ['.cache/**/*', '.cache/']
 
     with patch('os.scandir', side_effect=system_error) as mock_scandir:
-        pyclean.modern.recursive_delete_debris(directory, patterns)
+        pyclean.main.recursive_delete_debris(directory, patterns)
 
     mock_log.warning.assert_called_once_with(
         'Cannot access directory %s: %s',
@@ -886,8 +855,8 @@ def test_remove_empty_directories():
         (directory / 'nonempty' / 'file.txt').write_text('content')
 
         args = Namespace(dry_run=False, ignore=[])
-        pyclean.modern.Runner.configure(args)
-        pyclean.modern.remove_empty_directories(directory)
+        pyclean.main.Runner.configure(args)
+        pyclean.main.remove_empty_directories(directory)
 
         assert not (directory / 'empty1').exists()
         assert not (directory / 'empty1' / 'empty2').exists()
@@ -906,8 +875,8 @@ def test_remove_empty_directories_with_ignore():
         (directory / '.venv' / 'empty2').mkdir(parents=True)
 
         args = Namespace(dry_run=False, ignore=['.venv'])
-        pyclean.modern.Runner.configure(args)
-        pyclean.modern.remove_empty_directories(directory)
+        pyclean.main.Runner.configure(args)
+        pyclean.main.remove_empty_directories(directory)
 
         assert not (directory / 'empty1').exists()
         assert (directory / '.venv').exists()
@@ -923,30 +892,24 @@ def test_remove_empty_directories_dry_run():
         (directory / 'empty').mkdir()
 
         args = Namespace(dry_run=True, ignore=[])
-        pyclean.modern.Runner.configure(args)
-        pyclean.modern.remove_empty_directories(directory)
+        pyclean.main.Runner.configure(args)
+        pyclean.main.remove_empty_directories(directory)
 
         assert (directory / 'empty').exists()
 
 
-@patch('pyclean.modern.remove_empty_directories')
-@patch('pyclean.modern.descend_and_clean')
+@patch('pyclean.folders.remove_empty_directories')
+@patch('pyclean.main.descend_and_clean')
 def test_folders_option_calls_remove_empty(mock_descend, mock_remove_empty):
-    """
-    Does the --folders option trigger empty directory removal?
-    """
     with ArgvContext('pyclean', '.', '--folders'):
         pyclean.cli.main()
 
     assert mock_remove_empty.called
 
 
-@patch('pyclean.modern.remove_empty_directories')
-@patch('pyclean.modern.descend_and_clean')
+@patch('pyclean.folders.remove_empty_directories')
+@patch('pyclean.main.descend_and_clean')
 def test_no_folders_option_skips_remove_empty(mock_descend, mock_remove_empty):
-    """
-    Does pyclean skip empty directory removal without --folders?
-    """
     with ArgvContext('pyclean', '.'):
         pyclean.cli.main()
 
@@ -960,18 +923,15 @@ def test_no_folders_option_skips_remove_empty(mock_descend, mock_remove_empty):
         OSError('I/O error'),
     ],
 )
-@patch('pyclean.modern.log')
+@patch('pyclean.folders.log')
 def test_remove_empty_directories_error(mock_log, system_error):
-    """
-    Does remove_empty_directories log a warning when directory access fails?
-    """
     args = Namespace(dry_run=False, ignore=[])
-    pyclean.modern.Runner.configure(args)
+    pyclean.main.Runner.configure(args)
 
     directory = Path('/nonexistent/test/directory')
 
     with patch('os.scandir', side_effect=system_error) as mock_scandir:
-        pyclean.modern.remove_empty_directories(directory)
+        pyclean.main.remove_empty_directories(directory)
 
     mock_log.warning.assert_called_once_with(
         'Cannot access directory %s: %s',
@@ -980,12 +940,8 @@ def test_remove_empty_directories_error(mock_log, system_error):
     )
 
 
-@patch('pyclean.modern.subprocess.run')
-def test_run_git_clean_dry_run(mock_run):
-    """
-    Does build_git_clean_command generate correct command for dry-run?
-    """
-    cmd = pyclean.modern.build_git_clean_command(
+def test_run_git_clean_dry_run():
+    cmd = pyclean.main.build_git_clean_command(
         ignore_patterns=['.idea', '.vscode'],
         dry_run=True,
         force=False,
@@ -998,12 +954,8 @@ def test_run_git_clean_dry_run(mock_run):
     assert '-n' in cmd
 
 
-@patch('pyclean.modern.subprocess.run')
-def test_run_git_clean_force(mock_run):
-    """
-    Does build_git_clean_command generate correct command for force mode?
-    """
-    cmd = pyclean.modern.build_git_clean_command(
+def test_run_git_clean_force():
+    cmd = pyclean.main.build_git_clean_command(
         ignore_patterns=['.tox'],
         dry_run=False,
         force=True,
@@ -1015,12 +967,8 @@ def test_run_git_clean_force(mock_run):
     assert '-f' in cmd
 
 
-@patch('pyclean.modern.subprocess.run')
-def test_run_git_clean_interactive(mock_run):
-    """
-    Does build_git_clean_command generate correct command for interactive mode?
-    """
-    cmd = pyclean.modern.build_git_clean_command(
+def test_run_git_clean_interactive():
+    cmd = pyclean.main.build_git_clean_command(
         ignore_patterns=[],
         dry_run=False,
         force=False,
@@ -1032,18 +980,15 @@ def test_run_git_clean_interactive(mock_run):
 
 
 @skip_if_no_git
-@patch('pyclean.modern.log')
+@patch('pyclean.gitclean.log')
 @patch(
-    'pyclean.modern.subprocess.run',
-    return_value=Mock(returncode=pyclean.modern.GIT_FATAL_ERROR),
+    'pyclean.gitclean.subprocess.run',
+    return_value=Mock(returncode=pyclean.main.GIT_FATAL_ERROR),
 )
 def test_execute_git_clean_not_a_git_repo(mock_run, mock_log):
-    """
-    Does execute_git_clean handle "not a git directory" gracefully?
-    """
     args = Namespace(ignore=[], git_clean=True, dry_run=False, yes=False)
 
-    pyclean.modern.execute_git_clean('/not/a/repo', args)
+    pyclean.main.execute_git_clean('/not/a/repo', args)
 
     assert mock_run.called
     mock_log.warning.assert_called_once_with(
@@ -1053,8 +998,8 @@ def test_execute_git_clean_not_a_git_repo(mock_run, mock_log):
 
 
 @skip_if_no_git
-@patch('pyclean.modern.execute_git_clean')
-@patch('pyclean.modern.descend_and_clean')
+@patch('pyclean.main.execute_git_clean')
+@patch('pyclean.main.descend_and_clean')
 def test_pyclean_with_git_clean(mock_descend, mock_git_clean):
     """
     Does pyclean call execute_git_clean when --git-clean flag is used?
@@ -1066,8 +1011,8 @@ def test_pyclean_with_git_clean(mock_descend, mock_git_clean):
 
 
 @skip_if_no_git
-@patch('pyclean.modern.execute_git_clean', side_effect=SystemExit(42))
-@patch('pyclean.modern.descend_and_clean')
+@patch('pyclean.main.execute_git_clean', side_effect=SystemExit(42))
+@patch('pyclean.main.descend_and_clean')
 def test_pyclean_git_clean_exit_nonzero_raises(mock_descend, mock_git_clean):
     """
     Does pyclean exit with git-clean's status code when git clean fails?

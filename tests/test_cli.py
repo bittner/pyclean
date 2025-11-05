@@ -42,7 +42,7 @@ def test_entrypoint():
     assert shutil.which('pyclean')
 
 
-@patch('pyclean.cli.modern.pyclean', side_effect=Exception('Error test'))
+@patch('pyclean.cli.main_module.pyclean', side_effect=Exception('Error test'))
 def test_main_handles_exceptions(mock_modern):
     """
     The main CLI entry point handles exceptions gracefully.
@@ -51,7 +51,7 @@ def test_main_handles_exceptions(mock_modern):
         pyclean.cli.main()
 
 
-@patch('pyclean.cli.modern.pyclean')
+@patch('pyclean.cli.main_module.pyclean')
 def test_mandatory_arg_missing(mock_modern):
     """
     Does CLI abort when no path is specified?
@@ -62,7 +62,7 @@ def test_mandatory_arg_missing(mock_modern):
     assert not mock_modern.called
 
 
-@patch('pyclean.cli.modern.pyclean')
+@patch('pyclean.cli.main_module.pyclean')
 def test_mandatory_args(mock_modern):
     """
     Does CLI execute fine when a path is specified?
@@ -221,7 +221,7 @@ def test_version_option():
     assert result.exit_code == 0
 
 
-@patch('pyclean.modern.pyclean')
+@patch('pyclean.main.pyclean')
 def test_default_modern(mock_modern_pyclean):
     """
     Does simply calling `pyclean` invoke the modern implementation?
