@@ -92,18 +92,16 @@ def recursive_delete_debris(directory, patterns):
         delete_filesystem_objects(directory, pattern)
 
     try:
-        subdirs = (
-            Path(entry.path) for entry in os.scandir(directory) if entry.is_dir()
-        )
+        subdirs = [entry for entry in os.scandir(directory) if entry.is_dir()]
     except (OSError, PermissionError) as err:
         log.warning('Cannot access directory %s: %s', directory, err)
         return
 
     for subdir in subdirs:
-        if should_ignore(subdir, Runner.ignore):
-            log.debug('Skipping %s', subdir)
+        if should_ignore(subdir.path, Runner.ignore):
+            log.debug('Skipping %s', subdir.name)
         else:
-            recursive_delete_debris(subdir, patterns)
+            recursive_delete_debris(subdir.path, patterns)
 
 
 def detect_debris_in_directory(directory):

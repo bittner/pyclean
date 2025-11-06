@@ -8,7 +8,7 @@ import platform
 from argparse import Namespace
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from unittest.mock import Mock, call, patch
+from unittest.mock import call, patch
 
 import pytest
 from conftest import SymlinkMock
@@ -18,19 +18,40 @@ from pyclean.bytecode import BYTECODE_DIRS, BYTECODE_FILES
 from pyclean.traversal import descend_and_clean, normalize, should_ignore
 
 
+@patch('pyclean.main.Runner.unlink')
+@patch('pyclean.main.Runner.rmdir')
 @patch('pyclean.traversal.log')
 @patch('os.scandir', return_value=[SymlinkMock()])
-def test_ignore_otherobjects(mock_scandir, mock_log):
-    pyclean.main.Runner.unlink = Mock()
-    pyclean.main.Runner.rmdir = Mock()
+def test_ignore_otherobjects(mock_scandir, mock_log, mock_rmdir, mock_unlink):
+    """
+    Does descend_and_clean log unidentified file objects in verbose mode?
+    """
+    expected_filename = SymlinkMock().path
 
     descend_and_clean(Path(), BYTECODE_FILES, BYTECODE_DIRS)
 
-    assert not pyclean.main.Runner.unlink.called
-    assert not pyclean.main.Runner.rmdir.called
+    assert not mock_unlink.called
+    assert not mock_rmdir.called
     assert mock_log.mock_calls == [
-        call.debug('Ignoring %s (neither a file nor a folder)', SymlinkMock()),
+        call.debug('Ignoring %s (neither a file nor a folder)', expected_filename),
     ]
+
+
+@patch('pyclean.traversal.log')
+def test_skip_ignored_directories(mock_log):
+    """
+    Does descend_and_clean log skipped directories correctly?
+    This ensures verbose output shows path strings, not DirEntry objects.
+    """
+    args = Namespace(dry_run=True, ignore=['.git'])
+    pyclean.main.Runner.configure(args)
+
+    # Our project directory contains the .git folder
+    directory = Path(__file__).parent.parent
+
+    descend_and_clean(directory, BYTECODE_FILES, BYTECODE_DIRS)
+
+    mock_log.debug.assert_called_with('Skipping %s', '.git')
 
 
 @pytest.mark.parametrize(
