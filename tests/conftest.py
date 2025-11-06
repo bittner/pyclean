@@ -22,7 +22,7 @@ class FilesystemObjectMock(Mock):
         name = kwargs['name'] if 'name' in kwargs else args[0]
         super().__init__(autospec=Path(name), **kwargs)
         self.name = name
-        self.path = name  # Add path attribute for os.DirEntry compatibility
+        self.path = name
 
     def __eq__(self, other):
         if not isinstance(other, FilesystemObjectMock):

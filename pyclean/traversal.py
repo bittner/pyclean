@@ -69,4 +69,4 @@ def descend_and_clean(directory, file_types, dir_names):
             if child.name in dir_names:
                 Runner.rmdir(Path(child.path))
         else:
-            log.debug('Ignoring %s (neither a file nor a folder)', child.path)
+            log.debug('Ignoring %s (neither a file nor a folder)', child)

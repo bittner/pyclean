@@ -29,7 +29,7 @@ def test_ignore_otherobjects(mock_scandir, mock_log):
     assert not pyclean.main.Runner.unlink.called
     assert not pyclean.main.Runner.rmdir.called
     assert mock_log.mock_calls == [
-        call.debug('Ignoring %s (neither a file nor a folder)', 'a-symlink'),
+        call.debug('Ignoring %s (neither a file nor a folder)', SymlinkMock()),
     ]
 
 
