@@ -33,7 +33,7 @@ def remove_empty_directories(directory):
         else:
             remove_empty_directories(subdir.path)
             try:
-                if subdir.is_dir() and not any(os.scandir(subdir.path)):
+                if not any(os.scandir(subdir.path)):
                     Runner.rmdir(Path(subdir.path))
             except (OSError, PermissionError) as err:
                 log.debug('Cannot check or remove directory %s: %s', subdir.path, err)
