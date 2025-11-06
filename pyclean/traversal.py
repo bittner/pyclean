@@ -56,17 +56,17 @@ def descend_and_clean(directory, file_types, dir_names):
     Walk and descend a directory tree, cleaning up files of a certain type
     along the way. Only delete directories if they are empty, in the end.
     """
-    for child in sorted(Path(directory).iterdir()):
+    for child in sorted(os.scandir(directory), key=lambda e: e.name):
         if child.is_file():
-            if child.suffix in file_types:
-                Runner.unlink(child)
+            if Path(child.path).suffix in file_types:
+                Runner.unlink(Path(child.path))
         elif child.is_dir():
-            if should_ignore(child, Runner.ignore):
-                log.debug('Skipping %s', child)
+            if should_ignore(child.path, Runner.ignore):
+                log.debug('Skipping %s', child.path)
             else:
-                descend_and_clean(child, file_types, dir_names)
+                descend_and_clean(child.path, file_types, dir_names)
 
             if child.name in dir_names:
-                Runner.rmdir(child)
+                Runner.rmdir(Path(child.path))
         else:
-            log.debug('Ignoring %s (neither a file nor a folder)', child)
+            log.debug('Ignoring %s (neither a file nor a folder)', child.path)
