@@ -19,8 +19,8 @@ from pyclean.traversal import descend_and_clean, normalize, should_ignore
 
 
 @patch('pyclean.traversal.log')
-@patch('pathlib.Path.iterdir', return_value=[SymlinkMock()])
-def test_ignore_otherobjects(mock_iterdir, mock_log):
+@patch('os.scandir', return_value=[SymlinkMock()])
+def test_ignore_otherobjects(mock_scandir, mock_log):
     pyclean.main.Runner.unlink = Mock()
     pyclean.main.Runner.rmdir = Mock()
 
