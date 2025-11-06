@@ -23,7 +23,7 @@ def normalize(path_pattern: str) -> str:
     return path_pattern.replace(os.sep, os.altsep or os.sep)
 
 
-def should_ignore(path, ignore_patterns: list[str]) -> bool:
+def should_ignore(pathname: str, ignore_patterns: list[str]) -> bool:
     """
     Check if a path should be ignored based on ignore patterns.
 
@@ -35,7 +35,7 @@ def should_ignore(path, ignore_patterns: list[str]) -> bool:
     if not ignore_patterns:
         return False
 
-    path = Path(path)
+    path = Path(pathname)
 
     for pattern in ignore_patterns:
         pattern_parts = Path(normalize(pattern)).parts

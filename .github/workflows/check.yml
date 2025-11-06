@@ -25,6 +25,7 @@ jobs:
         env:
         - lint
         - format
+        - mypy
         - package
         - license
     steps:

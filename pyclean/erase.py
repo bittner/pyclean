@@ -5,6 +5,7 @@
 """Freeform target deletion with interactive prompt."""
 
 import logging
+from pathlib import Path
 
 from .runner import Runner
 
@@ -21,7 +22,12 @@ def confirm(message):
         raise SystemExit(msg)
 
 
-def delete_filesystem_objects(directory, path_glob, prompt=False, dry_run=False):
+def delete_filesystem_objects(
+    directory: Path,
+    path_glob: str,
+    prompt=False,
+    dry_run=False,
+):
     """
     Identifies all pathnames matching a specific glob pattern, and attempts
     to delete them in the proper order, optionally asking for confirmation.
@@ -57,7 +63,12 @@ def delete_filesystem_objects(directory, path_glob, prompt=False, dry_run=False)
         Runner.rmdir(dir_object)
 
 
-def remove_freeform_targets(directory, glob_patterns, yes, dry_run=False):
+def remove_freeform_targets(
+    directory: Path,
+    glob_patterns: list[str],
+    yes,
+    dry_run=False,
+):
     """
     Remove free-form targets using globbing.
 

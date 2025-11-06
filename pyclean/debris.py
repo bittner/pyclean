@@ -81,7 +81,7 @@ def remove_debris_for(topic, directory):
     recursive_delete_debris(directory, patterns)
 
 
-def recursive_delete_debris(directory, patterns):
+def recursive_delete_debris(directory: Path, patterns: list[str]):
     """
     Recursively delete debris matching any of the given patterns.
 
@@ -101,7 +101,7 @@ def recursive_delete_debris(directory, patterns):
         if should_ignore(subdir.path, Runner.ignore):
             log.debug('Skipping %s', subdir.name)
         else:
-            recursive_delete_debris(subdir.path, patterns)
+            recursive_delete_debris(Path(subdir.path), patterns)
 
 
 def detect_debris_in_directory(directory):

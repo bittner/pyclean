@@ -58,6 +58,19 @@ exclude_also = ["if __name__ == .__main__.:"]
 show_missing = true
 skip_covered = true
 
+[tool.mypy]
+exclude = [
+  "tests/",
+  "tests\\.py$",
+  "test_.*\\.py$",
+  ".*_tests\\.py$",
+]
+ignore_missing_imports = true
+pretty = true
+warn_redundant_casts = true
+warn_unreachable = true
+warn_unused_ignores = true
+
 [tool.pytest.ini_options]
 addopts = "--color=yes --doctest-modules --junitxml=tests/junit-report.xml --verbose"
 
