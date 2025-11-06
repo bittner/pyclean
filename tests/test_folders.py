@@ -138,6 +138,6 @@ def test_remove_empty_directories_with_nested_error(mock_log, system_error):
 
         mock_log.debug.assert_called_once_with(
             'Cannot check or remove directory %s: %s',
-            subdir,
+            str(subdir),
             system_error,
         )
