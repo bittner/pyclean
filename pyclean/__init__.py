@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""
-Pure Python cross-platform pyclean. Clean up your Python bytecode.
-"""
+"""Pure Python cross-platform pyclean. Clean up your Python bytecode."""
 
-__version__ = '3.3.0'
+__version__ = '3.4.0'

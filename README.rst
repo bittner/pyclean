@@ -241,6 +241,16 @@ inside the current folder. If you omit the final ``tmp/`` you'll leave the
 empty ``tmp`` directory in place. (**WARNING!** Don't put the ``.`` *after*
 the ``--erase`` option! Obviously, your project files will all be deleted.)
 
+Empty directories 📂
+----------------------
+
+PyClean can safely detect and remove empty directories that are left in
+your project after refactoring code.
+
+.. code:: shell
+
+    pyclean . --folders --verbose
+
 Git-clean integration 🏷️
 --------------------------
 
@@ -254,11 +264,11 @@ The ``--ignore`` patterns are honored as exclusions.
 
 .. code:: shell
 
-    pyclean . --git-clean --dry-run
+    pyclean . --debris all --git-clean --dry-run
 
 .. code:: shell
 
-    pyclean . --debris --git-clean --yes
+    pyclean . --ignore .idea .vscode --git-clean --yes
 
 **Note:** Git must be installed for this feature. If a directory is not
 under version control, a warning is logged and pyclean continues.
