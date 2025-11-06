@@ -62,11 +62,11 @@ def descend_and_clean(directory, file_types, dir_names):
                 Runner.unlink(Path(child.path))
         elif child.is_dir():
             if should_ignore(child.path, Runner.ignore):
-                log.debug('Skipping %s', child.path)
+                log.debug('Skipping %s', child.name)
             else:
                 descend_and_clean(child.path, file_types, dir_names)
 
             if child.name in dir_names:
                 Runner.rmdir(Path(child.path))
         else:
-            log.debug('Ignoring %s (neither a file nor a folder)', child)
+            log.debug('Ignoring %s (neither a file nor a folder)', child.name)

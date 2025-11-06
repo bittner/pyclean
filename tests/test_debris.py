@@ -226,7 +226,7 @@ def test_debris_cleanup_scans_directories_once():
 
         def counting_should_ignore(path, patterns):
             call_count['total'] += 1
-            if path.name == '.git':
+            if Path(path).name == '.git':
                 call_count['git_checks'] += 1
             return original_should_ignore(path, patterns)
 
@@ -264,3 +264,21 @@ def test_recursive_delete_debris_error(mock_log, system_error):
         directory,
         mock_scandir.side_effect,
     )
+
+
+@patch('pyclean.debris.log')
+def test_skip_ignored_directories(mock_log):
+    """
+    Does recursive_delete_debris log skipped directories correctly?
+    This ensures verbose output shows path strings, not DirEntry objects.
+    """
+    args = Namespace(dry_run=True, ignore=['.git'])
+    pyclean.main.Runner.configure(args)
+
+    # Our project directory contains the .git folder
+    directory = Path(__file__).parent.parent
+    patterns = ['.cache/**/*', '.cache/']
+
+    recursive_delete_debris(directory, patterns)
+
+    mock_log.debug.assert_called_with('Skipping %s', '.git')

@@ -29,7 +29,7 @@ def remove_empty_directories(directory):
 
     for subdir in subdirs:
         if should_ignore(subdir.path, Runner.ignore):
-            log.debug('Skipping %s', subdir)
+            log.debug('Skipping %s', subdir.name)
         else:
             remove_empty_directories(subdir.path)
             try:

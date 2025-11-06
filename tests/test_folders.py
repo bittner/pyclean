@@ -141,3 +141,20 @@ def test_remove_empty_directories_with_nested_error(mock_log, system_error):
             str(subdir),
             system_error,
         )
+
+
+@patch('pyclean.folders.log')
+def test_skip_ignored_directories(mock_log):
+    """
+    Does remove_empty_directories log skipped directories correctly?
+    This ensures verbose output shows path strings, not DirEntry objects.
+    """
+    args = Namespace(dry_run=True, ignore=['.git'])
+    pyclean.main.Runner.configure(args)
+
+    # Our project directory contains the .git folder
+    directory = Path(__file__).parent.parent
+
+    remove_empty_directories(directory)
+
+    mock_log.debug.assert_called_with('Skipping %s', '.git')
