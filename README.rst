@@ -216,8 +216,8 @@ Python bytecode. The following topics are currently covered:
 
     pyclean . --debris --verbose --dry-run
 
-Remove arbitrary file system objects 🐊
----------------------------------------
+Arbitrary file system objects 🐊
+--------------------------------
 
 PyClean also lets you remove free-form targets using globbing. Note that
 this is **potentially dangerous**: You can delete everything anywhere in
