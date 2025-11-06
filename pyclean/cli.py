@@ -81,7 +81,8 @@ def parse_arguments():
         '--git-clean',
         action='store_true',
         default=False,
-        help='run git clean to remove untracked files',
+        help='run git clean to remove untracked files; this will be interactive'
+        ' unless --yes is used.',
     )
     parser.add_argument(
         '-i',
