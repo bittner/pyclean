@@ -22,20 +22,18 @@ def remove_empty_directories(directory):
     remove directories that are empty.
     """
     try:
-        subdirs = [
-            Path(entry.path) for entry in os.scandir(directory) if entry.is_dir()
-        ]
+        subdirs = [entry for entry in os.scandir(directory) if entry.is_dir()]
     except (OSError, PermissionError) as err:
         log.warning('Cannot access directory %s: %s', directory, err)
         return
 
     for subdir in subdirs:
-        if should_ignore(subdir, Runner.ignore):
+        if should_ignore(subdir.path, Runner.ignore):
             log.debug('Skipping %s', subdir)
         else:
-            remove_empty_directories(subdir)
+            remove_empty_directories(subdir.path)
             try:
-                if next(subdir.iterdir(), None) is None:
-                    Runner.rmdir(subdir)
+                if subdir.is_dir() and not any(os.scandir(subdir.path)):
+                    Runner.rmdir(Path(subdir.path))
             except (OSError, PermissionError) as err:
-                log.debug('Cannot check or remove directory %s: %s', subdir, err)
+                log.debug('Cannot check or remove directory %s: %s', subdir.path, err)

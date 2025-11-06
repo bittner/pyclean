@@ -23,7 +23,7 @@ def normalize(path_pattern: str) -> str:
     return path_pattern.replace(os.sep, os.altsep or os.sep)
 
 
-def should_ignore(path: Path, ignore_patterns: list[str]) -> bool:
+def should_ignore(path, ignore_patterns: list[str]) -> bool:
     """
     Check if a path should be ignored based on ignore patterns.
 
@@ -34,6 +34,8 @@ def should_ignore(path: Path, ignore_patterns: list[str]) -> bool:
     """
     if not ignore_patterns:
         return False
+
+    path = Path(path)
 
     for pattern in ignore_patterns:
         pattern_parts = Path(normalize(pattern)).parts
@@ -54,7 +56,7 @@ def descend_and_clean(directory, file_types, dir_names):
     Walk and descend a directory tree, cleaning up files of a certain type
     along the way. Only delete directories if they are empty, in the end.
     """
-    for child in sorted(directory.iterdir()):
+    for child in sorted(Path(directory).iterdir()):
         if child.is_file():
             if child.suffix in file_types:
                 Runner.unlink(child)
