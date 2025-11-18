@@ -5,7 +5,7 @@
 pyclean |pypi-latest| |conda-latest|
 ====================================
 
-|checks-status| |tests-status| |publish-status| |scrutinizer| |codacy| |python-versions| |python-impl| |license|
+|checks-status| |tests-status| |publish-status| |download-stats| |scrutinizer| |codacy| |python-versions| |python-impl| |license|
 
 Worried about ``.pyc`` files and ``__pycache__`` directories? Fear not!
 PyClean is here to help. Finally, the single-command clean up for Python
@@ -18,6 +18,9 @@ bytecode files in your favorite directories. On any platform.
 .. |pypi-latest| image:: https://img.shields.io/pypi/v/pyclean.svg
    :target: https://pypi.org/project/pyclean
    :alt: Latest version on PyPI
+.. |download-stats| image:: https://img.shields.io/pypi/dm/pyclean.svg
+   :alt: Monthly downloads from PyPI
+   :target: https://pypistats.org/packages/pyclean
 .. |conda-latest| image:: https://img.shields.io/conda/vn/conda-forge/pyclean
    :target: https://anaconda.org/conda-forge/pyclean
    :alt: Latest version on Anaconda
