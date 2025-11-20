@@ -36,8 +36,8 @@ tox list
 ```
 
 ```shell
-# run just linting and the tests for Python 3.12
-tox -e lint,py312
+# run just linting and the tests for Python 3.14
+tox -e lint,py314
 ```
 
 ```shell
@@ -97,4 +97,4 @@ pip install git+https://github.com/bittner/pyclean@feature-branch#egg=pyclean
 
 [pyenv]: https://github.com/pyenv/pyenv#installation
 [tox]: https://tox.wiki/
-[uv]: https://docs.astral.sh/uv/
+[uv]: https://docs.astral.sh/uv/concepts/python-versions/#installing-a-python-version
