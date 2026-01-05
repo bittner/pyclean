@@ -201,6 +201,7 @@ Python bytecode. The following topics are currently covered:
 - Packaging (build files and folders)
 - Pytest (build files and folders)
 - Ruff (ruff cache folder)
+- Complexipy (complexity analysis of python code) – *optional*
 - Jupyter (notebook checkpoints) – *optional*
 - Mypy (mypy cache folder) – *optional*
 - Pyright (pyright app cache folder) – *optional*
