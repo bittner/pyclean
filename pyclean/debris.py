@@ -19,6 +19,10 @@ DEBRIS_TOPICS = {
         '.cache/**/*',
         '.cache/',
     ],
+    'complexipy': [
+        '.complexipy_cache/**/*',
+        '.complexipy_cache/',
+    ],
     'coverage': [
         '.coverage',
         'coverage.json',
