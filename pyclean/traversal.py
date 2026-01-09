@@ -4,6 +4,8 @@
 
 """Directory traversal and ignore pattern matching."""
 
+from __future__ import annotations
+
 import logging
 import os
 from pathlib import Path
@@ -23,7 +25,7 @@ def normalize(path_pattern: str) -> str:
     return path_pattern.replace(os.sep, os.altsep or os.sep)
 
 
-def should_ignore(pathname: str, ignore_patterns: list[str]) -> bool:
+def should_ignore(pathname: str, ignore_patterns: list[str] | None) -> bool:
     """
     Check if a path should be ignored based on ignore patterns.
 
