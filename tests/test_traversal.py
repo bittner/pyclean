@@ -92,8 +92,7 @@ def test_should_ignore(path_str, patterns, expected):
     """
     Does should_ignore correctly match path patterns?
     """
-    path = Path(path_str)
-    result = should_ignore(path, patterns)
+    result = should_ignore(path_str, patterns)
     assert result == expected
 
 
@@ -112,8 +111,7 @@ def test_should_ignore_windows_paths(path_str, patterns, expected):
     Does should_ignore correctly handle Windows-style backslash patterns?
     This test only runs on Windows where backslash is a path separator.
     """
-    path = Path(path_str)
-    result = should_ignore(path, patterns)
+    result = should_ignore(path_str, patterns)
     assert result == expected
 
 
