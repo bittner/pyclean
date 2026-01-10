@@ -4,4 +4,4 @@
 
 """Pure Python cross-platform pyclean. Clean up your Python bytecode."""
 
-__version__ = '3.4.0'
+__version__ = '3.5.0'
