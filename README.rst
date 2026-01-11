@@ -232,7 +232,7 @@ reason, the ``--erase`` option has a few artificial constraints:
 
 .. code:: shell
 
-    pyclean . --erase tmp/**/* tmp/
+    pyclean . --erase 'tmp/**/*' tmp/
 
 The above would delete the entire ``tmp/`` directory with all subdirectories
 inside the current folder. If you omit the final ``tmp/`` you'll leave the
