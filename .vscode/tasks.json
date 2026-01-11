@@ -1,0 +1,236 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Check format",
+      "type": "shell",
+      "command": "tox -e format",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "Check lint",
+      "type": "shell",
+      "command": "tox -e lint",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "Check types",
+      "type": "shell",
+      "command": "tox -e types",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "Check license",
+      "type": "shell",
+      "command": "tox -e license",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "Check package",
+      "type": "shell",
+      "command": "tox -e package",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "Test local Python",
+      "type": "shell",
+      "command": "tox -e py",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "Test Python 3.9",
+      "type": "shell",
+      "command": "tox -e py39",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "Test Python 3.10",
+      "type": "shell",
+      "command": "tox -e py310",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "Test Python 3.11",
+      "type": "shell",
+      "command": "tox -e py311",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "Test Python 3.12",
+      "type": "shell",
+      "command": "tox -e py312",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "Test Python 3.13",
+      "type": "shell",
+      "command": "tox -e py313",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "Test Python 3.14",
+      "type": "shell",
+      "command": "tox -e py314",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    },
+    {
+      "dependsOn": [
+        "Check format",
+        "Check lint",
+        "Check types",
+        "Check license",
+        "Check package"
+      ],
+      "label": "Run checks",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    },
+    {
+      "dependsOn": [
+        "Test Python 3.9",
+        "Test Python 3.10",
+        "Test Python 3.11",
+        "Test Python 3.12",
+        "Test Python 3.13",
+        "Test Python 3.14"
+      ],
+      "label": "Run tests",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    },
+    {
+      "dependsOn": ["Run checks", "Run tests"],
+      "label": "Run checks + tests",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "Clean up workspace",
+      "type": "shell",
+      "command": "tox -e clean",
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "Run Tox",
+      "type": "shell",
+      "command": "tox",
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    }
+  ]
+}
