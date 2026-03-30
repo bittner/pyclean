@@ -13,6 +13,7 @@ import pytest
 from cli_test_helpers import ArgvContext
 
 import pyclean.cli
+import pyclean.ignore
 import pyclean.main
 import pyclean.traversal
 from pyclean.debris import (
@@ -223,7 +224,7 @@ def test_debris_cleanup_scans_directories_once():
         (directory / 'subdir1').mkdir()
         (directory / 'subdir2').mkdir()
 
-        original_should_ignore = pyclean.traversal.should_ignore
+        original_should_ignore = pyclean.ignore.should_ignore
         call_count = {'total': 0, 'git_checks': 0}
 
         def counting_should_ignore(path, patterns):

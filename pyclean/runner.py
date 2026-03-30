@@ -9,6 +9,8 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
+from .ignore import path_is_ignored
+
 if TYPE_CHECKING:
     from argparse import Namespace
     from pathlib import Path
@@ -42,6 +44,10 @@ class CleanupRunner:
         self.unlink_failed = 0
         self.rmdir_count = 0
         self.rmdir_failed = 0
+
+    def is_ignored(self, path: Path) -> bool:
+        """Check if a path or any of its ancestors matches an ignore pattern."""
+        return path_is_ignored(path, self.ignore)
 
 
 Runner = CleanupRunner()

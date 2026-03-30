@@ -38,6 +38,8 @@ def delete_filesystem_objects(
     are empty (for both files & directories) when we attempt to remove them.
     """
     all_names = sorted(directory.glob(path_glob), reverse=True)
+    if Runner.ignore:
+        all_names = [n for n in all_names if not Runner.is_ignored(n)]
     dirs = (name for name in all_names if name.is_dir() and not name.is_symlink())
     files = (name for name in all_names if not name.is_dir() or name.is_symlink())
 

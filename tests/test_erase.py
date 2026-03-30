@@ -14,7 +14,11 @@ from conftest import DirectoryMock, FileMock, SymlinkMock
 
 import pyclean.cli
 import pyclean.main
-from pyclean.erase import confirm, delete_filesystem_objects, remove_freeform_targets
+from pyclean.erase import (
+    confirm,
+    delete_filesystem_objects,
+    remove_freeform_targets,
+)
 
 
 @patch('pyclean.main.remove_freeform_targets')
@@ -213,3 +217,77 @@ def test_confirm_no(mock_input):
     Does confirm return False for 'no' answer?
     """
     assert confirm('Test message') is False
+
+
+def test_path_is_ignored_for_dir_itself():
+    """
+    Does Runner.is_ignored return True for an ignored directory itself?
+    """
+    pyclean.main.Runner.ignore = ['allure-results']
+    assert pyclean.main.Runner.is_ignored(Path('allure-results'))
+
+
+def test_path_is_ignored_for_file_in_ignored_dir():
+    """
+    Does Runner.is_ignored return True for a file inside an ignored directory?
+    """
+    pyclean.main.Runner.ignore = ['allure-results']
+    assert pyclean.main.Runner.is_ignored(Path('allure-results/foo.txt'))
+
+
+def test_path_is_ignored_for_nested_path_in_ignored_dir():
+    """
+    Does Runner.is_ignored return True for a deeply nested path inside an ignored
+    directory?
+    """
+    pyclean.main.Runner.ignore = ['allure-results']
+    assert pyclean.main.Runner.is_ignored(Path('allure-results/sub/deep/file.txt'))
+
+
+def test_path_is_not_ignored_for_unrelated_path():
+    """
+    Does Runner.is_ignored return False for a path not matching any ignore pattern?
+    """
+    pyclean.main.Runner.ignore = ['allure-results']
+    assert not pyclean.main.Runner.is_ignored(Path('keep.txt'))
+    assert not pyclean.main.Runner.is_ignored(Path('other/foo.txt'))
+
+
+def test_delete_filesystem_objects_skips_ignored_dirs(tmp_path):
+    """
+    Does delete_filesystem_objects skip files and directories in ignored paths?
+    """
+    ignored_dir = tmp_path / 'allure-results'
+    ignored_dir.mkdir()
+    ignored_file = ignored_dir / 'foo.txt'
+    ignored_file.write_text('test')
+
+    args = Namespace(dry_run=False, ignore=['allure-results'])
+    pyclean.main.Runner.configure(args)
+
+    delete_filesystem_objects(tmp_path, 'allure-results/**/*', prompt=False)
+
+    assert ignored_file.exists(), 'File in ignored directory should not be deleted'
+
+
+def test_delete_filesystem_objects_erases_non_ignored(tmp_path):
+    """
+    Does delete_filesystem_objects still erase non-ignored paths when ignore is set?
+    """
+    ignored_dir = tmp_path / 'allure-results'
+    ignored_dir.mkdir()
+    ignored_file = ignored_dir / 'foo.txt'
+    ignored_file.write_text('test')
+    non_ignored_file1 = tmp_path / 'keep.txt'
+    non_ignored_file1.write_text('keep')
+    non_ignored_file2 = tmp_path / 'erase.txt'
+    non_ignored_file2.write_text('erase')
+
+    args = Namespace(dry_run=False, ignore=['allure-results'])
+    pyclean.main.Runner.configure(args)
+
+    delete_filesystem_objects(tmp_path, '*.txt', prompt=False)
+
+    assert ignored_file.exists(), 'File in ignored directory should not be deleted'
+    assert not non_ignored_file1.exists(), 'Non-ignored file should be deleted'
+    assert not non_ignored_file2.exists(), 'Non-ignored file should be deleted'

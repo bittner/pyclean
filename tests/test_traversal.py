@@ -15,7 +15,8 @@ from conftest import SymlinkMock
 
 import pyclean.main
 from pyclean.bytecode import BYTECODE_DIRS, BYTECODE_FILES
-from pyclean.traversal import descend_and_clean, normalize, should_ignore
+from pyclean.ignore import normalize, should_ignore
+from pyclean.traversal import descend_and_clean
 
 
 @patch('pyclean.main.Runner.unlink')
