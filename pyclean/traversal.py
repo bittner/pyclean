@@ -53,6 +53,13 @@ def should_ignore(pathname: str, ignore_patterns: list[str] | None) -> bool:
     return False
 
 
+def path_is_ignored(path: Path, ignore_patterns: list[str]) -> bool:
+    """Check if a path or any of its ancestors matches an ignore pattern."""
+    if not isinstance(path, Path):
+        path = Path(str(path))
+    return any(should_ignore(str(p), ignore_patterns) for p in [path, *path.parents])
+
+
 def descend_and_clean(directory, file_types, dir_names):
     """
     Walk and descend a directory tree, cleaning up files of a certain type

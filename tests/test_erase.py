@@ -15,11 +15,11 @@ from conftest import DirectoryMock, FileMock, SymlinkMock
 import pyclean.cli
 import pyclean.main
 from pyclean.erase import (
-    _path_is_ignored,
     confirm,
     delete_filesystem_objects,
     remove_freeform_targets,
 )
+from pyclean.traversal import path_is_ignored
 
 
 @patch('pyclean.main.remove_freeform_targets')
@@ -222,31 +222,31 @@ def test_confirm_no(mock_input):
 
 def test_path_is_ignored_for_dir_itself():
     """
-    Does _path_is_ignored return True for an ignored directory itself?
+    Does path_is_ignored return True for an ignored directory itself?
     """
-    assert _path_is_ignored(Path('allure-results'), ['allure-results'])
+    assert path_is_ignored(Path('allure-results'), ['allure-results'])
 
 
 def test_path_is_ignored_for_file_in_ignored_dir():
     """
-    Does _path_is_ignored return True for a file inside an ignored directory?
+    Does path_is_ignored return True for a file inside an ignored directory?
     """
-    assert _path_is_ignored(Path('allure-results/foo.txt'), ['allure-results'])
+    assert path_is_ignored(Path('allure-results/foo.txt'), ['allure-results'])
 
 
 def test_path_is_ignored_for_nested_path_in_ignored_dir():
     """
-    Does _path_is_ignored return True for a deeply nested path inside an ignored directory?
+    Does path_is_ignored return True for a deeply nested path inside an ignored directory?
     """
-    assert _path_is_ignored(Path('allure-results/sub/deep/file.txt'), ['allure-results'])
+    assert path_is_ignored(Path('allure-results/sub/deep/file.txt'), ['allure-results'])
 
 
 def test_path_is_not_ignored_for_unrelated_path():
     """
-    Does _path_is_ignored return False for a path not matching any ignore pattern?
+    Does path_is_ignored return False for a path not matching any ignore pattern?
     """
-    assert not _path_is_ignored(Path('keep.txt'), ['allure-results'])
-    assert not _path_is_ignored(Path('other/foo.txt'), ['allure-results'])
+    assert not path_is_ignored(Path('keep.txt'), ['allure-results'])
+    assert not path_is_ignored(Path('other/foo.txt'), ['allure-results'])
 
 
 def test_delete_filesystem_objects_skips_ignored_dirs(tmp_path):

@@ -8,16 +8,9 @@ import logging
 from pathlib import Path
 
 from .runner import Runner
-from .traversal import should_ignore
+from .traversal import path_is_ignored
 
 log = logging.getLogger(__name__)
-
-
-def _path_is_ignored(path: Path, ignore_patterns: list[str]) -> bool:
-    """Check if path or any of its ancestors matches an ignore pattern."""
-    if not isinstance(path, Path):
-        path = Path(str(path))
-    return any(should_ignore(str(p), ignore_patterns) for p in [path, *path.parents])
 
 
 def confirm(message):
@@ -47,7 +40,7 @@ def delete_filesystem_objects(
     """
     all_names = sorted(directory.glob(path_glob), reverse=True)
     if Runner.ignore:
-        all_names = [n for n in all_names if not _path_is_ignored(n, Runner.ignore)]
+        all_names = [n for n in all_names if not path_is_ignored(n, Runner.ignore)]
     dirs = (name for name in all_names if name.is_dir() and not name.is_symlink())
     files = (name for name in all_names if not name.is_dir() or name.is_symlink())
 
