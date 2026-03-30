@@ -8,8 +8,8 @@ import logging
 import os
 from pathlib import Path
 
+from .ignore import should_ignore
 from .runner import Runner
-from .traversal import should_ignore
 
 log = logging.getLogger(__name__)
 

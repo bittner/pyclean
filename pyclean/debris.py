@@ -9,8 +9,8 @@ import os
 from pathlib import Path
 
 from .erase import delete_filesystem_objects
+from .ignore import should_ignore
 from .runner import Runner
-from .traversal import should_ignore
 
 log = logging.getLogger(__name__)
 

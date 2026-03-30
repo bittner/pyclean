@@ -237,7 +237,8 @@ def test_path_is_ignored_for_file_in_ignored_dir():
 
 def test_path_is_ignored_for_nested_path_in_ignored_dir():
     """
-    Does Runner.is_ignored return True for a deeply nested path inside an ignored directory?
+    Does Runner.is_ignored return True for a deeply nested path inside an ignored
+    directory?
     """
     pyclean.main.Runner.ignore = ['allure-results']
     assert pyclean.main.Runner.is_ignored(Path('allure-results/sub/deep/file.txt'))
