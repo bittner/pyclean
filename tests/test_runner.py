@@ -109,3 +109,37 @@ def test_dryrun(
     assert not mock_real_rmdir.called
     assert mock_dry_unlink.called
     assert mock_dry_rmdir.called
+
+
+def test_is_ignored_for_dir_itself():
+    """
+    Does Runner.is_ignored return True for an ignored directory itself?
+    """
+    pyclean.main.Runner.ignore = ['allure-results']
+    assert pyclean.main.Runner.is_ignored(Path('allure-results'))
+
+
+def test_is_ignored_for_file_in_ignored_dir():
+    """
+    Does Runner.is_ignored return True for a file inside an ignored directory?
+    """
+    pyclean.main.Runner.ignore = ['allure-results']
+    assert pyclean.main.Runner.is_ignored(Path('allure-results/foo.txt'))
+
+
+def test_is_ignored_for_nested_path_in_ignored_dir():
+    """
+    Does Runner.is_ignored return True for a deeply nested path inside an ignored
+    directory?
+    """
+    pyclean.main.Runner.ignore = ['allure-results']
+    assert pyclean.main.Runner.is_ignored(Path('allure-results/sub/deep/file.txt'))
+
+
+def test_is_not_ignored_for_unrelated_path():
+    """
+    Does Runner.is_ignored return False for a path not matching any ignore pattern?
+    """
+    pyclean.main.Runner.ignore = ['allure-results']
+    assert not pyclean.main.Runner.is_ignored(Path('keep.txt'))
+    assert not pyclean.main.Runner.is_ignored(Path('other/foo.txt'))
