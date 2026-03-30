@@ -70,7 +70,7 @@ def descend_and_clean(directory, file_types, dir_names):
             if Path(child.path).suffix in file_types:
                 Runner.unlink(Path(child.path))
         elif child.is_dir():
-            if should_ignore(child.path, Runner.ignore):
+            if Runner.is_ignored(Path(child.path)):
                 log.debug('Skipping %s', child.name)
             else:
                 descend_and_clean(child.path, file_types, dir_names)

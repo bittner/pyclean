@@ -43,6 +43,12 @@ class CleanupRunner:
         self.rmdir_count = 0
         self.rmdir_failed = 0
 
+    def is_ignored(self, path: Path) -> bool:
+        """Check if a path or any of its ancestors matches an ignore pattern."""
+        from .traversal import path_is_ignored  # avoid circular import at module level
+
+        return path_is_ignored(path, self.ignore)
+
 
 Runner = CleanupRunner()
 

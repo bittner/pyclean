@@ -8,7 +8,6 @@ import logging
 from pathlib import Path
 
 from .runner import Runner
-from .traversal import path_is_ignored
 
 log = logging.getLogger(__name__)
 
@@ -40,7 +39,7 @@ def delete_filesystem_objects(
     """
     all_names = sorted(directory.glob(path_glob), reverse=True)
     if Runner.ignore:
-        all_names = [n for n in all_names if not path_is_ignored(n, Runner.ignore)]
+        all_names = [n for n in all_names if not Runner.is_ignored(n)]
     dirs = (name for name in all_names if name.is_dir() and not name.is_symlink())
     files = (name for name in all_names if not name.is_dir() or name.is_symlink())
 

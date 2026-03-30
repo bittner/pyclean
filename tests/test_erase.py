@@ -19,7 +19,6 @@ from pyclean.erase import (
     delete_filesystem_objects,
     remove_freeform_targets,
 )
-from pyclean.traversal import path_is_ignored
 
 
 @patch('pyclean.main.remove_freeform_targets')
@@ -222,31 +221,35 @@ def test_confirm_no(mock_input):
 
 def test_path_is_ignored_for_dir_itself():
     """
-    Does path_is_ignored return True for an ignored directory itself?
+    Does Runner.is_ignored return True for an ignored directory itself?
     """
-    assert path_is_ignored(Path('allure-results'), ['allure-results'])
+    pyclean.main.Runner.ignore = ['allure-results']
+    assert pyclean.main.Runner.is_ignored(Path('allure-results'))
 
 
 def test_path_is_ignored_for_file_in_ignored_dir():
     """
-    Does path_is_ignored return True for a file inside an ignored directory?
+    Does Runner.is_ignored return True for a file inside an ignored directory?
     """
-    assert path_is_ignored(Path('allure-results/foo.txt'), ['allure-results'])
+    pyclean.main.Runner.ignore = ['allure-results']
+    assert pyclean.main.Runner.is_ignored(Path('allure-results/foo.txt'))
 
 
 def test_path_is_ignored_for_nested_path_in_ignored_dir():
     """
-    Does path_is_ignored return True for a deeply nested path inside an ignored directory?
+    Does Runner.is_ignored return True for a deeply nested path inside an ignored directory?
     """
-    assert path_is_ignored(Path('allure-results/sub/deep/file.txt'), ['allure-results'])
+    pyclean.main.Runner.ignore = ['allure-results']
+    assert pyclean.main.Runner.is_ignored(Path('allure-results/sub/deep/file.txt'))
 
 
 def test_path_is_not_ignored_for_unrelated_path():
     """
-    Does path_is_ignored return False for a path not matching any ignore pattern?
+    Does Runner.is_ignored return False for a path not matching any ignore pattern?
     """
-    assert not path_is_ignored(Path('keep.txt'), ['allure-results'])
-    assert not path_is_ignored(Path('other/foo.txt'), ['allure-results'])
+    pyclean.main.Runner.ignore = ['allure-results']
+    assert not pyclean.main.Runner.is_ignored(Path('keep.txt'))
+    assert not pyclean.main.Runner.is_ignored(Path('other/foo.txt'))
 
 
 def test_delete_filesystem_objects_skips_ignored_dirs(tmp_path):
