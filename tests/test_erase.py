@@ -4,6 +4,7 @@
 
 """Tests for the erase module."""
 
+import logging
 from argparse import Namespace
 from pathlib import Path
 from unittest.mock import call, patch
@@ -251,6 +252,34 @@ def test_path_is_not_ignored_for_unrelated_path():
     pyclean.main.Runner.ignore = ['allure-results']
     assert not pyclean.main.Runner.is_ignored(Path('keep.txt'))
     assert not pyclean.main.Runner.is_ignored(Path('other/foo.txt'))
+
+
+def test_erase_ignored_dir_produces_no_output(tmp_path, caplog):
+    """
+    Does erase suppress all output for ignored directories?
+
+    When a glob pattern matches only ignored paths, the erase feature
+    should not produce any log output about those patterns (regression
+    test for the --ignore flag not fully suppressing --erase targets).
+    """
+    ignored_dir = tmp_path / 'foo'
+    ignored_dir.mkdir()
+    (ignored_dir / 'file.txt').write_text('test')
+    (ignored_dir / 'sub').mkdir()
+    (ignored_dir / 'sub' / 'deep.txt').write_text('test')
+
+    args = Namespace(dry_run=True, ignore=['foo'])
+    pyclean.main.Runner.configure(args)
+
+    with caplog.at_level(logging.DEBUG):
+        remove_freeform_targets(tmp_path, ['foo/**/*', 'foo'], yes=True, dry_run=True)
+
+    assert pyclean.main.Runner.unlink_count == 0
+    assert pyclean.main.Runner.rmdir_count == 0
+    for record in caplog.records:
+        assert 'foo' not in record.message, (
+            f'Ignored pattern should not appear in output: {record.message!r}'
+        )
 
 
 def test_delete_filesystem_objects_skips_ignored_dirs(tmp_path):

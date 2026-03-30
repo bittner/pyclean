@@ -40,6 +40,9 @@ def delete_filesystem_objects(
     all_names = sorted(directory.glob(path_glob), reverse=True)
     if Runner.ignore:
         all_names = [n for n in all_names if not Runner.is_ignored(n)]
+    if not all_names:
+        return
+    log.debug('Erase file system objects matching: %s', path_glob)
     dirs = (name for name in all_names if name.is_dir() and not name.is_symlink())
     files = (name for name in all_names if not name.is_dir() or name.is_symlink())
 
@@ -87,5 +90,4 @@ def remove_freeform_targets(
       object is shown (unless the ``--yes`` option is used, in addition).
     """
     for path_glob in glob_patterns:
-        log.debug('Erase file system objects matching: %s', path_glob)
         delete_filesystem_objects(directory, path_glob, prompt=not yes, dry_run=dry_run)
