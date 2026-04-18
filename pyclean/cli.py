@@ -22,6 +22,7 @@ def parse_arguments():
     debris_optional_topics = ['complexipy', 'jupyter', 'mypy', 'pyright', 'tox']
     debris_choices = ['all', *debris_default_topics, *debris_optional_topics]
     ignore_default_items = [
+        '.direnv',
         '.git',
         '.hg',
         '.svn',
