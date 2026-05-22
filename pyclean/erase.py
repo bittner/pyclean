@@ -4,10 +4,16 @@
 
 """Freeform target deletion with interactive prompt."""
 
-import logging
-from pathlib import Path
+from __future__ import annotations
 
+import logging
+from typing import TYPE_CHECKING
+
+from .ignore import path_is_ignored
 from .runner import Runner
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 log = logging.getLogger(__name__)
 
@@ -27,6 +33,7 @@ def delete_filesystem_objects(
     path_glob: str,
     prompt=False,
     dry_run=False,
+    ignore_patterns: list[str] | None = None,
 ):
     """
     Identifies all pathnames matching a specific glob pattern, and attempts
@@ -38,8 +45,9 @@ def delete_filesystem_objects(
     are empty (for both files & directories) when we attempt to remove them.
     """
     all_names = sorted(directory.glob(path_glob), reverse=True)
-    if Runner.ignore:
-        all_names = [n for n in all_names if not Runner.is_ignored(n)]
+    ignore_patterns = Runner.ignore if ignore_patterns is None else ignore_patterns
+    if ignore_patterns:
+        all_names = [n for n in all_names if not path_is_ignored(n, ignore_patterns)]
     if not all_names:
         return
     log.debug('Erase file system objects matching: %s', path_glob)
@@ -73,6 +81,7 @@ def remove_freeform_targets(
     glob_patterns: list[str],
     yes,
     dry_run=False,
+    explicit_ignore_patterns: list[str] | None = None,
 ):
     """
     Remove free-form targets using globbing.
@@ -90,4 +99,10 @@ def remove_freeform_targets(
       object is shown (unless the ``--yes`` option is used, in addition).
     """
     for path_glob in glob_patterns:
-        delete_filesystem_objects(directory, path_glob, prompt=not yes, dry_run=dry_run)
+        delete_filesystem_objects(
+            directory,
+            path_glob,
+            prompt=not yes,
+            dry_run=dry_run,
+            ignore_patterns=explicit_ignore_patterns,
+        )

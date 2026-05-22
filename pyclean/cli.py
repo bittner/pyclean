@@ -91,7 +91,7 @@ def parse_arguments():
         metavar='DIRECTORY',
         action='extend',
         nargs='+',
-        default=ignore_default_items,
+        default=None,
         help='directory that should be ignored (may be specified multiple times;'
         ' default: %s)' % ' '.join(ignore_default_items),
     )
@@ -135,6 +135,9 @@ def parse_arguments():
         log.debug('Debris topics to scan for: %s', ' '.join(args.debris))
     else:
         args.debris = []
+
+    args.explicit_ignore = args.ignore or []
+    args.ignore = [*ignore_default_items, *args.explicit_ignore]
 
     log.debug('Ignored directories: %s', ' '.join(args.ignore))
 

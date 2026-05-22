@@ -112,6 +112,7 @@ def test_ignore_option():
         args = pyclean.cli.parse_arguments()
 
     assert args.ignore == expected_ignore_list
+    assert args.explicit_ignore == ['foo', 'bar']
 
 
 def test_debris_default_args():

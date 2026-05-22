@@ -50,7 +50,7 @@ def test_erase_loop(mock_delete_fs_obj):
     remove_freeform_targets(directory, patterns, yes=False, dry_run=False)
 
     assert mock_delete_fs_obj.mock_calls == [
-        call(directory, 'foo.txt', prompt=True, dry_run=False),
+        call(directory, 'foo.txt', prompt=True, dry_run=False, ignore_patterns=None),
     ]
 
 
@@ -286,3 +286,80 @@ def test_delete_filesystem_objects_erases_non_ignored(tmp_path):
     assert ignored_file.exists(), 'File in ignored directory should not be deleted'
     assert not non_ignored_file1.exists(), 'Non-ignored file should be deleted'
     assert not non_ignored_file2.exists(), 'Non-ignored file should be deleted'
+
+
+def test_erase_under_default_ignored_ancestor_is_not_blocked(tmp_path):
+    """
+    Does --erase still delete matches in an explicitly named directory
+    under a default ignored ancestor?
+    """
+    target_dir = tmp_path / '.tox' / 'generated' / 'django'
+    target_dir.mkdir(parents=True)
+    target_file = target_dir / 'pyproject.toml'
+    target_file.write_text('[build-system]')
+
+    args = Namespace(
+        directory=[str(target_dir)],
+        debris=[],
+        erase=['**/*'],
+        yes=True,
+        dry_run=False,
+        folders=False,
+        git_clean=False,
+        ignore=[
+            '.direnv',
+            '.git',
+            '.hg',
+            '.svn',
+            '.tox',
+            '.venv',
+            'node_modules',
+            'venv',
+        ],
+        explicit_ignore=[],
+    )
+
+    pyclean.main.pyclean(args)
+
+    assert not target_file.exists(), (
+        'File should be deleted by --erase in target directory'
+    )
+
+
+def test_erase_applies_explicit_ignore_on_top_of_defaults(tmp_path):
+    """
+    Does --erase apply only explicit ignore patterns for filtering matches?
+    """
+    target_dir = tmp_path / '.tox' / 'generated' / 'django'
+    target_dir.mkdir(parents=True)
+    kept_file = target_dir / 'keep.txt'
+    removed_file = target_dir / 'erase.txt'
+    kept_file.write_text('keep')
+    removed_file.write_text('remove')
+
+    args = Namespace(
+        directory=[str(target_dir)],
+        debris=[],
+        erase=['**/*'],
+        yes=True,
+        dry_run=False,
+        folders=False,
+        git_clean=False,
+        ignore=[
+            '.direnv',
+            '.git',
+            '.hg',
+            '.svn',
+            '.tox',
+            '.venv',
+            'node_modules',
+            'venv',
+            'keep.txt',
+        ],
+        explicit_ignore=['keep.txt'],
+    )
+
+    pyclean.main.pyclean(args)
+
+    assert kept_file.exists(), 'Explicitly ignored file should not be deleted'
+    assert not removed_file.exists(), 'Non-ignored file should be deleted'
