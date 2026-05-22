@@ -288,7 +288,7 @@ def test_delete_filesystem_objects_erases_non_ignored(tmp_path):
     assert not non_ignored_file2.exists(), 'Non-ignored file should be deleted'
 
 
-def test_erase_under_default_ignored_ancestor_is_not_blocked(tmp_path):
+def test_erase_in_explicit_target_under_default_ignored_ancestor(tmp_path):
     """
     Does --erase still delete matches in an explicitly named directory
     under a default ignored ancestor?

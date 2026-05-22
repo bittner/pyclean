@@ -7,13 +7,10 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
+from pathlib import Path
 
 from .ignore import path_is_ignored
 from .runner import Runner
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 log = logging.getLogger(__name__)
 
@@ -29,7 +26,7 @@ def confirm(message):
 
 
 def delete_filesystem_objects(
-    directory: Path,
+    directory: Path | str,
     path_glob: str,
     prompt=False,
     dry_run=False,
@@ -43,8 +40,14 @@ def delete_filesystem_objects(
     and first delete *all files* before removing directories. This way we
     make sure that the directories that are deepest down in the hierarchy
     are empty (for both files & directories) when we attempt to remove them.
+
+    If ``ignore_patterns`` is not provided, the current ``Runner.ignore``
+    patterns are used for compatibility with existing internal call sites.
     """
+    directory = Path(directory)
     all_names = sorted(directory.glob(path_glob), reverse=True)
+    # Keep existing behavior for call sites like debris cleanup that invoke
+    # delete_filesystem_objects() directly and rely on Runner.ignore filtering.
     ignore_patterns = Runner.ignore if ignore_patterns is None else ignore_patterns
     if ignore_patterns:
         all_names = [n for n in all_names if not path_is_ignored(n, ignore_patterns)]
@@ -77,7 +80,7 @@ def delete_filesystem_objects(
 
 
 def remove_freeform_targets(
-    directory: Path,
+    directory: Path | str,
     glob_patterns: list[str],
     yes,
     dry_run=False,
@@ -98,6 +101,7 @@ def remove_freeform_targets(
     - A confirmation prompt for the deletion of every single file system
       object is shown (unless the ``--yes`` option is used, in addition).
     """
+    directory = Path(directory)
     for path_glob in glob_patterns:
         delete_filesystem_objects(
             directory,

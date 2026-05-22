@@ -136,8 +136,9 @@ def parse_arguments():
     else:
         args.debris = []
 
-    args.explicit_ignore = args.ignore or []
-    args.ignore = [*ignore_default_items, *args.explicit_ignore]
+    args.explicit_ignore = args.ignore if args.ignore is not None else []
+    # Keep defaults first while deduplicating explicit repeats.
+    args.ignore = list(dict.fromkeys([*ignore_default_items, *args.explicit_ignore]))
 
     log.debug('Ignored directories: %s', ' '.join(args.ignore))
 
