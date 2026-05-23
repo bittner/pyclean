@@ -242,6 +242,11 @@ inside the current folder. If you omit the final ``tmp/`` you'll leave the
 empty ``tmp`` directory in place. (**WARNING!** Don't put the ``.`` *after*
 the ``--erase`` option! Obviously, your project files will all be deleted.)
 
+``--erase`` matches are filtered only by patterns you pass explicitly to
+``--ignore``; the built-in default ignore list (``.git``, ``.tox``, ``.venv``,
+…) does **not** restrict ``--erase``. This lets you wipe contents inside a
+directory like ``.tox/generated/`` when you name it explicitly.
+
 Empty directories 📂
 ----------------------
 

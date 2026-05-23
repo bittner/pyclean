@@ -100,13 +100,19 @@ def remove_freeform_targets(
       is empty when it is attempted to be deleted.
     - A confirmation prompt for the deletion of every single file system
       object is shown (unless the ``--yes`` option is used, in addition).
+
+    Only ``explicit_ignore_patterns`` (typically the user's ``--ignore``
+    values) constrain ``--erase`` matches. The built-in default ignore
+    list does not restrict ``--erase`` — when no explicit ignore patterns
+    are given, every match is deleted.
     """
     directory = Path(directory)
+    ignore_patterns = explicit_ignore_patterns or []
     for path_glob in glob_patterns:
         delete_filesystem_objects(
             directory,
             path_glob,
             prompt=not yes,
             dry_run=dry_run,
-            ignore_patterns=explicit_ignore_patterns,
+            ignore_patterns=ignore_patterns,
         )
