@@ -4,9 +4,12 @@
 
 """Freeform target deletion with interactive prompt."""
 
+from __future__ import annotations
+
 import logging
 from pathlib import Path
 
+from .ignore import path_is_ignored
 from .runner import Runner
 
 log = logging.getLogger(__name__)
@@ -23,10 +26,11 @@ def confirm(message):
 
 
 def delete_filesystem_objects(
-    directory: Path,
+    directory: Path | str,
     path_glob: str,
     prompt=False,
     dry_run=False,
+    ignore_patterns: list[str] | None = None,
 ):
     """
     Identifies all pathnames matching a specific glob pattern, and attempts
@@ -36,10 +40,17 @@ def delete_filesystem_objects(
     and first delete *all files* before removing directories. This way we
     make sure that the directories that are deepest down in the hierarchy
     are empty (for both files & directories) when we attempt to remove them.
+
+    If ``ignore_patterns`` is not provided, the current ``Runner.ignore``
+    patterns are used for compatibility with existing internal call sites.
     """
+    directory = Path(directory)
     all_names = sorted(directory.glob(path_glob), reverse=True)
-    if Runner.ignore:
-        all_names = [n for n in all_names if not Runner.is_ignored(n)]
+    # Keep existing behavior for call sites like debris cleanup that invoke
+    # delete_filesystem_objects() directly and rely on Runner.ignore filtering.
+    ignore_patterns = Runner.ignore if ignore_patterns is None else ignore_patterns
+    if ignore_patterns:
+        all_names = [n for n in all_names if not path_is_ignored(n, ignore_patterns)]
     if not all_names:
         return
     log.debug('Erase file system objects matching: %s', path_glob)
@@ -69,10 +80,11 @@ def delete_filesystem_objects(
 
 
 def remove_freeform_targets(
-    directory: Path,
+    directory: Path | str,
     glob_patterns: list[str],
     yes,
     dry_run=False,
+    explicit_ignore_patterns: list[str] | None = None,
 ):
     """
     Remove free-form targets using globbing.
@@ -88,6 +100,19 @@ def remove_freeform_targets(
       is empty when it is attempted to be deleted.
     - A confirmation prompt for the deletion of every single file system
       object is shown (unless the ``--yes`` option is used, in addition).
+
+    Only ``explicit_ignore_patterns`` (typically the user's ``--ignore``
+    values) constrain ``--erase`` matches. The built-in default ignore
+    list does not restrict ``--erase`` — when no explicit ignore patterns
+    are given, every match is deleted.
     """
+    directory = Path(directory)
+    ignore_patterns = explicit_ignore_patterns or []
     for path_glob in glob_patterns:
-        delete_filesystem_objects(directory, path_glob, prompt=not yes, dry_run=dry_run)
+        delete_filesystem_objects(
+            directory,
+            path_glob,
+            prompt=not yes,
+            dry_run=dry_run,
+            ignore_patterns=ignore_patterns,
+        )

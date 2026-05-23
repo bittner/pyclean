@@ -31,7 +31,13 @@ def pyclean(args):
         for topic in args.debris:
             remove_debris_for(topic, dir_path)
 
-        remove_freeform_targets(dir_path, args.erase, args.yes, args.dry_run)
+        remove_freeform_targets(
+            dir_path,
+            args.erase,
+            args.yes,
+            args.dry_run,
+            explicit_ignore_patterns=getattr(args, 'explicit_ignore', []),
+        )
 
         if args.folders:
             log.debug('Removing empty directories...')

@@ -112,6 +112,29 @@ def test_ignore_option():
         args = pyclean.cli.parse_arguments()
 
     assert args.ignore == expected_ignore_list
+    assert args.explicit_ignore == ['foo', 'bar']
+
+
+def test_ignore_defaults_without_option():
+    """
+    Does --ignore still default to the built-in ignore list?
+    """
+    default = [
+        '.direnv',
+        '.git',
+        '.hg',
+        '.svn',
+        '.tox',
+        '.venv',
+        'node_modules',
+        'venv',
+    ]
+
+    with ArgvContext('pyclean', '.'):
+        args = pyclean.cli.parse_arguments()
+
+    assert args.ignore == default
+    assert args.explicit_ignore == []
 
 
 def test_debris_default_args():
