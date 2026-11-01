@@ -145,6 +145,7 @@ def test_debris_default_args():
         args = pyclean.cli.parse_arguments()
 
     assert args.debris == ['cache', 'coverage', 'package', 'pytest', 'ruff']
+    assert args.debris_without_topics
 
 
 def test_debris_optional_args():
@@ -192,6 +193,7 @@ def test_debris_explicit_args():
         args = pyclean.cli.parse_arguments()
 
     assert args.debris == ['package', 'pytest']
+    assert not args.debris_without_topics
 
 
 def test_debris_invalid_args():

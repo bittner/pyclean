@@ -184,14 +184,59 @@ def test_suggest_debris_with_artifacts(mock_descend, mock_log):
 @patch('pyclean.main.descend_and_clean')
 def test_no_suggest_debris_when_used(mock_descend, mock_log):
     """
-    Does pyclean NOT suggest --debris when it's already used?
+    Does pyclean avoid suggesting the base --debris option when it's already used?
     """
     with TemporaryDirectory() as tmp, ArgvContext('pyclean', tmp, '--debris'):
         pyclean.cli.main()
 
-    # Check that the suggestion was NOT logged
+    # The base hint is replaced by the optional-topics hint.
     log_info_calls = [str(call) for call in mock_log.info.call_args_list]
-    assert not any('Hint: Use --debris' in msg for msg in log_info_calls)
+    assert not any(
+        'Hint: Use --debris to also clean up' in msg for msg in log_info_calls
+    )
+    assert any('Hint: Use --debris all' in msg for msg in log_info_calls)
+
+
+@pytest.mark.parametrize('option', ['-d', '--debris'])
+@patch('pyclean.debris.log')
+def test_suggest_optional_debris_topics(mock_log, option):
+    """Does bare --debris identify optional topics left behind?"""
+    with TemporaryDirectory() as tmp:
+        directory = Path(tmp)
+        (directory / '.ipynb_checkpoints').mkdir()
+        (directory / '.mypy_cache').mkdir()
+        (directory / '.pytest_cache').mkdir()
+
+        with ArgvContext('pyclean', tmp, option):
+            pyclean.cli.main()
+
+    mock_log.info.assert_called_once_with(
+        'Hint: Use --debris all or specify optional topics to clean up '
+        'more aggressively. Detected: %s',
+        'jupyter mypy',
+    )
+
+
+@patch('pyclean.debris.log')
+def test_suggest_optional_debris_topics_without_artifacts(mock_log):
+    """Does bare --debris still explain how to include optional topics?"""
+    with TemporaryDirectory() as tmp, ArgvContext('pyclean', tmp, '--debris'):
+        pyclean.cli.main()
+
+    mock_log.info.assert_called_once_with(
+        'Hint: Use --debris all or specify optional topics to clean up '
+        'more aggressively.',
+    )
+
+
+@pytest.mark.parametrize('topic', ['mypy', 'all'])
+@patch('pyclean.debris.log')
+def test_no_optional_hint_with_explicit_debris_topics(mock_log, topic):
+    """Does an explicit choice suppress the optional topic hint?"""
+    with TemporaryDirectory() as tmp, ArgvContext('pyclean', tmp, '-d', topic):
+        pyclean.cli.main()
+
+    mock_log.info.assert_not_called()
 
 
 def test_ignore_with_debris_cleanup():
