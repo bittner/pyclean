@@ -8,7 +8,11 @@ import logging
 from pathlib import Path
 
 from .bytecode import BYTECODE_DIRS, BYTECODE_FILES
-from .debris import remove_debris_for, suggest_debris_option
+from .debris import (
+    remove_debris_for,
+    suggest_debris_option,
+    suggest_optional_debris_topics,
+)
 from .erase import remove_freeform_targets
 from .folders import remove_empty_directories
 from .gitclean import execute_git_clean
@@ -67,3 +71,5 @@ def pyclean(args):
 
     if not args.debris:
         suggest_debris_option(args)
+    elif getattr(args, 'debris_without_topics', False):
+        suggest_optional_debris_topics(args)
