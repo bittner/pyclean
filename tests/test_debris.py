@@ -106,6 +106,27 @@ def test_debris_recursive():
         assert dir_nested_topic.parent.exists()
 
 
+def test_debris_coverage_parallel_data_files():
+    """
+    Are the data files of parallel coverage runs deleted, but not the
+    coverage configuration?
+    """
+    with TemporaryDirectory() as tmp:
+        directory = Path(tmp)
+        data_files = [
+            directory / '.coverage.myhost.pid1234.XqzCbEdx',
+            directory / '.coverage.myhost.pid1234.XqzCbEdx.Ha0jIIxXkNjh',
+        ]
+        config_file = directory / '.coveragerc'
+        for file in [*data_files, config_file]:
+            file.touch()
+
+        remove_debris_for('coverage', directory)
+
+        assert not any(file.exists() for file in data_files)
+        assert config_file.exists()
+
+
 def test_detect_debris_in_directory():
     """
     Does ``detect_debris_in_directory()`` identify debris artifacts?

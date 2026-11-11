@@ -25,6 +25,7 @@ DEBRIS_TOPICS = {
     ],
     'coverage': [
         '.coverage',
+        '.coverage.*.pid*.X*',
         'coverage.json',
         'coverage.lcov',
         'coverage.xml',
