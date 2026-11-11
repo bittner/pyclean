@@ -200,7 +200,7 @@ popular Python development tools in their default locations, along with
 Python bytecode. The following topics are currently covered:
 
 - Cache (general purpose folder for several tools, e.g. Python eggs, legacy Pytest)
-- Coverage (coverage database, and supported file formats)
+- Coverage (coverage database, also of parallel runs, and supported file formats)
 - Packaging (build files and folders)
 - Pytest (build files and folders)
 - Ruff (ruff cache folder)
