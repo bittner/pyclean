@@ -80,19 +80,6 @@
       }
     },
     {
-      "label": "Test Python 3.9",
-      "type": "shell",
-      "command": "tox -e py39",
-      "group": {
-        "kind": "test",
-        "isDefault": false
-      },
-      "presentation": {
-        "focus": true,
-        "reveal": "silent"
-      }
-    },
-    {
       "label": "Test Python 3.10",
       "type": "shell",
       "command": "tox -e py310",
@@ -158,6 +145,19 @@
       }
     },
     {
+      "label": "Test Python 3.15",
+      "type": "shell",
+      "command": "tox -e py315",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "focus": true,
+        "reveal": "silent"
+      }
+    },
+    {
       "dependsOn": [
         "Check format",
         "Check lint",
@@ -177,12 +177,12 @@
     },
     {
       "dependsOn": [
-        "Test Python 3.9",
         "Test Python 3.10",
         "Test Python 3.11",
         "Test Python 3.12",
         "Test Python 3.13",
-        "Test Python 3.14"
+        "Test Python 3.14",
+        "Test Python 3.15"
       ],
       "label": "Run tests",
       "group": {
