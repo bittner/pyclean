@@ -68,6 +68,9 @@ quote-style = "single"
 extend-select = ["ALL"]
 extend-ignore = ["ANN", "B904", "D", "FBT002", "INP001", "Q000", "UP"]
 
+[tool.ruff.lint.flake8-copyright]
+notice-rgx = "SPDX-FileCopyrightText: \\d{4}"
+
 [tool.ruff.lint.flake8-quotes]
 inline-quotes="single"
 

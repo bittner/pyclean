@@ -98,7 +98,7 @@ def test_quiet_logging(mock_descend, mock_logconfig):
 @patch('pyclean.main.suggest_debris_option')
 @patch('pyclean.runner.CleanupRunner.configure')
 @patch('pyclean.main.log')
-def test_report_failures(  # noqa: PLR0913
+def test_report_failures(  # noqa: PLR0913, PLR0917
     mock_log,
     mock_configure,
     mock_suggest,
