@@ -127,6 +127,7 @@ def parse_arguments():
     if args.yes and not args.erase and not args.git_clean:
         parser.error('Specifying --yes only makes sense with --erase or --git-clean.')
 
+    args.debris_without_topics = 'debris' in args and not args.debris
     if 'debris' in args:
         if 'all' in args.debris:
             args.debris = debris_default_topics + debris_optional_topics

@@ -150,3 +150,25 @@ def suggest_debris_option(args):
             'Hint: Use --debris to also clean up build artifacts '
             'from common Python development tools.',
         )
+
+
+def suggest_optional_debris_topics(args):
+    """Suggest optional topics when --debris was used without topic arguments."""
+    detected_topics = set()
+    for dir_name in args.directory:
+        dir_path = Path(dir_name)
+        if dir_path.exists():
+            detected_topics.update(detect_debris_in_directory(dir_path))
+
+    optional_detected = sorted(detected_topics - set(args.debris))
+    if optional_detected:
+        log.info(
+            'Hint: Use --debris all or specify optional topics to clean up '
+            'more aggressively. Detected: %s',
+            ' '.join(optional_detected),
+        )
+    else:
+        log.info(
+            'Hint: Use --debris all or specify optional topics to clean up '
+            'more aggressively.',
+        )
